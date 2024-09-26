@@ -20,11 +20,10 @@ This website showcases the activities, events, and achievements of the society, 
 ## Getting Started
 
 To get a local copy of the project and run it locally:
-
+```bash
 ### 1. Clone the repository
 git clone https://github.com/Nithin-2005-dev/Electra_Website.git
 cd Electra_Website
-```bash
 ### 2. Install Dependencies
 npm install
 # or
