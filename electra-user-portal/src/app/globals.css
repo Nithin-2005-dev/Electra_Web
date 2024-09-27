@@ -6,10 +6,13 @@
   --background: #ffffff;
   --foreground: #171717;
 }
-
+body{
+  background: #070F2B;
+  color: whitesmoke;
+}
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #303031;
     --foreground: #ededed;
   }
 }
