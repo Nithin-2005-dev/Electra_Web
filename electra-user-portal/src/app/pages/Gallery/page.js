@@ -1,4 +1,4 @@
-import Header from "@/components/header/page.js"
+import Header from "@/components/header/Header"
 const Gallery = () => {
   return (
     <>
