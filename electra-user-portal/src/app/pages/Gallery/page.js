@@ -1,10 +1,9 @@
-import Header from "@/components/header/page"
-
+import Header from "@/components/header/page.js"
 const Gallery = () => {
   return (
     <>
     <Header/>
-      you are in gallery
+    you are in gallery page
     </>
   )
 }

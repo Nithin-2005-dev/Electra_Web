@@ -1,23 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+*{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
 }
 body{
-  background: #070F2B;
   color: whitesmoke;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #303031;
-    --foreground: #ededed;
-  }
+  background-color: #070F2B;
 }
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+::-webkit-scrollbar{
+  display: none;
 }

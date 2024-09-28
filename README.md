@@ -52,3 +52,10 @@ project structure
 ├── public       # Static assets
 ├── styles       # custom styles with css modules
 └── README.md    # Project documentation
+
+packages
+->three.js three/fibre three/drei #3d model rendering
+->shadcn #ui components
+->react icons #custom icons
+->hover.css #for hovering effect of buttons [https://github.com/IanLunn/Hover]
+->react-verticle-components #event-timeline
