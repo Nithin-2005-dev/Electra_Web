@@ -14,8 +14,8 @@ const Header = () => {
         <Link href={'/pages/Gallery'}  className={isActive('/pages/Gallery')?'text-orange-400':'text-white'}>
             Gallery
         </Link>
-        <Link href={'/pages/About'}  className={isActive('/pages/About')?'text-orange-400':'text-white'}>
-            About Us
+        <Link href={'/pages/Resources'}  className={isActive('/pages/Resources')?'text-orange-400':'text-white'}>
+            Resources
         </Link>
         <Link href={'/pages/Team'}  className={isActive('/pages/Team')?'text-orange-400':'text-white'}>
             Core-Team
