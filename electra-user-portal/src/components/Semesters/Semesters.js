@@ -15,7 +15,7 @@ const Semesters = () => {
       <div className='w-[55vw]'>
       {
             images.map((image)=>{
-              return   <Card.Img src={image} className='w-[15vw] inline-block m-3 cursor-pointer'/>
+              return   <Card.Img src={image} className='w-[15vw] inline-block m-3 cursor-pointer hover:scale-110'/>
             })
         }
       </div>
