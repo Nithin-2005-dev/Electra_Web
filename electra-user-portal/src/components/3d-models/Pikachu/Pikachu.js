@@ -6,18 +6,24 @@ Source: https://sketchfab.com/3d-models/pikachu-37c740f674cd4719a1d1d2970bbe8c30
 Title: Pikachu
 */
 'use client'
-import React, { useEffect, useRef } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useGLTF, useAnimations } from '@react-three/drei'
+import { AnimationStore } from '@/app/store/AnimationStore';
 
 export default function Pikachu(props) {
+  const {pikaAnimation}=useContext(AnimationStore)
+  const size=window.innerWidth<550?1.3:2.5;
   const group = useRef()
   const { nodes, materials, animations } = useGLTF('/pika.glb')
   const { actions,names } = useAnimations(animations, group)
+  const [past,present]=useState(pikaAnimation);
   useEffect(()=>{
-    actions[names[1]].play()
+    actions[names[past]].stop();
+    actions[names[pikaAnimation]].play();
+    present(pikaAnimation)
   })
   return (
-    <group ref={group} {...props} dispose={null} scale={2.5} position={[0.2,-1.5,0]}>
+    <group ref={group} {...props} dispose={null} scale={size} position={[0.2,-1.5,0]}>
       <group name="Sketchfab_Scene">
         <primitive object={nodes.GLTF_created_0_rootJoint} />
         <skinnedMesh

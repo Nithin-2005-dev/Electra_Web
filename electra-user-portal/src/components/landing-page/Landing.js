@@ -4,12 +4,16 @@ import LightninigBold from '../3d-models/lightning-bolt'
 import { Environment} from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import {motion} from 'framer-motion'
-import ReactTypingEffect from 'react-typing-effect'
+import Typewriter from 'typewriter-effect';
 const Landing = () => {
+  new Typewriter('#typewriter', {
+    strings: ['Hello', 'World'],
+    autoStart: true,
+  });
   return (
     <>
        <div className={`flex items-center`}>
-      <div className="w-1/2 flex flex-col p-4 gap-3 flex-wrap">
+       <div className="w-1/2 flex flex-col p-4 gap-3 flex-wrap">
       <motion.div className="border-l-4 border-yellow-300 " initial={{
         x:-1000,
       }}
@@ -22,26 +26,23 @@ const Landing = () => {
         }
       }}
       >
-      <span className='font-bold text-2xl lg:text-5xl sm:text-lg text-blue-200 md:text-3xl'>Electra Society:</span>
-      <ReactTypingEffect eraseSpeed={120} eraseDelay={1} speed={120}
-        text={["Powering Innovation & Excellence"]}
-        cursorRenderer={cursor => <h1 className='font-extralight text-2xl lg:text-5xl sm:text-xl md:text:3xl'>{cursor}</h1>}
-        displayTextRenderer={(text, i) => {
-          return (
-            <span className='font-bold text-2xl lg:text-5xl sm:text-lg text-rose-200'>
-              {text.split('').map((char, i) => {
-                const key = `${i}`;
-                return (
-                  <span
-                    key={key}
-                    style={i%2 === 0 ? { color: ''} : {}}
-                  >{char}</span>
-                );
-              })}
-            </span>
-          );
-        }}        
-      />
+      <span className='font-bold text-2xl lg:text-5xl sm:text-lg text-blue-200 md:text-3xl'>Electra Society:
+      <span className='text-red-200 inline-block'>
+      <Typewriter options={
+        {
+          loop:true,
+          delay:200
+        }
+      }
+  onInit={(typewriter) => {
+    typewriter.typeString('Powering Innovation & Excellence')
+    .deleteAll()
+    .pauseFor(1000)
+    .start();
+  }}
+/>
+      </span>
+      </span>
       </motion.div>
       <motion.div className="text-lg lg:text-2xl sm:text-base font-serif" initial={{
         x:-1000,
