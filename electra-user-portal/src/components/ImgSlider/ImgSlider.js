@@ -9,7 +9,7 @@ const ImgSlider = () => {
   return (
     <div className={`bg-cover h-[45vh] ${styles['res-slider']}`}>
     <div className={`text-center font-black text-3xl p-4 ${styles['permanent-marker-regular']}`}>Memorable Moments</div>
-      <Carousel fade nextIcon={<IoCaretForward className='text-5xl text-slate-100 opacity-100' />} prevIcon={<IoCaretBack className='text-5xl text-slate-100 opacity-100' />}>
+      <Carousel keyboard fade pause={true} nextIcon={<IoCaretForward className='text-5xl text-slate-100 opacity-100'/>} prevIcon={<IoCaretBack className='text-5xl text-slate-100 opacity-100'/>}>
       {
         imgs.map((pic)=>{
             return  <CarouselItem interval={3000} key={pic}>
