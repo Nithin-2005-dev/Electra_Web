@@ -31,7 +31,7 @@ const PhotoGroup = () => {
         },
        ];
   return (
-    <div className='flex flex-wrap justify-center items-center gap-3'>
+    <div className='flex flex-wrap justify-center items-center gap-3 my-4'>
     {items.map((item)=>{
       return  <>
       <GalleryCard item={item} key={item.likes}/>

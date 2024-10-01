@@ -8,7 +8,7 @@ const HeroText = () => {
   const {setPikaAnimation}=useContext(AnimationStore)
   return (
     <>
-     <div className='flex flex-col w-[50vw] justify-center items-start content-center gap-3 px-2 lg:p-8 md:px-5 resource-res' onMouseOver={()=>{
+     <div className='flex flex-col w-[50vw] justify-center items-start content-center gap-3 px-2 resource-res' onMouseOver={()=>{
           setPikaAnimation(1)
       }}
       onMouseLeave={()=>{
@@ -33,7 +33,7 @@ The Electrical Engineering Department at NIT Silchar is committed to providing y
 Whether you’re looking for lecture notes, preparing for exams, or working on your projects, our Resources Hub is here to assist you every step of the way. 
 </div>
 <div>
-<button className={`bg-[#AD49E1] font-bold p-1 px-2 rounded-xl ${styles['hvr-buzz-out']} hover:border-white hover:border-2 text-xs md:text-lg lg:text-xl`}>Course structure<IoCloudDownloadSharp className={`inline mx-1`}/></button>
+<button className={`bg-[#AD49E1] font-bold p-1 px-2 rounded-xl ${styles['hvr-buzz-out']} hover:border-white hover:border-2 text-sm md:text-lg lg:text-2xl`}>Course structure<IoCloudDownloadSharp className={`inline mx-1`}/></button>
 </div>
     </div> 
     </>

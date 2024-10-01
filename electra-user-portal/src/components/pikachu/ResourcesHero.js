@@ -17,12 +17,13 @@ useMotionValueEvent(scrollY, "change", (latest) => {
 })
   return (
     <div className='flex flex-col'>
-    <button className={`bg-[#AD49E1] font-bold p-1 px-2 rounded-xl hover:border-white hover:border-2 ${styles['doubt-btn']} text-xs md:text-lg lg:text-xl `} onClick={()=>{
+    <button className={`bg-[#AD49E1] font-bold p-1 px-2 rounded-xl hover:border-white hover:border-2 ${styles['doubt-btn']} text-sm md:text-lg lg:text-2xl `} onClick={()=>{
         setDoubt(!doubt)
     }}>{doubt? 'Doubt cleared?':'Ask Pikachu'}</button>
     <div className='flex w-[50vw] h-[90vh]'>
       <div className='fixed right-0' onMouseOver={()=>{
           setPikaAnimation(2)
+
       }}
       onMouseLeave={()=>{
           setPikaAnimation(1)

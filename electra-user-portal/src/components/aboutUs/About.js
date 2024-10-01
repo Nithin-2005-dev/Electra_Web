@@ -22,7 +22,7 @@ const AboutUs = () => {
             </div>
             <div className='font-bold text-2xl text-fuchsia-200'>{pillar.name}</div>
             </div>
-                <div className={`text-left ${styles['edu-au-vic-wa-nt-guide ']} text-blue-100 font-semibold text-xs`}>{pillar.Info}</div>
+                <div className={`text-left ${styles['edu-au-vic-wa-nt-guide ']} text-blue-100 font-semibold text-xs lg:text-lg`}>{pillar.Info}</div>
             </div>
             <hr className='mx-3 border-3 border-white'/>
             </>
