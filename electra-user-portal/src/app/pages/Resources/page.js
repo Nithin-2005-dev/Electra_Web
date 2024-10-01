@@ -7,10 +7,11 @@ import Semesters from "@/components/Semesters/Semesters"
 const Resources = () => {
   return (
     <AnimationStoreProvider>
-    <div className="flex flex-col gap-16 md:gap-6">
+    <div className="flex flex-col gap-20 md:gap-6">
     <Header/>
-    </div>
     <ResourcesHero/>
+    </div>
+    
     <Semesters/>
     </AnimationStoreProvider>
   )
