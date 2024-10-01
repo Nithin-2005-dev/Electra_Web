@@ -13,9 +13,9 @@ const GalleryCard = ({item}) => {
     const [comment,setComment]=useState(false)
   return (
     <div>
-      <Card style={{ width: '22rem' }}>
-      <CardHeader className='text-center bg-[#070F2B] text-neutral-300 font-bold'>Event Name</CardHeader>
-      <span className='absolute -right-2 -top-2 text-xl'>
+      <Card className='w-[70vw] lg:w-[30vw] sm:w-[40vw]'>
+      <CardHeader className='text-center bg-[#070F2B] text-neutral-300 font-bold text-xs md:text-base lg:text-lg'>Event Name</CardHeader>
+      <span className='absolute -right-2 -top-2 text-base lg:text-xl'>
       <Badge pill bg="danger">
       <FaHeart></FaHeart>{item.likes}
       </Badge>
@@ -23,15 +23,15 @@ const GalleryCard = ({item}) => {
       <Card.Img variant="top" src={item.image} />
     </Card>
     <CardFooter>
-    <div className='flex gap-4 p-2 text-blue-400 text-lg'>
-        <div><AiTwotoneLike /></div>
+    <div className='flex gap-4 p-2 text-blue-400 text-2xl w-full justify-evenly border-1 border-t-0 border-white '>
+        <div className='hover:scale-110'><AiTwotoneLike /></div>
         <div onClick={()=>{
             setComment(true)
-        }}><FaComments /></div>
+        }} className='hover:scale-110'><FaComments /></div>
         <div onClick={()=>{
             setFullPic(true)
-        }}><BsArrowsFullscreen /></div>
-        <div><FaDownload /></div>
+        }} className='hover:scale-110'><BsArrowsFullscreen /></div>
+        <div className='hover:scale-110'><FaDownload /></div>
     </div>
     </CardFooter>
     <FullPhoto item={item} setFullPic={setFullPic} fullPic={fullPic}/>

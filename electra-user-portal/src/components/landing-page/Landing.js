@@ -12,7 +12,7 @@ const Landing = () => {
   });
   return (
     <>
-       <div className={`flex items-center`}>
+       <div className={`flex items-center h-[100vh]`}>
        <div className="w-1/2 flex flex-col p-4 gap-3 flex-wrap">
       <motion.div className="border-l-4 border-yellow-300 " initial={{
         x:-1000,
@@ -65,7 +65,7 @@ const Landing = () => {
           duration:10
         }
       }}>
-      <Canvas style={{width:'50vw',height:'80vh'}} shadows>
+      <Canvas style={{width:'50vw',height:'93vh'}} shadows>
       <LightninigBold />
       <Environment preset="park"/>
       </Canvas>

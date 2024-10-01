@@ -16,15 +16,21 @@ useMotionValueEvent(scrollY, "change", (latest) => {
   setPikaAnimation(0)
 })
   return (
-    <>
-    <button className={`bg-[#AD49E1] font-bold p-1 px-2 rounded-xl hover:border-white hover:border-2 ${styles['doubt-btn']} `} onClick={()=>{
+    <div className='flex flex-col'>
+    <button className={`bg-[#AD49E1] font-bold p-1 px-2 rounded-xl hover:border-white hover:border-2 ${styles['doubt-btn']} text-xs md:text-lg lg:text-xl `} onClick={()=>{
         setDoubt(!doubt)
-    }}>{doubt? 'Doubt cleared?':'Ask a Doubt to Pikachu?'}</button>
+    }}>{doubt? 'Doubt cleared?':'Ask Pikachu'}</button>
     <div className='flex w-[50vw] h-[90vh]'>
       <div className='fixed right-0' onMouseOver={()=>{
           setPikaAnimation(2)
       }}
       onMouseLeave={()=>{
+          setPikaAnimation(1)
+      }}
+      onTouchStart={()=>{
+          setPikaAnimation(2)
+      }}
+      onTouchEnd={()=>{
           setPikaAnimation(1)
       }}
       >
@@ -40,7 +46,7 @@ useMotionValueEvent(scrollY, "change", (latest) => {
         doubt && <GenAi/>
       }
     </div>
-    </>
+    </div>
   )
 }
 

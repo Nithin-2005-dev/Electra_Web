@@ -1,5 +1,4 @@
 # Electra Society Website - NIT Silchar
-
 This repository contains the source code for the official website of the Electra Society of NIT Silchar, built using Next.js.
 ## Overview
 

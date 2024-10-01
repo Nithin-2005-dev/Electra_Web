@@ -21,7 +21,7 @@ export default function Pikachu(props) {
     actions[names[past]].stop();
     actions[names[pikaAnimation]].play();
     present(pikaAnimation)
-  })
+  },[past])
   return (
     <group ref={group} {...props} dispose={null} scale={size} position={[0.2,-1.5,0]}>
       <group name="Sketchfab_Scene">

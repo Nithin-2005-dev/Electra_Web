@@ -18,6 +18,7 @@ export default function RootLayout({ children }) {
 <link href="https://fonts.googleapis.com/css2?family=Sofadi+One&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet"></link>
 <link href="https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap" rel="stylesheet"></link>
 <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Shadows+Into+Light&display=swap" rel="stylesheet"></link>
+<link href="https://fonts.googleapis.com/css2?family=Edu+AU+VIC+WA+NT+Guides:wght@400..700&display=swap" rel="stylesheet"/>
     </head>
       <body
       >

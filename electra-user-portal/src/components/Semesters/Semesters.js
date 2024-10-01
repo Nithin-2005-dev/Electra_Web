@@ -10,12 +10,22 @@ const Semesters = () => {
     <div onMouseOver={()=>{
         setPikaAnimation(1)
     }}
+    onMouseLeave={()=>{
+          setPikaAnimation(2)
+      }}
+      onTouchEnd={()=>{
+      setPikaAnimation(1)
+  }}
+  onTouchStart={()=>{
+      setPikaAnimation(2)
+  }} 
+
     >
-      <motion.div className='text-5xl font-bold m-2 border-b-4 inline-block border-yellow-400 ' initial={{y:-10,opacity:0}} whileInView={{y:0,opacity:1,transition:{duration:2}}}>Semesters</motion.div>
+      <motion.div className='text-2xl lg:text-5xl font-bold m-2 border-b-4 inline-block border-yellow-400 mx-4' initial={{y:-10,opacity:0}} whileInView={{y:0,opacity:1,transition:{duration:2}} }>Semesters</motion.div>
       <div className='w-[55vw]'>
       {
             images.map((image)=>{
-              return   <Card.Img src={image} className='w-[15vw] inline-block m-3 cursor-pointer hover:scale-110'/>
+              return   <Card.Img src={image} className='resource-res inline-block m-3 cursor-pointer hover:scale-110 w-[20vw] xl:w-[15vw]' key={image}/>
             })
         }
       </div>

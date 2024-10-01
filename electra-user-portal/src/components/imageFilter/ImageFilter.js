@@ -3,7 +3,7 @@ import React from 'react'
 import styles from '../../app/styles/ImageFilter.module.css'
 const ImageFilter = () => {
   return (
-    <div className='my-5 mx-3 flex justify-between border-1 p-2 rounded-xl text-xs lg:text-xl font-bold shadow-xl shadow-slate-800'>
+    <div className='my-5 mx-3 flex justify-between border-1 p-2 rounded-xl text-xs lg:text-xl font-bold shadow-xl shadow-slate-800 '>
       <div>
         <select name="" id="" className='bg-slate-600 rounded-xl hover:opacity-80 lg:p-2 lg:px-3 md:p-2 md:px-3 sm:p-3 sm:px-3 p-1 px-1 text-xs lg:text-xl font-bold'>
             <option value="" className='bg-slate-500'>2023-2024</option>

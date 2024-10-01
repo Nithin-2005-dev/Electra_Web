@@ -10,15 +10,16 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
+import styles from '../../app/styles/CommentDialog.module.css'
 import { Card, Image } from 'react-bootstrap'
 import { disableInstantTransitions } from 'framer-motion';
 const FullPhoto = ({item,setFullPic,fullPic}) => {
   return (
-    <Dialog open={fullPic} onOpenChange={setFullPic}>
-      <DialogContent>
-      <Card style={{ width: '28rem' }}>
-      <Image src={item.image} fluid />
+    <Dialog open={fullPic} onOpenChange={setFullPic} >
+      <DialogContent className={`aspect-auto border-0`}>
+      <Card>
+      <Card.Img src={item.image} fluid className='aspect-auto' />
     </Card>
       </DialogContent>
     </Dialog>

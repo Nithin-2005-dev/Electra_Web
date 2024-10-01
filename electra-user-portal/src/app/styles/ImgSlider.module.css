@@ -9,39 +9,8 @@
     font-weight: 400;
     font-style: normal;
   }
-  .res-slider{
-    @media (min-width:200px) {
-        height: 25vh;
+  .img-slider {
+    @media (min-width:350px) {
+          max-width: 70vw;      
     }
   }
-  .res-slider{
-    @media (min-width:340px) {
-        height: 25vh;
-    }
-  }
-  .res-slider{
-    @media (min-width:500px) {
-        height: 48vh;
-    }
-  }
-  .res-slider{
-    @media (min-width:768px) {
-        height: 35vh;
-    }
-  }
-  .res-slider{
-    @media (min-width:850px) {
-        height: 55vh;
-    }
-  }
-  .res-slider{
-    @media (min-width:1024px) {
-        height: 65vh;
-    }
-  }
-  .res-slider{
-    @media (min-width:1200px) {
-        height: 80vh;
-    }
-  }
-  

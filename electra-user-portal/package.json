@@ -21,6 +21,8 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "dotenv": "^16.4.5",
+    "embla-carousel-react": "^8.3.0",
+    "firebase": "^10.13.2",
     "framer-motion": "^11.9.0",
     "hover.css": "^2.3.2",
     "lucide-react": "^0.446.0",
