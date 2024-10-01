@@ -13,8 +13,11 @@ const ImageFilter = () => {
       <div className={`${styles['permanent-marker-regular']} text-blue-200 text-base lg:text-2xl md:text-lg`}>Electra Gallery</div>
       <div>
       <select name="" id="" className='bg-slate-600 rounded-xl hover:opacity-80 lg:p-2 lg:px-3 md:p-2 md:px-3 sm:p-3 sm:px-3 p-1 px-1 text-xs lg:text-xl font-bold'>
-            <option value="" className='bg-slate-500'>Tech</option>
-            <option value="" className='bg-slate-500'>Social</option><option value="" className='bg-slate-500'>Content</option><option value="" className='bg-slate-500'>Design</option><option value="" className='bg-slate-500'>Marketing</option>
+            <option value="" className='bg-slate-500'>Udvega</option>
+            <option value="" className='bg-slate-500'>Blitz surge</option><option value="" className='bg-slate-500'>Power surge</option><option value="" className='bg-slate-500'>Electra cup</option>
+            <option value="" className='bg-slate-500'>Electra dev module</option>
+            <option value="" className='bg-slate-500'>codesta</option>
+            <option value="" className='bg-slate-500'>Carvaan</option>
         </select>
       </div>
     </div>
