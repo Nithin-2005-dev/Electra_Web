@@ -1,4 +1,22 @@
-.loader {
+'use client'
+import React from "react";
+import styled from "styled-components";
+
+const Loader = () => {
+  return (
+    <StyledWrapper className="absolute top-1/2 right-1/2">
+      <div className="loader">
+        <div className="loader-bar bar-1" />
+        <div className="loader-bar bar-2" />
+        <div className="loader-bar bar-3" />
+        <div className="loader-bar bar-4" />
+      </div>
+    </StyledWrapper>
+  );
+};
+
+const StyledWrapper = styled.div`
+  .loader {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -50,3 +68,7 @@
     transform: scaleY(1);
   }
 }
+
+`;
+
+export default Loader;

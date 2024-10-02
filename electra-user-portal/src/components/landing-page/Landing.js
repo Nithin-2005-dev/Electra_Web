@@ -15,7 +15,7 @@ const Landing = () => {
     <>
        <div className={`flex items-center h-[100vh]`}>
        <div className="w-1/2 flex flex-col p-4 gap-3 flex-wrap">
-      <motion.div className="border-l-4 border-yellow-300 " initial={{
+      <motion.div className="border-l-4 border-yellow-300" initial={{
         x:-1000,
       }}
       animate={{
