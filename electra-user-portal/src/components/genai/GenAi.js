@@ -50,7 +50,7 @@ draggable
 pauseOnHover
 theme="dark"
 />
-      <div className='relative top-[6vh]'>
+      <div className='relative top-[4vh]'>
       <Card body className='h-[70vh] overflow-hidden overflow-y-scroll bg-slate-700 m-2 rounded-2xl text-white w-[55vw] lg:w-[45vw]' id='res' >
       {response==''?'Ask Questions related to your subjects ':response}
       </Card>

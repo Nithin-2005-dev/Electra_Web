@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useEffect } from 'react'
 import LightninigBold from '../3d-models/lightning-bolt'
 import { Environment} from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
