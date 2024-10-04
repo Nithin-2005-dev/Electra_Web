@@ -1,4 +1,4 @@
-import { connectDb } from "@/app/dbConfig/dbConfig";
+import { connectDb } from "@/app/database/dbConfig";
 import { User } from "@/models/user.model";
 import { NextResponse } from "next/server";
 import { genSalt, hash } from "bcryptjs";

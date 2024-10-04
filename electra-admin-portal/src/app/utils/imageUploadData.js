@@ -38,5 +38,10 @@ export const ImageUploadData=[
         event:'favorites',
         floderName:'favorites',
         preset:'f9s9bew0'
+    },
+    {
+        event:'Orientation',
+        floderName:'Orientation',
+        preset:'msc4qksk'
     }
 ]

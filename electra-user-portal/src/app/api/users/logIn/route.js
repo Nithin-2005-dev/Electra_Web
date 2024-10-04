@@ -2,7 +2,7 @@ import { User } from "@/models/user.model";
 import { NextResponse } from "next/server";
 import { compare } from "bcryptjs";
 import { sign } from "jsonwebtoken";
-const { connectDb } = require("@/app/dbConfig/dbConfig");
+const { connectDb } = require("@/app/database/dbConfig");
 connectDb();
 export async function POST(req) {
   try {

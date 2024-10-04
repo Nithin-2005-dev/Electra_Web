@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import {
   Carousel,
@@ -10,8 +10,10 @@ import {
 } from "@/components/ui/carousel"
 import styles from '../../app/styles/ImgSlider.module.css'
 import { CardImg } from 'react-bootstrap'
+import { ImageProvider } from '@/app/store/ImageStore'
+import { CldImage } from 'next-cloudinary'
 const ImgSlider = () => {
-    const imgs=['https://images.pexels.com/photos/853168/pexels-photo-853168.jpeg?auto=compress&cs=tinysrgb&w=400','https://images.pexels.com/photos/1549280/pexels-photo-1549280.jpeg?auto=compress&cs=tinysrgb&w=400','https://images.pexels.com/photos/1974927/pexels-photo-1974927.jpeg?auto=compress&cs=tinysrgb&w=400','https://images.pexels.com/photos/708392/pexels-photo-708392.jpeg?auto=compress&cs=tinysrgb&w=400']
+  const {imgs} =useContext(ImageProvider);
   return (
     <>
     <div className={`${styles['res-slider']}`}>
@@ -31,7 +33,14 @@ const ImgSlider = () => {
             <div>
               <Card className='border-1'>
                 <CardContent className="flex aspect-square items-center justify-center p-0  border-0">
-                    <CardImg src={pic}/>
+                <CldImage key={pic._id}
+            width="960"
+            height="600"
+            src={pic.publicId}
+            sizes="100vw"
+            alt="Description of my image"
+            className='aspect-square'
+          />
                 </CardContent>
               </Card>
             </div>

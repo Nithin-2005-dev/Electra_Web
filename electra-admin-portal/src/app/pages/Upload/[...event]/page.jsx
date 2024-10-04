@@ -8,7 +8,7 @@ const page = ({params}) => {
    <>
    <label htmlFor="year">Year</label>
     <input type="number" ref={useRef()}/>
-    <UploadImage preset={params.event[0]} year={yearRef}/>
+    <UploadImage preset={params.event[0]} year={yearRef.currentCldUploadWidget?.value}/>
    </>
   )
 }
