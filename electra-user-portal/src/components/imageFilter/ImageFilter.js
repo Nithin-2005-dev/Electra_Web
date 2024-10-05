@@ -3,19 +3,19 @@ import React, { useContext, useState } from 'react'
 import styles from '../../app/styles/ImageFilter.module.css'
 import { ImageProvider } from '@/app/store/ImageStore'
 const ImageFilter = () => {
-  const {setCurrentEventFilter}=useContext(ImageProvider)
-  return (
-    <div className='my-5 mx-3 flex border-1 p-2 rounded-xl text-xs lg:text-xl font-bold shadow-xl shadow-slate-800 justify-between'>
+  const {setCurrentEventFilter,loading}=useContext(ImageProvider)
+  return <>
+    {
+      !loading &&     <div className='my-5 mx-3 flex border-1 p-2 rounded-xl text-xs lg:text-xl font-bold shadow-xl shadow-slate-800 justify-between'>
       <div className={`${styles['permanent-marker-regular']} text-blue-200 text-base lg:text-2xl md:text-lg place-self-center`}>Electra Gallery</div>
       <div className='place-self-end'>
-      <select name="" id="" className='bg-slate-600 rounded-xl hover:opacity-80 lg:p-2 lg:px-3 md:p-2 md:px-3 sm:p-3 sm:px-3 p-1 px-1 text-xs lg:text-lg font-bold' onClick={(e)=>{
+      <select name="" id="" className='bg-slate-600 rounded-xl hover:opacity-80 lg:p-2 lg:px-3 md:p-2 md:px-3 sm:p-3 sm:px-3 p-1 px-1 text-xs lg:text-lg font-bold' onChange={(e)=>{
           setCurrentEventFilter(e.target.value)
         }}>
-      <option value="all" className='bg-slate-500'>Event</option>
+      <option value="all" className='bg-slate-500'>Events</option>
             <option value="udvega" className='bg-slate-500'>Udvega</option>
-            
-            <option value="powerSurge" className='bg-slate-500'>Power surge</option>
-            <option value="electraCup" className='bg-slate-500'>Electra cup</option>
+            {/* <option value="blitzSurge" className='bg-slate-500'>Blitz surge</option> */}
+            <option value="powerSurge" className='bg-slate-500'>Power surge</option><option value="electraCup" className='bg-slate-500'>Electra cup</option>
             {/* <option value="electraDevModule" className='bg-slate-500'>Electra dev module</option> */}
             {/* <option value="codesta" className='bg-slate-500'>codesta</option> */}
             <option value="carvaan" className='bg-slate-500'>Carvaan</option>
@@ -23,7 +23,8 @@ const ImageFilter = () => {
         </select>
       </div>
     </div>
-  )
+    }
+    </>
 }
 
 export default ImageFilter
