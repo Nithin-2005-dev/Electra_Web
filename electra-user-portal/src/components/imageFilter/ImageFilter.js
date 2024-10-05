@@ -13,10 +13,12 @@ const ImageFilter = () => {
         }}>
       <option value="all" className='bg-slate-500'>Event</option>
             <option value="udvega" className='bg-slate-500'>Udvega</option>
-            <option value="blitzSurge" className='bg-slate-500'>Blitz surge</option><option value="powerSurge" className='bg-slate-500'>Power surge</option><option value="electraCup" className='bg-slate-500'>Electra cup</option>
-            <option value="electraDevModule" className='bg-slate-500'>Electra dev module</option>
-            <option value="codesta" className='bg-slate-500'>codesta</option>
-            <option value="" className='bg-slate-500'>Carvaan</option>
+            
+            <option value="powerSurge" className='bg-slate-500'>Power surge</option>
+            <option value="electraCup" className='bg-slate-500'>Electra cup</option>
+            {/* <option value="electraDevModule" className='bg-slate-500'>Electra dev module</option> */}
+            {/* <option value="codesta" className='bg-slate-500'>codesta</option> */}
+            <option value="carvaan" className='bg-slate-500'>Carvaan</option>
             <option value="Orientation" className='bg-slate-500'>Orientation</option>
         </select>
       </div>

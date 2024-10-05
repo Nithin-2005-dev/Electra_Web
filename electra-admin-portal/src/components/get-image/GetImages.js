@@ -17,12 +17,12 @@ const GetImages = () => {
     }
   }
   return (
-    <div>
+    <div >
       <button onClick={handleGet}>Get</button>
+      <div className="flex flex-wrap">
       {imgs.map((pic) => {
         return (
-          <>
-            <div>
+            <div className="w-1/4">
             <CldImage key={pic._id}
             width="960"
             height="600"
@@ -30,11 +30,13 @@ const GetImages = () => {
             sizes="100vw"
             alt="Description of my image"
           />
+          <div>
           <button onClick={()=>{handleDelete(pic)}}>Delete</button>
+          </div>
             </div>
-          </>
         );
       })}
+      </div>
     </div>
   );
 };

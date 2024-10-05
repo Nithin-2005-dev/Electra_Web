@@ -1,7 +1,7 @@
 import GetImages from '../../../components/get-image/GetImages'
 const page = () => {
   return (
-    <div>
+    <div >
       <GetImages/>
     </div>
   )

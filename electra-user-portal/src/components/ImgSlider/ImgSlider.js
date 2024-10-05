@@ -16,7 +16,7 @@ const ImgSlider = () => {
  const {imgs}=useContext(ImageProvider);
  let random;
  if(imgs.length!=0){
- random=[imgs[Math.round(Math.random()*imgs.length)],imgs[Math.round(Math.random()*imgs.length)],imgs[Math.round(Math.random()*imgs.length)],imgs[Math.round(Math.random()*imgs.length)],imgs[Math.round(Math.random()*imgs.length)]]
+ random=[imgs[Math.round(Math.random()*imgs.length-2)],imgs[Math.round(Math.random()*imgs.length-2)],imgs[Math.round(Math.random()*imgs.length-2)],imgs[Math.round(Math.random()*imgs.length-2)],imgs[Math.round(Math.random()*imgs.length-2)]]
  }else{
   random=[]
  }
@@ -35,14 +35,14 @@ const ImgSlider = () => {
     >
       <CarouselContent>
         {random && random.map((pic) => (
-          <CarouselItem key={pic._id} className="md:basis-1/2 lg:basis-1/1">
+          <CarouselItem key={pic?._id} className="md:basis-1/2 lg:basis-1/1">
             <div>
-              <Card className='border-1'>
+             <Card className='border-1'>
                 <CardContent className="flex aspect-square items-center justify-center p-0  border-0">
-                <CldImage key={pic._id}
+                <CldImage key={pic?._id}
             width="960"
             height="600"
-            src={pic.publicId}
+            src={pic?.publicId}
             sizes="100vw"
             alt="Description of my image"
             className='aspect-square'

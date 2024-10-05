@@ -30,13 +30,13 @@ const GenAi = () => {
   }}
   onMouseLeave={()=>{
       setPikaAnimation(2)
-  }} 
-  onTouchEnd={()=>{
-      setPikaAnimation(1)
   }}
-  onTouchStart={()=>{
-      setPikaAnimation(2)
-  }} 
+  onTouchEnd={()=>{
+  setPikaAnimation(1)
+}}
+onTouchStart={()=>{
+  setPikaAnimation(2)
+}} 
   >
     <ToastContainer
 position="top-right"
