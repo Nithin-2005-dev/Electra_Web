@@ -1,6 +1,6 @@
 import { ConnectDb } from "../../database/dbConfig";
 import { ImageUpload} from "@/models/Image.model";
-import { NextRequest, NextResponse } from "next/server";
+import {  NextResponse } from "next/server";
 export async function POST(req) {
 console.log('db connecting')
 await ConnectDb();
@@ -39,7 +39,7 @@ console.log('db connected')
     }
   } catch (err) {
     return NextResponse.json({
-      message: "something went wrong",
+      message: "something went wrong"+err,
       status: 500,
     });
   }

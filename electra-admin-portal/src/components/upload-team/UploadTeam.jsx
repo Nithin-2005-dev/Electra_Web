@@ -13,7 +13,8 @@ const UploadTeam = ({preset,team}) => {
   const positionRef=useRef();
   const handleUpload=async(res)=>{
     try{
-     const response=await axios.post('/api/uploadTeam',{
+      console.log(imageRef)
+     await axios.post('/api/uploadTeam',{
         name:nameRef.current.value,year:yearRef.current.value,position:positionRef.current.value,publicId:res.info.public_id,insta:instaRef.current.value,fb:fbRef.current.value,linkdin:linkdinRef.current.value,category:team
       })
       nameRef.current.value='';yearRef.current.value='';positionRef.current.value='';imageRef='';instaRef.current.value='';fbRef.current.value='';linkdinRef.current.value='';
@@ -37,7 +38,7 @@ const UploadTeam = ({preset,team}) => {
         <select name="" id="" ref={positionRef}>
         {
           teamData.map((team)=>{
-         return <option value={team}>{team}</option>
+         return <option value={team} key={team}>{team}</option>
           })
         }
         </select>

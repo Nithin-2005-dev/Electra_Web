@@ -2,10 +2,8 @@
 import { ImageUploadData } from "@/app/utils/imageUploadData";
 import axios from "axios";
 import { CldUploadWidget } from "next-cloudinary";
-import { useRouter } from "next/navigation";
 import React from "react";
 const UploadImage = ({ preset, year }) => {
-  const router = useRouter();
   const current = ImageUploadData.filter((ele) => {
     return preset == ele.preset;
   });

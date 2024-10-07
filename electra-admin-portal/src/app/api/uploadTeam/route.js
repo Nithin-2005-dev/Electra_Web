@@ -33,7 +33,7 @@ export async function POST(req){
         }
     }catch(err){
         return NextResponse.json({
-            message:'spmething went wrong!!',
+            message:'spmething went wrong!!'+err,
             status:500,
         })
     }
