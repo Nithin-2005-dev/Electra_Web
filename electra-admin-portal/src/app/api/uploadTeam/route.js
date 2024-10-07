@@ -11,14 +11,15 @@ export async function POST(req){
                 status:402,
             })
         }
-        const {name,year,position,publicId,insta,fb,linkdin}=reqBody;
+        const {name,year,position,publicId,insta,fb,linkdin,category}=reqBody;
         if(name=='' || year=='' || position==''){
             return NextResponse.json({
                 message:'enter mandatory fields',
                 status:402,
             })
         }
-        const result=await Team.create({name,year,position,insta,publicId,fb,linkdin});
+        const result=await Team.create({name,year,position,insta,publicId,fb,linkdin,category});
+        console.log(result)
         if(!result){
             return NextResponse.json({
                 message:'failed to update in dataBase!! please try again',

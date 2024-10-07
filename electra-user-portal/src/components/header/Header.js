@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 const Header = () => {
     const path=usePathname();
-    console.log(path)
     const isActive=(currentPath)=>path==currentPath;
   return (
     <header className='px-2'>

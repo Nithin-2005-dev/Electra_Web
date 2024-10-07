@@ -9,6 +9,7 @@ const Resources = () => {
   return (
     <AnimationStoreProvider>
     <div className="flex flex-col gap-20 md:gap-6">
+    <Header/>
     <ResourcesHero/>
     </div>    
     <Semesters/>

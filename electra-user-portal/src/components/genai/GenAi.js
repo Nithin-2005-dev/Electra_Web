@@ -59,9 +59,7 @@ theme="dark"
       {response==''?'Ask Questions related to your subjects ':response}
       </Card>
       <div className='flex flex-wrap items-center'>
-      <input type="text" placeholder="Type your doubt Here" className='w-[55vw] lg:w-[45vw] rounded-xl p-2 ml-2 mr-1 text-black' ref={queryRef} onKeyPress={(key)=>{
-        console.log(key)
-      }}/>
+      <input type="text" placeholder="Type your doubt Here" className='w-[55vw] lg:w-[45vw] rounded-xl p-2 ml-2 mr-1 text-black' ref={queryRef}/>
       </div>
          <div className='flex m-2 my-3 justify-between'>
             <button className={`${styles['hvr-ripple-in']} bg-red-500 p-1 px-2 lg:px-3 font-bold rounded-xl text-xs lg:text-base`}

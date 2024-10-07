@@ -4,34 +4,29 @@ export const data=[
         preset:'w9cwi8jo',
     },
     {
+        name:'vice president',
+        preset:'nzc7wn5s',
+    },
+    {
         name:'treasurer',
-        preset:'w9cwi8jo',
+        preset:'jmcd0aay',
     }, {
         name:'general secretary',
-        preset:'w9cwi8jo',
+        preset:'ugkfxisy',
     },
     {
-        name:'vice president',
-        preset:'w9cwi8jo',
+        name:'assistant general secretary',
+        preset:'muqmmbcg',
     },
     {
-        name:'cultural head',
-        preset:'w9cwi8jo',
+        name:'heads',
+        preset:'etrroc43',
     },
     {
-        name:'social media management',
-        preset:'w9cwi8jo',
-    },
-    {
-        name:'technical',
-        preset:'w9cwi8jo',
-    },
-    {
-        name:'marketing',
-        preset:'w9cwi8jo',
-    },
-    {
-        name:'content',
-        preset:'w9cwi8jo',
+        name:'technical team',
+        preset:'bmauvylt',
+    },{
+        name:'executive team',
+        preset:'hiuqiwug',
     },
 ]
