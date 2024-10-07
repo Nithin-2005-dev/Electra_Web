@@ -1,6 +1,7 @@
 'use client'
 import React, { useContext } from 'react'
 import styles from '../../app/styles/HeroText.module.css'
+import { saveAs } from 'file-saver';
 import Link from 'next/link'
 import { IoCloudDownloadSharp } from "react-icons/io5";
 import { AnimationStore } from '@/app/store/AnimationStore';
@@ -33,7 +34,9 @@ The Electrical Engineering Department at NIT Silchar is committed to providing y
 Whether you’re looking for lecture notes, preparing for exams, or working on your projects, our Resources Hub is here to assist you every step of the way. 
 </div>
 <div>
-<button className={`bg-[#AD49E1] font-bold p-1 px-2 rounded-xl ${styles['hvr-buzz-out']} hover:border-white hover:border-2 text-sm md:text-lg lg:text-2xl`}>Course structure<IoCloudDownloadSharp className={`inline mx-1`}/></button>
+<button className={`bg-[#AD49E1] font-bold p-1 px-2 rounded-xl ${styles['hvr-buzz-out']} hover:border-white hover:border-2 text-sm md:text-lg lg:text-2xl`} onClick={()=>{
+  saveAs('https://pdfupload.io/docs/ac74e0c9','eed_nits_btech_course_structure.pdf')
+}}>Course structure<IoCloudDownloadSharp className={`inline mx-1`}/></button>
 </div>
     </div> 
     </>

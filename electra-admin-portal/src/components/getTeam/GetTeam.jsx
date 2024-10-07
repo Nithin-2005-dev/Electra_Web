@@ -4,15 +4,14 @@ import axios from "axios";
 import { CldImage } from "next-cloudinary";
 import { useRouter } from "next/dist/client/router";
 const GetImages = () => {
-  const [imgs, getImgs] = useState([]);
+  const [team, getTeam] = useState([]);
   const handleGet = async () => {
-    const response = await axios.get("/api/getImg");
-    getImgs(response.data);
-    console.log(imgs);
+    const response = await axios.get("/api/getTeam");
+    getTeam(response.data);
   };
   const handleDelete = async (req) => {
     try {
-      const response = await axios.delete(`/api/deleteImg?id=${req._id}`);
+      const response = await axios.delete(`/api/deleteTeam?id=${req._id}`);
     } catch (err) {
       console.log(err);
     }
@@ -21,21 +20,25 @@ const GetImages = () => {
     <div>
       <button onClick={handleGet}>Get</button>
       <div className="flex flex-wrap">
-        {imgs.map((pic) => {
+        {team.map((t) => {
           return (
             <div className="w-1/4">
               <CldImage
-                key={pic._id}
+                key={t._id}
                 width="960"
                 height="600"
-                src={pic.publicId}
+                src={t.publicId}
                 sizes="100vw"
                 alt="Description of my image"
               />
+            <p>name:{t.name}</p>
+            <p>position:{t.position}</p>
+            <p>year:{t.year}</p>
+            <p>category:{t.category}</p>
               <div>
                 <button
                   onClick={() => {
-                    handleDelete(pic);
+                    handleDelete(t);
                   }}
                 >
                   Delete

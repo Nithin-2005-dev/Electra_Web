@@ -7,6 +7,12 @@ await ConnectDb();
 console.log('db connected')
   try {
     const reqBody = await req.json();
+    if(!reqBody){
+      return NextResponse.json({
+          message:'something went wrong!',
+          status:500,
+      })
+  }
     const { publicId, date, year, category } = reqBody;
     if (publicId == "" || date == "" || year == "" || category == "") {
       return NextResponse.json({

@@ -6,7 +6,7 @@ import Loader from "./loading"
 const Team = () => {
   return (
     <>
-    <Header/>
+      <Header/>
     <CoreTeamFilter/>
     <TeamCard/>
     </>

@@ -15,6 +15,7 @@ const GenAi = () => {
     const queryRef=useRef();
     const [response,setResponse]=useState('')
     const handleQuery=async()=>{
+      try{
         const text=queryRef.current.value;
         setResponse('Wait we will be back soon...')
         if(text==''){
@@ -23,6 +24,9 @@ const GenAi = () => {
          setResponse(await askApi(text))
         queryRef.current.value='';
         }
+      }catch(err){
+        setResponse('something went wrong!! please try again')
+      }
     }
   return (
     <div onMouseOver={()=>{
@@ -30,13 +34,13 @@ const GenAi = () => {
   }}
   onMouseLeave={()=>{
       setPikaAnimation(2)
-  }} 
-  onTouchEnd={()=>{
-      setPikaAnimation(1)
   }}
-  onTouchStart={()=>{
-      setPikaAnimation(2)
-  }} 
+  onTouchEnd={()=>{
+  setPikaAnimation(1)
+}}
+onTouchStart={()=>{
+  setPikaAnimation(2)
+}} 
   >
     <ToastContainer
 position="top-right"
@@ -55,9 +59,7 @@ theme="dark"
       {response==''?'Ask Questions related to your subjects ':response}
       </Card>
       <div className='flex flex-wrap items-center'>
-      <input type="text" placeholder="Type your doubt Here" className='w-[55vw] lg:w-[45vw] rounded-xl p-2 ml-2 mr-1 text-black' ref={queryRef} onKeyPress={(key)=>{
-        console.log(key)
-      }}/>
+      <input type="text" placeholder="Type your doubt Here" className='w-[55vw] lg:w-[45vw] rounded-xl p-2 ml-2 mr-1 text-black' ref={queryRef}/>
       </div>
          <div className='flex m-2 my-3 justify-between'>
             <button className={`${styles['hvr-ripple-in']} bg-red-500 p-1 px-2 lg:px-3 font-bold rounded-xl text-xs lg:text-base`}
