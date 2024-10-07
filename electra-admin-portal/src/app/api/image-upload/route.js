@@ -22,7 +22,7 @@ console.log('db connected')
     const result = await ImageUpload.create({
       publicId,
       date,
-      year:2022,
+      year,
       category,
     });
 
