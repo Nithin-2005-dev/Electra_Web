@@ -15,6 +15,7 @@ const GenAi = () => {
     const queryRef=useRef();
     const [response,setResponse]=useState('')
     const handleQuery=async()=>{
+      try{
         const text=queryRef.current.value;
         setResponse('Wait we will be back soon...')
         if(text==''){
@@ -23,6 +24,9 @@ const GenAi = () => {
          setResponse(await askApi(text))
         queryRef.current.value='';
         }
+      }catch(err){
+        setResponse('something went wrong!! please try again')
+      }
     }
   return (
     <div onMouseOver={()=>{
