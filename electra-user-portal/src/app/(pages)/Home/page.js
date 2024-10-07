@@ -7,7 +7,7 @@ import AboutUs from "@/components/aboutUs/About"
 const Home = () => {
   return (
     <div>
-      <Header/>
+    <Header/>
       <Landing/>
       <AboutUs/>
       <Events/>

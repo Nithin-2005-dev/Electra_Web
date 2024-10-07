@@ -31,7 +31,7 @@ const GalleryCard = ({ pic }) => {
       </span> */}
         <CldImage
           key={pic._id}
-          width="960"
+          width="500"
           height="600"
           src={pic.publicId}
           sizes="100vw"

@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 const Loader = () => {
   return (
-    <StyledWrapper className="absolute top-1/2 right-1/2">
+    <StyledWrapper className="absolute top-1/2 right-[46vw]">
       <div className="loader">
         <div className="loader-bar bar-1" />
         <div className="loader-bar bar-2" />

@@ -44,11 +44,11 @@ const ImgSlider = () => {
                 <CardContent className="flex aspect-square items-center justify-center p-0  border-0">
                 <CldImage key={pic?._id}
             width="960"
-            height="600"
+            height="0"
             src={pic?.publicId}
             sizes="100vw"
             alt="Description of my image"
-            className='aspect-square'
+            className='aspect-square rounded-xl'
           />
                 </CardContent>
               </Card>
