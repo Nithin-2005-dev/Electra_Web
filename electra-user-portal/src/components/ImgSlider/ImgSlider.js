@@ -33,14 +33,14 @@ const ImgSlider = () => {
       }}
       className={`w-full max-w-52 lg:max-w-4xl sm:max-w-sm md:max-w-2xl xl:max-w-6xl border-hidden ${styles['img-slider']}`}
     >
-      <CarouselContent>
+      <CarouselContent >
         {random && random.map((pic) => {
           if(!pic){
             return;
           }
          return <CarouselItem key={pic?._id} className="md:basis-1/2 lg:basis-1/1">
             <div>
-             <Card className='border-1'>
+             <Card className='border-0'>
                 <CardContent className="flex aspect-square items-center justify-center p-0  border-0">
                 <CldImage key={pic?._id}
             width="960"
