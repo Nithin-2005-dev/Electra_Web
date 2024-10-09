@@ -40,7 +40,7 @@ const Header = () => {
         transition:{
             type:"tween"
         }
-     }} layout className={`flex flex-col gap-6 justify-start mx-2 p-2 m-3 ${styles['fredoka']} text-white text-3xl lg:text-lg md:text-base p-2 w-[40vw] fixed top-[5vh] right-[2vw] bg-slate-950 z-[100] h-[50vh] bg-opacity-70 shadow-[0.2rem_0rem_0.5rem] shadow-slate-500 rounded-xl`}>
+     }} layout className={`flex flex-col gap-6 justify-start mx-2 p-2 m-4 ${styles['fredoka']} text-white text-3xl lg:text-lg md:text-base p-2 w-[40vw] fixed top-[5vh] right-[2vw] bg-slate-950 z-[100] h-[50vh] bg-opacity-70 shadow-[0.2rem_0rem_0.5rem] shadow-slate-500 rounded-xl`}>
         <Link href='/' className={isActive('/')?'text-orange-400 ':'text-white'}>
             <RiHome4Fill className='inline-block'/><p className='text-xl inline-block'>Home</p>
         </Link>
