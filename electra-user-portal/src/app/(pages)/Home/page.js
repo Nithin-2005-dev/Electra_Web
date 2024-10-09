@@ -4,6 +4,7 @@ import Events from "@/components/Events/Events"
 import Header from "@/components/header/Header"
 import Landing from "@/components/landing-page/Landing"
 import AboutUs from "@/components/aboutUs/About"
+import Footer from "@/components/footer/Footer"
 const Home = () => {
   return (
     <div>
@@ -11,6 +12,7 @@ const Home = () => {
       <Landing/>
       <AboutUs/>
       <Events/>
+      <Footer/>
     </div>
   )
 }

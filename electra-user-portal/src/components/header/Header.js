@@ -14,6 +14,9 @@ const Header = () => {
     <>
     <header className='px-2 hidden sm:block'>
      <nav className={`flex flex-row gap-10 justify-end mx-2 p-2 ${styles['fredoka']} text-white text-sm lg:text-lg md:text-base right-0 z-50 p-2 w-[100vw] fixed top-0 bg-[#070F2B]`}>
+     <div className='absolute top-0 left-0 mx-3 my-1'>
+        <img src='https://i.imghippo.com/files/mt3cO1728475194.png' alt='electra-logo' width={'40'}/>
+        </div>
         <Link href='/' className={isActive('/')?'text-orange-400':'text-white'}>
             Home
         </Link>

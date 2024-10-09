@@ -1,6 +1,8 @@
 "use client";
 import axios from "axios";
+import Link from "next/link";
 import React, { useRef } from "react";
+import { IoHome } from "react-icons/io5";
 const Login = ({ setSign }) => {
   const emailRef = useRef();
   const passWordRef = useRef();
@@ -21,6 +23,15 @@ const Login = ({ setSign }) => {
   const handleForgotPassword = () => {};
   return (
     <>
+     <h2 className="text-center p-3 font-black text-xl text-sky-200 [text-shadow:_0rem_0.3rem_0.3rem_rgb(99_102_241_/_0.8)] lg:text-3xl sm:text-2xl">
+        Join Our Community
+      </h2>
+      <Link
+        href={"/"}
+        className="bg-fuchsia-500 text-white absolute top-0 m-3 p-2 rounded-xl font-bold drop-shadow-[0rem_0rem_0.5rem_rgba(50,250,250,0.5)] text-xl sm:3xl hover:scale-125"
+      >
+        <IoHome />
+      </Link>
       <div className="flex flex-col absolute w-3/4 top-[20vh] right-[12.5vw] md:w-1/2 md:top-1/4 md:right-1/4 gap-2 justify-center content-center flex-wrap border-1  rounded-xl p-3 bg-slate-950 bg-opacity-50 drop-shadow-[0rem_0rem_0.5rem_rgba(50,250,250,0.5)]">
         <div className="font-black text-2xl w-full text-center text-white font-serif">
           Login
@@ -63,15 +74,14 @@ const Login = ({ setSign }) => {
             >
               Log In
             </button>
+            <Link href={'/Sign-Up'}>
             <button
               type="submit"
               className="bg-fuchsia-600 rounded-xl px-3 p-1 text-lg font-bold text-fuchsia-300 my-2"
-              onClick={() => {
-                setSign(true);
-              }}
             >
               Join
             </button>
+            </Link>
           </div>
         </div>
       </div>

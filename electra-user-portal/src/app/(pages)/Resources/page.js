@@ -4,6 +4,7 @@ import Header from "@/components/header/Header"
 import ResourcesHero from "@/components/pikachu/ResourcesHero"
 import Semesters from "@/components/Semesters/Semesters"
 import Loader from "./loading"
+import Footer from "@/components/footer/Footer"
 
 const Resources = () => {
   return (
@@ -13,6 +14,7 @@ const Resources = () => {
     <ResourcesHero/>
     </div>    
     <Semesters/>
+    <Footer/>
     </AnimationStoreProvider>
   )
 }

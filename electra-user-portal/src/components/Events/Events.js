@@ -25,7 +25,7 @@ const Events = () => {
               }
             }
             >
-                <div className={`text-yellow-500 font-semibold text-2xl ${styles['sofadi-one-regular']} text-center ${styles['title-shadow']}`}>{event.title}</div>
+                <div className={`text-yellow-500 font-semibold text-2xl ${styles['sofadi-']} text-center ${styles['title-shadow']}`} style={{fontFamily:'Lucida Sans'}}>{event.title}</div>
                 <div className={`text-[#bed3de] font-mono ${styles['space-grotesk']} ${styles['dec-shadow']}`}>{event.description}</div>
                 <div className='flex justify-center mt-2'>
                 <Button className={`bg-[#0F4C75] rounded-xl hover:opacity-80 hover:bg-[#0F4C75] ${styles['hvr-float-shadow']} font-bold px-4 ${styles['card-button']}`} onClick={()=>{
