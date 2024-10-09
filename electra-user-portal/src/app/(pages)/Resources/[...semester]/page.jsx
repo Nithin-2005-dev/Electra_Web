@@ -7,7 +7,7 @@ const page = ({params}) => {
   return (
     <AnimationStoreProvider>
     <div>
-     <h2 className="text-center p-3 font-black text2xl text-sky-200 [text-shadow:_0rem_0.3rem_0.3rem_rgb(99_102_241_/_0.8)] lg:text-3xl sm:text-3xl">Semester-{semester}</h2>
+     <h2 className="text-center p-3 font-black text2xl text-sky-200 [text-shadow:_0rem_0.3rem_0.3rem_rgb(99_102_241_/_0.8)] lg:text-3xl sm:text-2xl text-2xl">Semester-{semester}</h2>
       <SemesterResources semester={semester}/>
     </div>
     </AnimationStoreProvider>

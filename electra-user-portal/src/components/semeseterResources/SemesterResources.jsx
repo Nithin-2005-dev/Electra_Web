@@ -50,7 +50,7 @@ const SemesterResources = ({semester}) => {
           setPikaAnimation(1)
       }}
       >
-      <Canvas style={{width:'50vw',height:'90vh'}}>
+      <Canvas style={{width:'50vw',height:'70vh'}}>
       <Pikachu/>
       <Environment preset='warehouse'/>
     </Canvas>

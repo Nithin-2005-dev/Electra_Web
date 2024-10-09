@@ -92,11 +92,10 @@ body{
   color: white;
   font-weight: 700;
   background: #6076f5;
-  padding: 1rem 3rem 1rem 3rem;
+  padding: 0.5rem 1rem;
   border-radius: 5rem;
   border: 2px solid whitesmoke;
   font-size: 1.2rem;
-  line-height: 1em;
   letter-spacing: 0.075em;
   transition: background 0.3s;
 }
