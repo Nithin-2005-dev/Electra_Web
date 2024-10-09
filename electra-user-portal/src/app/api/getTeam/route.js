@@ -1,10 +1,11 @@
 import { NextResponse } from "next/dist/server/web/spec-extension/response";
-import {ImageUpload} from '../../../models/Image.model'
 import {ConnectDb} from '../../database/dbConfig'
-export async function GET() {
+import { Team } from "@/models/team.model.js";
+export async function GET(req) {
     await ConnectDb();
     try{
-      const data= await ImageUpload.find();
+        const year=req.nextUrl.searchParams.get('team');
+      const data= await Team.find({year});
       return NextResponse.json(data)
     }catch(err){
         return NextResponse.json({

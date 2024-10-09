@@ -18,8 +18,8 @@ export default function Pikachu(props) {
   const { actions,names } = useAnimations(animations, group)
   const [past,present]=useState(pikaAnimation);
   useEffect(()=>{
-    actions[names[past]].stop();
-    actions[names[pikaAnimation]].play();
+    actions[names[past]]?.stop();
+    actions[names[pikaAnimation]]?.play();
     present(pikaAnimation)
   })
   return (

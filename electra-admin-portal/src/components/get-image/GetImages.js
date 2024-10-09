@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { CldImage } from "next-cloudinary";
-import { useRouter } from "next/dist/client/router";
 const GetImages = () => {
   const [imgs, getImgs] = useState([]);
   const handleGet = async () => {
@@ -13,6 +12,7 @@ const GetImages = () => {
   const handleDelete = async (req) => {
     try {
       const response = await axios.delete(`/api/deleteImg?id=${req._id}`);
+      console.log(response)
     } catch (err) {
       console.log(err);
     }
@@ -23,7 +23,7 @@ const GetImages = () => {
       <div className="flex flex-wrap">
         {imgs.map((pic) => {
           return (
-            <div className="w-1/4">
+            <div className="w-1/4" key={pic._id}>
               <CldImage
                 key={pic._id}
                 width="960"

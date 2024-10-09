@@ -8,7 +8,7 @@ export async function GET() {
       return NextResponse.json(data)
     }catch(err){
         return NextResponse.json({
-            message:'something went wrong!',
+            message:'something went wrong!'+err,
             status:500,
         })
     }

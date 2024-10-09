@@ -10,7 +10,7 @@ export async function GET(req) {
     const response = await ImageUpload.find({category:event});
     return NextResponse.json(response)
     }else{
-      const response = await ImageUpload.find();
+    const response = await ImageUpload.find();
     return NextResponse.json(response)
     }
   } catch (err) {

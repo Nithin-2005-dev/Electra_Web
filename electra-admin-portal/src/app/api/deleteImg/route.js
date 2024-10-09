@@ -10,7 +10,7 @@ export async function DELETE(req) {
     return NextResponse.json({ data });
   } catch (err) {
     return NextResponse.json({
-      message: "something went wrong!",
+      message: "something went wrong!"+err,
       status: 500,
     });
   }

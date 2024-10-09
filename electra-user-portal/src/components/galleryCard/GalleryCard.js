@@ -20,7 +20,7 @@ const GalleryCard = ({ pic }) => {
   });
   return (
     <div>
-      <Card className="w-[70vw] lg:w-[30vw] sm:w-[40vw]">
+      <Card className="w-[70vw] lg:w-[30vw] sm:w-[40vw] border-3 rounded-b-none">
         <CardHeader className="text-center bg-[#070F2B] text-neutral-300 font-bold text-xs md:text-base lg:text-lg">
           {pic.category + " (" + pic.year + ")"}
         </CardHeader>
@@ -40,7 +40,7 @@ const GalleryCard = ({ pic }) => {
         />
       </Card>
       <CardFooter>
-        <div className="flex gap-4 p-2 text-blue-400 text-2xl w-full justify-evenly border-1 border-t-0 border-white ">
+        <div className="flex gap-4 p-2 text-blue-400 text-2xl w-full justify-evenly border-3 border-t-0 border-white rounded-b-xl">
           {/* <div className='hover:scale-110'><AiTwotoneLike /></div>
         <div onClick={()=>{
             setComment(true)

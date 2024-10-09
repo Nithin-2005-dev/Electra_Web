@@ -10,6 +10,7 @@ const GetResources = () => {
   const handleDelete = async (req) => {
     try {
       const response = await axios.delete(`/api/deleteRes?id=${req._id}`);
+      console.log(response)
     } catch (err) {
       console.log(err);
     }
@@ -20,7 +21,7 @@ const GetResources = () => {
       <div className="flex flex-wrap">
         {resos.map((res) => {
           return (
-            <div className="w-1/4">
+            <div className="w-1/4" key={res._id}>
               <iframe
                 src={res.driveUrl}
                 width="640"

@@ -8,7 +8,6 @@ import Typewriter from 'typewriter-effect';
 import Link from 'next/link'
 const Landing = () => {
   new Typewriter('#typewriter', {
-    strings: ['Hello', 'World'],
     autoStart: true,
   });
   return (
@@ -27,7 +26,7 @@ const Landing = () => {
         }
       }}
       >
-      <span className='font-bold text-2xl lg:text-5xl sm:text-lg text-blue-200 md:text-3xl'>Electra Society:
+      <span className='font-bold text-lg lg:text-5xl sm:text-lg text-blue-200 md:text-3xl'>Electra Society:
       <span className='text-red-200 inline-block'>
       <Typewriter options={
         {

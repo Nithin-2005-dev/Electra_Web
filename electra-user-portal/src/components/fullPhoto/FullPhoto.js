@@ -19,14 +19,14 @@ const FullPhoto = ({item,setFullPic,fullPic}) => {
   return (
     <Dialog open={fullPic} onOpenChange={setFullPic} >
       <DialogContent className={`aspect-auto border-0`}>
-      <Card>
+      <Card className='rounded-xl'>
       <CldImage
             width="960"
             height="600"
             src={item.publicId}
             sizes="100vw"
             alt="Description of my image"
-            className='aspect-square'
+            className='aspect-square rounded-xl'
           />
     </Card>
       </DialogContent>
