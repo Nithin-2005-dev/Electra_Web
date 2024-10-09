@@ -8,7 +8,7 @@ import Loader from "./loading"
 const Resources = () => {
   return (
     <AnimationStoreProvider>
-    <div className="flex flex-col gap-20 md:gap-6">
+    <div className="flex flex-col gap-20 sm:gap-10 md:gap-6">
     <Header/>
     <ResourcesHero/>
     </div>    
