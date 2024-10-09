@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 const Toggler = ({setMenu,menu}) => {
   return (
-      <div className="float-end  scale-75 px-[3.5vw]">
+      <div className="float-end  scale-75 px-[3.5vw] bg-transparent">
         <input type="checkbox" id="checkbox" onClick={()=>{
             setMenu(!menu)
         }}/>

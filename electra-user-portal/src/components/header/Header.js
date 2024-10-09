@@ -31,22 +31,31 @@ const Header = () => {
     <div className='fixed right-0 z-[100] block sm:hidden bg-transparent w-full'>
     <Toggler setMenu={setMenu} menu={menu}/>
     </div>
+    <div className=''>
     {menu &&  <header className='px-2 block sm:hidden ease-in-out'>
-     <motion.nav layout className={`flex flex-col gap-5 justify-end mx-2 p-2 ${styles['fredoka']} text-white text-3xl lg:text-lg md:text-base text-end p-2 w-[100vw] fixed top-[5vh] right-[2vw] bg-transparent z-[100]`}>
-        <Link href='/' className={isActive('/')?'text-orange-400 drop-shadow-[0rem_0rem_0.5rem_rgba(255,0,0,1)]':'text-white drop-shadow-[0rem_0rem_1rem_rgba(255,255,255,1)]'}>
-            <RiHome4Fill className='inline-block'/>
+     <motion.nav initial={{
+        x:500
+     }} animate={{
+        x:0,
+        transition:{
+            type:"tween"
+        }
+     }} layout className={`flex flex-col gap-6 justify-start mx-2 p-2 m-3 ${styles['fredoka']} text-white text-3xl lg:text-lg md:text-base p-2 w-[40vw] fixed top-[5vh] right-[2vw] bg-slate-950 z-[100] h-[50vh] bg-opacity-70 shadow-[0.2rem_0rem_0.5rem] shadow-slate-500 rounded-xl`}>
+        <Link href='/' className={isActive('/')?'text-orange-400 ':'text-white'}>
+            <RiHome4Fill className='inline-block'/><p className='text-xl inline-block'>Home</p>
         </Link>
-        <Link href={'/Gallery'}  className={isActive('/Gallery')?'text-orange-400 drop-shadow-[0rem_0rem_0.5rem_rgba(255,0,0,1)]':'text-white drop-shadow-[0rem_0rem_1rem_rgba(255,255,255,1)]'}>
-            <RiGalleryFill className='inline-block'/>
+        <Link href={'/Gallery'}  className={isActive('/Gallery')?'text-orange-400 ':'text-white'}>
+            <RiGalleryFill className='inline-block'/><p className='text-xl inline-block'>Gallery</p>
         </Link>
-        <Link href={'/Resources'} id='resource' className={isActive('/Resources')?'text-orange-400 drop-shadow-[0rem_0rem_0.5rem_rgba(255,0,0,1)]':'text-white drop-shadow-[0rem_0rem_1rem_rgba(255,255,255,1)]'}>
-            <RiBook2Fill className='inline-block'/>
+        <Link href={'/Resources'} id='resource' className={isActive('/Resources')?'text-orange-400 ':'text-white'}>
+            <RiBook2Fill className='inline-block'/><p className='text-xl inline-block'>Resources</p>
         </Link>
-        <Link href={'/Team'}  className={isActive('/Team')?'text-orange-400 drop-shadow-[0rem_0rem_0.5rem_rgba(255,0,0,1)]':'text-white drop-shadow-[0rem_0rem_1rem_rgba(255,255,255,1)]'}>
-        <RiTeamFill className='inline-block' />
+        <Link href={'/Team'}  className={isActive('/Team')?'text-orange-400 ':'text-white'}>
+        <RiTeamFill className='inline-block' /><p className='text-xl inline-block'>Team</p>
         </Link>
      </motion.nav> 
     </header>}
+    </div>
     </>
   )
 }
