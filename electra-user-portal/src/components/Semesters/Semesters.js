@@ -26,7 +26,7 @@ const Semesters = () => {
       <div className='w-[55vw] flex flex-wrap'>
       {
             images.map((image,i)=>{
-              return   <Link href={`/Resources/semester${i+1}`}><Card.Img src={image} className='resource-res inline-block m-3 cursor-pointer hover:scale-110 w-[16vw] xl:w-[15vw]' key={image}/></Link>
+              return   <Link href={`/Resources/semester${i+1}`} key={i}><Card.Img src={image} className='resource-res inline-block m-3 cursor-pointer hover:scale-110 w-[16vw] xl:w-[15vw]' /></Link>
             })
         }
       </div>

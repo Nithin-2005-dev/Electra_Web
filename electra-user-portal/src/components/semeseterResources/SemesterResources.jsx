@@ -33,7 +33,7 @@ const SemesterResources = ({semester}) => {
       </Link>
       <div className='flex justify-center flex-col gap-3 absolute h-[90vh] p-2 mx-3 items-center w-1/2'> 
       {items.map((item)=>{
-       return <Link href={`/Resources/Categories/${semester}|${item.category}`} className='w-full'><ResourceCard item={item} key={item.name}/></Link>
+       return <Link href={`/Resources/Categories/${semester}|${item.category}`} className='w-full' key={item.name}><ResourceCard item={item} /></Link>
       })}
       </div>
       <div className='fixed right-0' onMouseOver={()=>{
