@@ -12,8 +12,8 @@ const SemesterResourceCategory = ({semester,category}) => {
   return (
     <div>
       {data.length>0 && data.map((ele)=>{
-        return <div >
-        <p key={ele._id} className='text-white'>{ele.subject}</p>
+        return <div key={ele._id} >
+        <p className='text-white'>{ele.subject}</p>
         <PdfDialog link={ele.driveUrl}/>
         </div>
       })}
