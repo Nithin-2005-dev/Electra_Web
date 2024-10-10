@@ -47,7 +47,7 @@ const ImgSlider = () => {
             height="0"
             src={pic?.publicId}
             sizes="100vw"
-            alt="Description of my image"
+            alt={`${pic.category}/${pic.year}`}
             className='aspect-square rounded-xl'
           />
                 </CardContent>

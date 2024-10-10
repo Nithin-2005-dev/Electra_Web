@@ -12,9 +12,9 @@ const PdfDialog = ({link}) => {
     <button onClick={()=>{
         setPdf(true)
     }}>view</button>
-    <div className='absolute top-[10vh] right-[15vw]'>
+    <div className='fixed top-[2vh] right-[15vw] lg:right-[25vw]'>
       <Dialog open={pdf} onOpenChange={setPdf} className='bg-black'>
-      <DialogContent className={`aspect-auto border-0 w-[70vw] h-[80vh]`}>
+      <DialogContent className={`aspect-auto border-0 w-[70vw] h-[80vh] lg:w-[50vw]`}>
       <DialogHeader>
         <div className='flex justify-end text-3xl text-red-600 font-black cursor-pointer'>
             <RxCross2 onClick={()=>{

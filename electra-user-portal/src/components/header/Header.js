@@ -12,11 +12,11 @@ const Header = () => {
     const isActive=(currentPath)=>path==currentPath;
   return (
     <>
-    <header className='px-2 hidden sm:block'>
-     <nav className={`flex flex-row gap-10 justify-end mx-2 p-2 ${styles['fredoka']} text-white text-sm lg:text-lg md:text-base right-0 z-50 p-2 w-[100vw] fixed top-0 bg-[#070F2B]`}>
-     <div className='absolute top-0 left-0 mx-3 my-1'>
+    <div className='fixed top-0 left-0 mx-3 my-1 z-[1000]'>
         <img src='https://i.imghippo.com/files/mt3cO1728475194.png' alt='electra-logo' width={'40'}/>
         </div>
+    <header className='px-2 hidden sm:block'>
+     <nav className={`flex flex-row gap-10 justify-end mx-2 p-2 ${styles['fredoka']} text-white text-sm lg:text-lg md:text-base right-0 z-50 p-2 w-[100vw] fixed top-0 bg-[#070F2B]`}>
         <Link href='/' className={isActive('/')?'text-orange-400':'text-white'}>
             Home
         </Link>
@@ -31,11 +31,12 @@ const Header = () => {
         </Link>
      </nav> 
     </header>
-    <div className='fixed right-0 z-[100] block sm:hidden bg-transparent w-full'>
+    <div className='fixed right-0 z-[100] block sm:hidden bg-transparent w-full top-0'>
     <Toggler setMenu={setMenu} menu={menu}/>
     </div>
     <div className=''>
-    {menu &&  <header className='px-2 block sm:hidden ease-in-out'>
+    <div className='h-[6vh] w-[100vw] bg-[#070F2B] fixed z-[80] top-0 sm:hidden'></div>
+    {menu &&  <header className='px-2 block sm:hidden ease-in-out '>
      <motion.nav initial={{
         x:500
      }} animate={{
@@ -43,7 +44,7 @@ const Header = () => {
         transition:{
             type:"tween"
         }
-     }} layout className={`flex flex-col gap-6 justify-start mx-2 p-2 m-4 ${styles['fredoka']} text-white text-3xl lg:text-lg md:text-base p-2 w-[40vw] fixed top-[5vh] right-[2vw] bg-slate-950 z-[100] h-[50vh] bg-opacity-70 shadow-[0.2rem_0rem_0.5rem] shadow-slate-500 rounded-xl`}>
+     }} layout className={` flex flex-col gap-6 justify-start mx-2 p-2 m-4 ${styles['fredoka']} text-white text-3xl lg:text-lg md:text-base p-2 w-[40vw] fixed top-[5vh] right-[2vw] bg-slate-950 z-[100] h-[50vh] bg-opacity-70 shadow-[0.2rem_0rem_0.5rem] shadow-slate-500 rounded-xl`}>
         <Link href='/' className={isActive('/')?'text-orange-400 ':'text-white'}>
             <RiHome4Fill className='inline-block'/><p className='text-xl inline-block'>Home</p>
         </Link>
