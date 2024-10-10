@@ -35,7 +35,7 @@ const GalleryCard = ({ pic }) => {
           height="600"
           src={pic.publicId}
           sizes="100vw"
-          alt="Description of my image"
+          alt={`${pic.category}/${pic.year}`}
           className="aspect-square"
         />
       </Card>

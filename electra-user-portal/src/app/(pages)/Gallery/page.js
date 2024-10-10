@@ -1,5 +1,6 @@
 'use server'
 import { ImageStoreProvider } from "@/app/store/ImageStore"
+import Footer from "@/components/footer/Footer"
 import Header from "@/components/header/Header"
 import ImageFilter from "@/components/imageFilter/ImageFilter"
 import ImgSlider from "@/components/ImgSlider/ImgSlider"
@@ -11,6 +12,7 @@ const Gallery = () => {
     <ImgSlider/>
     <ImageFilter/>
     <PhotoGroup/>
+    <Footer/>
     </ImageStoreProvider>
   )
 }

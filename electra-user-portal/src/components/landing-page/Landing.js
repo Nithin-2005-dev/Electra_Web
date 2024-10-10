@@ -1,12 +1,35 @@
 'use client'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import LightninigBold from '../3d-models/lightning-bolt'
 import { Environment} from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import {motion} from 'framer-motion'
 import Typewriter from 'typewriter-effect';
 import Link from 'next/link'
+import axios from 'axios'
 const Landing = () => {
+  const [user,setUser]=useState("user");
+  const getUserDetails=async()=>{
+    try{
+    const res=await axios.post('/api/users/user');
+    const name=await res.data.data.userName
+    setUser(name);
+    }catch(err){
+      setUser("user")
+      console.log(err);
+    }
+  }
+  const handleLogOut=async()=>{
+    try{
+    await axios('/api/users/logOut')
+    setUser(undefined)
+    }catch(err){
+
+    }
+  }
+  useEffect(()=>{
+    getUserDetails();
+  },[])
   new Typewriter('#typewriter', {
     autoStart: true,
   });
@@ -44,7 +67,7 @@ const Landing = () => {
       </span>
       </span>
       </motion.div>
-      <motion.div className="text-lg lg:text-2xl sm:text-base font-serif" initial={{
+      <motion.div className="text-lg lg:text-2xl sm:text-base font-serif capitalize" initial={{
         x:-1000,
       }}
       animate={{
@@ -55,11 +78,13 @@ const Landing = () => {
           duration:1,
           delay:1,
         }
-      }}>The Official Society of the Electrical Engineering Department, NIT Silchar</motion.div>
+      }}>{`${user? `Hello ${user} ,welcome to `:``}The Official Society of the Electrical Engineering Department, NIT Silchar`}</motion.div>
       <div className=' absolute bottom-[10vh] md:bottom-[18vh]'>
-      <Link href={'/Sign-Up'} className='bg-yellow-600 font-black px-3 sm:text-2xl rounded-xl mr-2 py-1 text-lg  hover:scale-110 hover:bg-yellow-500 hover:border-4 hover:border-double'>
+      {user!="user"? <button onClick={handleLogOut} className='bg-yellow-600 font-black px-3 sm:text-2xl rounded-xl mr-2 py-1 text-lg  hover:scale-110 hover:bg-yellow-500 hover:border-4 hover:border-double'>
+      Log Out
+    </button>:<Link href={'/Sign-Up'} className='bg-yellow-600 font-black px-3 sm:text-2xl rounded-xl mr-2 py-1 text-lg  hover:scale-110 hover:bg-yellow-500 hover:border-4 hover:border-double'>
       Join Us
-    </Link>
+    </Link>}
       </div>
       </div>
       <motion.div initial={{y:-1000}} animate={{

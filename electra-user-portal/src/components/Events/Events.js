@@ -1,5 +1,5 @@
 'use client'
-import { EventData } from '@/app/utils/eventData';
+import { EventData } from '@/app/utils/knowMoreData';
 import React, { useRef, useState } from 'react'
 import { VerticalTimeline, VerticalTimelineElement }  from 'react-vertical-timeline-component';
 import 'react-vertical-timeline-component/style.min.css';
@@ -25,14 +25,14 @@ const Events = () => {
               }
             }
             >
-                <div className={`text-yellow-500 font-semibold text-2xl ${styles['sofadi-one-regular']} text-center ${styles['title-shadow']}`}>{event.title}</div>
+                <div className={`text-yellow-500 font-semibold text-2xl ${styles['sofadi-']} text-center ${styles['title-shadow']}`} style={{fontFamily:'Lucida Sans'}}>{event.title}</div>
                 <div className={`text-[#bed3de] font-mono ${styles['space-grotesk']} ${styles['dec-shadow']}`}>{event.description}</div>
-                <div className='flex justify-between mt-2'>
+                <div className='flex justify-center mt-2'>
                 <Button className={`bg-[#0F4C75] rounded-xl hover:opacity-80 hover:bg-[#0F4C75] ${styles['hvr-float-shadow']} font-bold px-4 ${styles['card-button']}`} onClick={()=>{
                   setOpenMore(true)
                   setData(event)
                 }}>Know More</Button>
-                <Button className={`bg-[#0F4C75] rounded-xl hover:opacity-80 hover:bg-[#0F4C75] ${styles['hvr-float-shadow']} font-bold px-4 ${styles['card-button']}`}>Register</Button>
+                {/* <Button className={`bg-[#0F4C75] rounded-xl hover:opacity-80 hover:bg-[#0F4C75] ${styles['hvr-float-shadow']} font-bold px-4 ${styles['card-button']}`}>Register</Button> */}
                 </div>
               </VerticalTimelineElement>
           })

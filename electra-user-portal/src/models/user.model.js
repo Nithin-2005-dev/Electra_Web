@@ -5,6 +5,10 @@ const userSchema=new mongoose.Schema({
             required:[true,'please provide userName'],
             unique:true,
         },
+        phone:{
+            type:String,
+            required:[true,'please provide phone number'],
+        },
         email:{
             type:String,
             required:[true,'please provide email']
@@ -30,4 +34,4 @@ const userSchema=new mongoose.Schema({
         verifyToken:String,
         verifyTokenExpiry:Date,
 });
-export const User=mongoose.models.users || mongoose.model('User',userSchema);
+export const User=mongoose.models.User || mongoose.model('User',userSchema);

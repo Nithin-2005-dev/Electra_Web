@@ -1,12 +1,13 @@
 'use client'
 import Link from 'next/link'
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { RiBook2Fill } from 'react-icons/ri'
 import ResourceCard from '../ui/ResourceCard'
 import { Canvas } from '@react-three/fiber'
 import { Environment } from '@react-three/drei'
 import Pikachu from '../3d-models/Pikachu/Pikachu'
 import { AnimationStore } from '@/app/store/AnimationStore'
+import { ResourceStore } from '@/app/store/ResourceStore'
 
 const SemesterResources = ({semester}) => {
   const {setPikaAnimation}=useContext(AnimationStore)

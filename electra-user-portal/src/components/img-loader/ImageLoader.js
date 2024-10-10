@@ -3,7 +3,8 @@ import styled from "styled-components";
 
 const ImageLoader = () => {
   return (
-    <StyledWrapper className="absolute top-1/2 right-[45vw]">
+    <div className="w-screen h-screen flex justify-center items-center z-[1000]">
+    <StyledWrapper>
       <div className="container_SevMini">
         <div className="SevMini">
           <svg
@@ -179,6 +180,7 @@ const ImageLoader = () => {
         </div>
       </div>
     </StyledWrapper>
+    </div>
   );
 };
 
