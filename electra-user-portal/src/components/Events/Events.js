@@ -1,5 +1,5 @@
 'use client'
-import { EventData } from '@/app/utils/eventData';
+import { EventData } from '@/app/utils/knowMoreData';
 import React, { useRef, useState } from 'react'
 import { VerticalTimeline, VerticalTimelineElement }  from 'react-vertical-timeline-component';
 import 'react-vertical-timeline-component/style.min.css';

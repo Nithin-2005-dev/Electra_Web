@@ -1,4 +1,4 @@
-import { NextResponse } from "next/dist/server/web/spec-extension/response";
+import { NextResponse } from "next/server";
 import { Resource} from "../../../models/resources.model";
 import {ConnectDb} from '../../database/dbConfig'
 export async function GET() {
