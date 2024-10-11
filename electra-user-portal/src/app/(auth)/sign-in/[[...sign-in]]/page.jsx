@@ -28,7 +28,7 @@ const page = () => {
               },
             }}/>
             <div className='flex already justify-end p-2'>
-      <p>Don't have an account?</p>
+      <p>{`Don't have an account?`}</p>
       <Link href={'/Sign-up'} className='text-blue-400 underline px-2'>sign-up</Link>
     </div>
     </div>

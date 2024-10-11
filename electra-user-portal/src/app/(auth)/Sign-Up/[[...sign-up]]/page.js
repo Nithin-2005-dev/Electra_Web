@@ -29,7 +29,7 @@ const Sign = () => {
               },
             }}/>
              <div className='flex already justify-end p-2'>
-      <p>Already have an account?</p>
+      <p>{`Already have an account?`}</p>
       <Link href={'/sign-in'} className='text-blue-400 underline px-2'>sign-in</Link>
     </div>
     </div>
