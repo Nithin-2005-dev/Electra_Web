@@ -13,7 +13,7 @@ const KnowMore = ({openMore,setOpenMore,dataToShow}) => {
   return (
     <div>
       <Dialog open={openMore} onOpenChange={setOpenMore}>
-  <DialogContent className={`border-0 bg-slate-950 bg-opacity-50 rounded-xl`}>
+  <DialogContent className={`border-0 bg-slate-950 bg-opacity-50 rounded-xl `}>
     <DialogHeader>
       <DialogTitle className='text-yellow-400'>{dataToShow?.title}</DialogTitle>
       <br/>
