@@ -1,0 +1,1 @@
+document.querySelector('.cl-formFieldLabel__firstName-field')?.innerHTML='Scholar Id'
