@@ -4,8 +4,8 @@ import { ClerkProvider } from '@clerk/nextjs';
 
 export const metadata = {
   title: "Electra Society",
-  description: "Discover the Electra Society of NIT Silchar. Explore event galleries, academic resources, team details, and all about the Electrical Engineering Department. Stay updated with seminars, workshops, and student activities organized by Electra Society.",
-  keywords:"Electrical Engineering, NIT Silchar, academic resources, class notes, electrical engineering department, engineering seminars, technical workshops, research publications, student activities, Electra Society, NIT Silchar events, faculty directory, lab manuals, project reports, engineering syllabus, engineering assignments.",
+  description: `Discover the Electra Society of NIT Silchar. Explore event galleries, academic resources, team details, and all about the Electrical Engineering Department. Stay updated with seminars, workshops, and student activities organized by Electra Society`,
+  keywords:`Electrical Engineering, NIT Silchar, academic resources, class notes, electrical engineering department, engineering seminars, technical workshops, research publications, student activities, Electra Society, NIT Silchar events, faculty directory, lab manuals, project reports, engineering syllabus, engineering assignments,Electra Society NIT Silchar,Electrical Engineering Site Nit Silchar`,
 };
 export default function RootLayout({ children }) {
   return (
