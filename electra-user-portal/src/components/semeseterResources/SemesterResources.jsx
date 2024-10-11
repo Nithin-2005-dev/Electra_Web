@@ -25,14 +25,15 @@ const SemesterResources = ({semester,category}) => {
         category:'assignments'
     }]
   return (
-    <div>
+    <div >
       <Link
         href={"/Resources"}
         className="bg-fuchsia-500 text-white absolute top-0 m-3 p-2 rounded-xl font-bold drop-shadow-[0rem_0rem_0.5rem_rgba(50,250,250,0.5)] text-xl sm:3xl hover:scale-125"
       >
         <RiBook2Fill />
       </Link>
-      <div className='flex justify-center flex-col gap-3 absolute h-[75vh] p-2 mx-3 items-center w-1/2'> 
+      <div 
+      className='flex justify-center flex-col gap-3 absolute h-[75vh] p-2 mx-3 items-center w-1/2'> 
       {items.map((item)=>{
        return <Link href={`/Resources/Categories/${semester}|${item.category}`} className='w-full' key={item.name}><ResourceCard item={item} /></Link>
       })}

@@ -8,9 +8,15 @@ import { Environment } from '@react-three/drei'
 import { AnimationStore } from '@/app/store/AnimationStore'
 import Link from 'next/link'
 import { RiBook2Fill } from 'react-icons/ri'
+import { useMotionValueEvent, useScroll } from 'framer-motion'
+import ResLoader from '../ui/ResLoader'
 const SemesterResourceCategory = ({semester,category}) => {
-  const {sem}=useContext(ResourceStore);
+  const {sem,resLoad}=useContext(ResourceStore);
   const {setPikaAnimation}=useContext(AnimationStore)
+  const { scrollY } = useScroll()
+useMotionValueEvent(scrollY, "change", (latest) => {
+  setPikaAnimation(0)
+})
     const {getResources,setData,data}=useContext(ResourceStore)
     const [subjectData,setSubjectData]=useState([])
     useEffect(()=>{
@@ -24,17 +30,33 @@ const SemesterResourceCategory = ({semester,category}) => {
       >
         <RiBook2Fill />
       </Link>
-    <div className='flex flex-col absolute left-0 w-1/2 gap-3 m-2 lg:m-5'>
+
+{resLoad ?<ResLoader/>:<> <div 
+    onMouseOver={()=>{
+          setPikaAnimation(1)
+
+      }}
+      onMouseLeave={()=>{
+          setPikaAnimation(2)
+      }}
+      onTouchStart={()=>{
+          setPikaAnimation(1)
+      }}
+      onTouchEnd={()=>{
+          setPikaAnimation(2)
+      }}
+     className='flex flex-col absolute left-0 w-1/2 justify-center gap-3 m-2 lg:m-5 p-2'>
     <h3 className='text-center capitalize font-mono font-bold text-2xl lg:text-3xl'>{category}</h3>
-      {data.length>0 && data.map((ele)=>{
-        return <div key={ele._id} >
-        <div className='flex justify-between gap-4 p-2 px-3 lg:px-6 bg-slate-900 shadow-xl shadow-slate-800 items-center rounded-xl'>
-        <div className='text-white self-center text-center content-center'>{ele.name}</div>
+  { data.length>0 && data.map((ele)=>{
+        return <div key={ele._id} className='' >
+        <div className='flex justify-between gap-4 p-2 px-3 lg:px-6 bg-slate-900 shadow-xl shadow-slate-900 items-center rounded-xl border-1'>
+        <div className='text-white self-center text-left content-center text-xs sm:text-base lg:text-lg'>{ele.name}</div>
         <PdfDialog link={ele.driveUrl}/>
         </div>
         </div>
       })}
-      <div className='fixed right-0' onMouseOver={()=>{
+    </div>
+     <div className='fixed right-0' onMouseOver={()=>{
           setPikaAnimation(2)
 
       }}
@@ -53,7 +75,7 @@ const SemesterResourceCategory = ({semester,category}) => {
       <Environment preset='warehouse'/>
     </Canvas>
       </div>
-    </div>
+      </>}
     </>
   )
 }

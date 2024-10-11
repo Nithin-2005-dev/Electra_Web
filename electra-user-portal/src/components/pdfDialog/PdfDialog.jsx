@@ -13,7 +13,7 @@ const PdfDialog = ({link}) => {
     <div>
     <button onClick={()=>{
         setPdf(true)
-    }}><p className='inline-block p-1 px-2 text-gray-400'>view</p><IoMdEye className='inline-block text-gray-600'/></button>
+    }} className='sm:bg-slate-800 rounded-xl px-2 sm:px-3 hover:scale-110 min-w-3'><p className=' p-1 px-2 text-gray-400 hidden sm:inline-block'>view</p><IoMdEye className='inline-block text-gray-600'/></button>
     <div className='fixed top-[2vh] right-[15vw] lg:right-[25vw] z-[2000]'>
       <Dialog open={pdf} onOpenChange={setPdf} className='bg-black'>
       <DialogContent className={`aspect-auto border-0 w-[70vw] h-[80vh] lg:w-[50vw]`}>
