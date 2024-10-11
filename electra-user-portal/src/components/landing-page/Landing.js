@@ -7,29 +7,31 @@ import {motion} from 'framer-motion'
 import Typewriter from 'typewriter-effect';
 import Link from 'next/link'
 import axios from 'axios'
+import { SignOutButton, useUser } from '@clerk/nextjs'
 const Landing = () => {
-  const [user,setUser]=useState("user");
-  const getUserDetails=async()=>{
-    try{
-    const res=await axios.post('/api/users/user');
-    const name=await res.data.data.userName
-    setUser(name);
-    }catch(err){
-      setUser("user")
-      console.log(err);
-    }
-  }
-  const handleLogOut=async()=>{
-    try{
-    await axios('/api/users/logOut')
-    setUser(undefined)
-    }catch(err){
+  const {user}=useUser()
+  // const [user,setUser]=useState("user");
+  // const getUserDetails=async()=>{
+  //   try{
+  //   const res=await axios.post('/api/users/user');
+  //   const name=await res.data.data.userName
+  //   setUser(name);
+  //   }catch(err){
+  //     setUser("user")
+  //     console.log(err);
+  //   }
+  // }
+  // const handleLogOut=async()=>{
+  //   try{
+  //   await axios('/api/users/logOut')
+  //   setUser(undefined)
+  //   }catch(err){
 
-    }
-  }
-  useEffect(()=>{
-    getUserDetails();
-  },[])
+  //   }
+  // }
+  // useEffect(()=>{
+  //   getUserDetails();
+  // },[])
   new Typewriter('#typewriter', {
     autoStart: true,
   });
@@ -78,11 +80,11 @@ const Landing = () => {
           duration:1,
           delay:1,
         }
-      }}>{`${user? `Hello ${user} ,welcome to `:``}The Official Society of the Electrical Engineering Department, NIT Silchar`}</motion.div>
+      }}>{`${user? `Hello ${user.username} ,welcome to `:``}The Official Society of the Electrical Engineering Department, NIT Silchar`}</motion.div>
       <div className=' absolute bottom-[10vh] md:bottom-[18vh]'>
-      {user!="user"? <button onClick={handleLogOut} className='bg-yellow-600 font-black px-3 sm:text-2xl rounded-xl mr-2 py-1 text-lg  hover:scale-110 hover:bg-yellow-500 hover:border-4 hover:border-double'>
+      {user? <SignOutButton className='bg-yellow-600 font-black px-3 sm:text-2xl rounded-xl mr-2 py-1 text-lg  hover:scale-110 hover:bg-yellow-500 hover:border-4 hover:border-double'>
       Log Out
-    </button>:<Link href={'/Sign-Up'} className='bg-yellow-600 font-black px-3 sm:text-2xl rounded-xl mr-2 py-1 text-lg  hover:scale-110 hover:bg-yellow-500 hover:border-4 hover:border-double'>
+    </SignOutButton>:<Link href={'/Sign-up'} className='bg-yellow-600 font-black px-3 sm:text-2xl rounded-xl mr-2 py-1 text-lg  hover:scale-110 hover:bg-yellow-500 hover:border-4 hover:border-double'>
       Join Us
     </Link>}
       </div>
