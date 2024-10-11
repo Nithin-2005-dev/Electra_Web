@@ -5,14 +5,16 @@ import React, { useState } from 'react'
 import { Card } from 'react-bootstrap'
 import 'reactjs-popup/dist/index.css';
 import { DialogHeader } from '../ui/dialog';
+import { FaRegFilePdf } from "react-icons/fa";
+import { IoMdEye } from "react-icons/io";
 const PdfDialog = ({link}) => {
     const [pdf,setPdf]=useState(false);
   return (
     <div>
     <button onClick={()=>{
         setPdf(true)
-    }}>view</button>
-    <div className='fixed top-[2vh] right-[15vw] lg:right-[25vw]'>
+    }}><p className='inline-block p-1 px-2 text-gray-400'>view</p><IoMdEye className='inline-block text-gray-600'/></button>
+    <div className='fixed top-[2vh] right-[15vw] lg:right-[25vw] z-[2000]'>
       <Dialog open={pdf} onOpenChange={setPdf} className='bg-black'>
       <DialogContent className={`aspect-auto border-0 w-[70vw] h-[80vh] lg:w-[50vw]`}>
       <DialogHeader>

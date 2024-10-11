@@ -23,7 +23,7 @@ export default function Pikachu(props) {
     present(pikaAnimation)
   })
   return (
-    <group ref={group} {...props} dispose={null} scale={size} position={[0.2,-1.5,0]}>
+    <group ref={group} {...props} dispose={null} scale={size} position={[0.2,-0.3,0]}>
       <group name="Sketchfab_Scene">
         <primitive object={nodes.GLTF_created_0_rootJoint} />
         <skinnedMesh

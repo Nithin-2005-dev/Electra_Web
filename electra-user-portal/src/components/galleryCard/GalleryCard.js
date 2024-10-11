@@ -36,7 +36,7 @@ const GalleryCard = ({ pic }) => {
           src={pic.publicId}
           sizes="100vw"
           alt={`${pic.category}/${pic.year}`}
-          className="aspect-square"
+          className="aspect-square object-fill"
         />
       </Card>
       <CardFooter>

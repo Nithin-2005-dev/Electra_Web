@@ -9,7 +9,7 @@ import Pikachu from '../3d-models/Pikachu/Pikachu'
 import { AnimationStore } from '@/app/store/AnimationStore'
 import { ResourceStore } from '@/app/store/ResourceStore'
 
-const SemesterResources = ({semester}) => {
+const SemesterResources = ({semester,category}) => {
   const {setPikaAnimation}=useContext(AnimationStore)
     const items=[{
         name:'Books',
@@ -32,7 +32,7 @@ const SemesterResources = ({semester}) => {
       >
         <RiBook2Fill />
       </Link>
-      <div className='flex justify-center flex-col gap-3 absolute h-[90vh] p-2 mx-3 items-center w-1/2'> 
+      <div className='flex justify-center flex-col gap-3 absolute h-[75vh] p-2 mx-3 items-center w-1/2'> 
       {items.map((item)=>{
        return <Link href={`/Resources/Categories/${semester}|${item.category}`} className='w-full' key={item.name}><ResourceCard item={item} /></Link>
       })}

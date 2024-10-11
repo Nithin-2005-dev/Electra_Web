@@ -16,7 +16,7 @@ const Sign = () => {
       >
         <IoHome />
       </Link>
-    <div className='flex flex-col justify-center items-center h-[88vh]'>
+    <div className='flex flex-col justify-center items-center'>
     {/* <SignUp/> */}
     <div className=''>
     <SignUp appearance={{

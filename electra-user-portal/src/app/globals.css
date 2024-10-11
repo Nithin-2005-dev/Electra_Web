@@ -258,7 +258,7 @@ body{
 .cl-otpCodeFieldInput,.cl-input{
   border: 1px solid whitesmoke;
   background-color: rgba(245, 245, 245, 0.395);
-  color: black;
+  color: whitesmoke;
 }
 .cl-formResendCodeLink{
   color: whitesmoke;
@@ -278,4 +278,26 @@ body{
 }
 .cl-formFieldAction{
   color: white;
+}
+.cl-footerActionLink,.cl-alternativeMethodsBlockButtonText{
+  color: white;
+  opacity: 1;
+  z-index: 10;
+}
+.cl-backLink{
+  width: 100%;
+  color: red;
+  text-decoration: underline;
+  font-weight: 600;
+  font-size: larger;
+  text-align: center;
+}
+.cl-internal-1fn33zq{
+  color: #44495f;
+}
+.cl-formFieldHintText{
+  display: none;
+}
+.cl-formFieldInputShowPasswordIcon{
+  color: wheat;
 }
