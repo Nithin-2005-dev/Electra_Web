@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { RiBook2Fill } from 'react-icons/ri'
 import { useMotionValueEvent, useScroll } from 'framer-motion'
 import ResLoader from '../ui/ResLoader'
+import NoRes from '../ui/NoRes'
 const SemesterResourceCategory = ({semester,category}) => {
   const {sem,resLoad}=useContext(ResourceStore);
   const {setPikaAnimation}=useContext(AnimationStore)
@@ -24,14 +25,15 @@ useMotionValueEvent(scrollY, "change", (latest) => {
     },[])
   return (
     <>
-      <Link
+    <Link
         href={"/Resources"}
         className="bg-fuchsia-500 text-white absolute top-0 m-3 p-2 rounded-xl font-bold drop-shadow-[0rem_0rem_0.5rem_rgba(50,250,250,0.5)] text-xl sm:3xl hover:scale-125"
       >
         <RiBook2Fill />
       </Link>
+    {resLoad ?<ResLoader/>:!data.length>0?<NoRes/>: <>
 
-{resLoad ?<ResLoader/>:<> <div 
+{<> <div 
     onMouseOver={()=>{
           setPikaAnimation(1)
 
@@ -76,6 +78,7 @@ useMotionValueEvent(scrollY, "change", (latest) => {
     </Canvas>
       </div>
       </>}
+    </>}
     </>
   )
 }
