@@ -55,7 +55,7 @@ theme="colored"
       <div className="flex flex-wrap gap-5 justify-center items-center">
         {imgs.map((pic) => {
           return (
-            <Card className="w-1/4 flex flex-col justify-center items-center gap-2 " key={pic._id}>
+            <Card className="w-[40vw] lg:w-1/4 flex flex-col justify-center items-center gap-2 " key={pic._id}>
             <CldImage
                 key={pic._id}
                 width="960"
