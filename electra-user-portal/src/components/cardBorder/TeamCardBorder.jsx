@@ -23,12 +23,11 @@ const StyledWrapper = styled.div`
  font-size: 18px;
  font-weight: 500;
  color: #fff;
- z-index: -200;
+ z-index: 0;
  border-radius: 15px;
 }
 
 .card::after {
-	z-index: -200;
  --m-i: linear-gradient(#000, #000);
  --m-o: content-box, padding-box;
  content: "";
