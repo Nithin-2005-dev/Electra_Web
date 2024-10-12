@@ -30,7 +30,7 @@ const TeamCard = ({ele}) => {
           className={`aspect-square ${hover && 'opacity-25'}`}
         />
         </div>
-        <CardBody className={`text-center font-bold text-white ${hover ?'text-xl relative bottom-[50%] z-20':''} hover:underline ${ele.name.length>14?'text-base':'text-lg'} capitalize hover:text-fuchsia-800`}>
+        <CardBody className={`text-center font-bold text-white ${hover ?'text-xl relative bottom-[50%] z-20':''} hover:underline hover:text-fuchsia-800 ${ele.name.length>14?'text-base':'text-lg'} capitalize `}>
             {ele.name}
         </CardBody>
         <CardLink className={`flex justify-evenly mx-2 lg:text-3xl text-4xl pb-2 ${hover && 'relative bottom-[30%]'} relative z-30`}>
