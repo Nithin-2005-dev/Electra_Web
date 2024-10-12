@@ -37,7 +37,7 @@ const TeamCardGroup= () => {
           })
       }
       </motion.div>
-      <hr className=''/>
+      <hr className='sm:mx-10 mx-5 font-black'/>
       <motion.div className='flex flex-wrap justify-center items-center relative p-5 gap-3'>
       {
           first2.length>0 && first2.map((ele)=>{
@@ -45,7 +45,7 @@ const TeamCardGroup= () => {
           })
       }
       </motion.div>
-      <hr className=''/>
+      <hr  className='sm:mx-10 mx-5 font-black'/>
       <motion.div className='flex flex-wrap justify-center items-center relative p-5 gap-3'>
       {
           second.length>0 && second.map((ele)=>{
@@ -53,7 +53,7 @@ const TeamCardGroup= () => {
           })
       }
       </motion.div>
-      <hr />
+      <hr  className='sm:mx-10 mx-5 font-black'/>
       <motion.div className='flex flex-wrap justify-center items-center relative p-5 gap-3'>
       {
           third.length>0 && third.map((ele)=>{
@@ -61,7 +61,7 @@ const TeamCardGroup= () => {
           })
       }
       </motion.div>
-      <hr />
+      <hr  className='sm:mx-10 mx-5 font-black'/>
       <motion.div className='flex flex-wrap justify-center items-center relative p-5 gap-3'>
       {
           fourth.length>0 && fourth.map((ele)=>{

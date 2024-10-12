@@ -6,7 +6,7 @@ const ResourceCard = ({item}) => {
   return (
      <>
        <div className="voltage-button">
-        <button className="w-full"><div className="text-sm md:text-xl">{item}</div></button>
+        <button className="w-full"><div className="text-xs sm:text-xl">{item}</div></button>
         <svg
           version="1.1"
           xmlns="http://www.w3.org/2000/svg"
