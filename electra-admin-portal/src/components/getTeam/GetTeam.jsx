@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { CldImage } from "next-cloudinary";
-import { Card } from "react-bootstrap";
+import { Card, CardBody } from "react-bootstrap";
 const GetImages = () => {
   const [team, getTeam] = useState([]);
   const handleGet = async () => {
@@ -37,10 +37,12 @@ const GetImages = () => {
                 sizes="100vw"
                 alt="Description of my image" className="aspect-square"
               />
-            <p className="text-white">name:{t.name}</p>
-            <p className="text-white">position:{t.position}</p>
-            <p className="text-white">year:{t.year}</p>
-            <p className="text-white">category:{t.category}</p>
+              <CardBody className="flex flex-wrap ">
+              <p className="text-white text-xs md:text-base"><strong>name</strong>:{t.name}</p>
+            <p className="text-white text-xs md:text-base"><strong>position</strong>:{t.position}</p>
+            <p className="text-white text-xs md:text-base"><strong>year</strong>:{t.year}</p>
+            <p className="text-white text-xs md:text-base"><strong>category</strong>:{t.category}</p>
+              </CardBody>
               <div>
                 <button
                   onClick={() => {

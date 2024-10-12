@@ -32,11 +32,11 @@ const GetResources = () => {
                 height="480"
                 allow="autoplay"
               ></iframe> */}
-              <p className="text-white inline-block">link:{res.driveUrl}</p>
-              <p className="text-white">name:{res.name}</p>
-              <p className="text-white">semester:{res.semester}</p>
-              <p className="text-white">subject:{res.subject}</p>
-              <p className="text-white">categoty:{res.category}</p>
+              <p className="text-white inline-block text-xs md:text-base"><strong>link:</strong>{res.driveUrl}</p>
+              <p className="text-white"><strong>name:</strong>{res.name}</p>
+              <p className="text-white"><strong>semester:</strong>{res.semester}</p>
+              <p className="text-white"><strong>subject</strong>{res.subject}</p>
+              <p className="text-white"><strong>category:</strong>{res.category}</p>
               <div>
                 <button
                   onClick={() => {
