@@ -10,7 +10,8 @@ import Link from 'next/link'
 import { RiBook2Fill } from 'react-icons/ri'
 import { useMotionValueEvent, useScroll } from 'framer-motion'
 import ResLoader from '../ui/ResLoader'
-const SemesterResourceCategory = ({semester,category}) => {
+import NoRes from '../ui/NoRes'
+const SemesterResourceCategory = ({semester,category,code}) => {
   const {sem,resLoad}=useContext(ResourceStore);
   const {setPikaAnimation}=useContext(AnimationStore)
   const { scrollY } = useScroll()
@@ -22,16 +23,21 @@ useMotionValueEvent(scrollY, "change", (latest) => {
     useEffect(()=>{
         getResources(semester,category)
     },[])
+    console.log(data);
+    const subData=data.filter((ele)=>{
+        return ele.subject==code;
+    })
   return (
     <>
-      <Link
+    <Link
         href={"/Resources"}
         className="bg-fuchsia-500 text-white absolute top-0 m-3 p-2 rounded-xl font-bold drop-shadow-[0rem_0rem_0.5rem_rgba(50,250,250,0.5)] text-xl sm:3xl hover:scale-125"
       >
         <RiBook2Fill />
       </Link>
+    {resLoad ?<ResLoader/>:!subData.length>0?<NoRes/>: <>
 
-{resLoad ?<ResLoader/>:<> <div 
+{<> <div 
     onMouseOver={()=>{
           setPikaAnimation(1)
 
@@ -45,9 +51,9 @@ useMotionValueEvent(scrollY, "change", (latest) => {
       onTouchEnd={()=>{
           setPikaAnimation(2)
       }}
-     className='flex flex-col absolute left-0 w-1/2 justify-center gap-3 m-2 lg:m-5 p-2'>
-    <h3 className='text-center capitalize font-mono font-bold text-2xl lg:text-3xl'>{category}</h3>
-  { data.length>0 && data.map((ele)=>{
+     className='flex flex-col absolute left-0 w-1/2 justify-center gap-3 m-2 lg:m-5 p-2 min-h-[50vh]'>
+    <h3 className='text-center capitalize font-mono font-bold text-2xl lg:text-3xl'>{category}<p className='uppercase inline-block'>({code})</p></h3>
+  { subData.length>0 && subData.map((ele)=>{
         return <div key={ele._id} className='' >
         <div className='flex justify-between gap-4 p-2 px-3 lg:px-6 bg-slate-900 shadow-xl shadow-slate-900 items-center rounded-xl border-1'>
         <div className='text-white self-center text-left content-center text-xs sm:text-base lg:text-lg'>{ele.name}</div>
@@ -76,6 +82,7 @@ useMotionValueEvent(scrollY, "change", (latest) => {
     </Canvas>
       </div>
       </>}
+    </>}
     </>
   )
 }

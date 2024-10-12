@@ -16,7 +16,7 @@ const TeamCard = ({ele}) => {
       }} onMouseLeave={()=>{
         setHover(false)
       }}>
-        <CardHeader className={`text-center font-black  text-white ${hover ?'text-lg relative top-[40%] z-20':''} hover:underline ${ele.position.length>14?'text-xs':'text-base'} capitalize`}>
+        <CardHeader className={`text-center font-black  text-white ${hover ?'text-lg relative top-[40%] z-20':''} hover:underline ${ele.position.length>14?'text-xs':'text-base'} capitalize hover:text-fuchsia-800`}>
         {ele.position}
         </CardHeader>
         <div className={`${hover && 'blur-sm opacity-50'}`}>
@@ -30,7 +30,7 @@ const TeamCard = ({ele}) => {
           className={`aspect-square ${hover && 'opacity-25'}`}
         />
         </div>
-        <CardBody className={`text-center font-bold text-white ${hover ?'text-xl relative bottom-[50%] z-20':''} hover:underline ${ele.name.length>14?'text-base':'text-lg'} capitalize`}>
+        <CardBody className={`text-center font-bold text-white ${hover ?'text-xl relative bottom-[50%] z-20':''} hover:underline hover:text-fuchsia-800 ${ele.name.length>14?'text-base':'text-lg'} capitalize `}>
             {ele.name}
         </CardBody>
         <CardLink className={`flex justify-evenly mx-2 lg:text-3xl text-4xl pb-2 ${hover && 'relative bottom-[30%]'} relative z-30`}>

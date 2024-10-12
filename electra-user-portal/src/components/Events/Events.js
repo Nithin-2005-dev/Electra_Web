@@ -8,6 +8,7 @@ import { Button } from '../ui/button';
 import { useInView } from 'react-intersection-observer';
 import {motion} from 'framer-motion'
 import KnowMore from '../knowMore/KnowMore';
+import { Scale } from 'lucide-react';
 const Events = () => {
   const [openMore,setOpenMore]=useState(false);
   const [dataToShow,setData]=useState({});
@@ -18,8 +19,9 @@ const Events = () => {
         {
           EventData.map((event)=>{
 
-            return <VerticalTimelineElement key={event.title} visible={true} contentStyle={{ background:'#3282B8', color: '#fff' }} icon={event.icon}
-            iconStyle={{background:'#3282B8',color:'white'}} contentArrowStyle={{ borderRight: '7px solid  #3282BB'}} intersectionObserverProps={
+            return <VerticalTimelineElement key={event.title} visible={true} contentStyle={{ background:'#3282B8', color: '#ffffff', }} icon={event.icon}
+            iconStyle={{background:'#3282B8',color:'white'} } 
+            contentArrowStyle={{ borderRight: '7px solid  #3282BB'}} intersectionObserverProps={
               {
                 
               }
