@@ -80,7 +80,7 @@ const Landing = () => {
           duration:1,
           delay:1,
         }
-      }}>{`${user? `Hello ${user.firstName} ,welcome to `:``}The Official Society of the Electrical Engineering Department, NIT Silchar`}</motion.div>
+      }}>{`${user?.firstName? `Hello ${user.firstName} ,welcome to `:``}The Official Society of the Electrical Engineering Department, NIT Silchar`}</motion.div>
       <div className=' absolute bottom-[10vh] md:bottom-[18vh]'>
       {user? <SignOutButton className='bg-yellow-600 font-black px-3 sm:text-2xl rounded-xl mr-2 py-1 text-lg  hover:scale-110 hover:bg-yellow-500 hover:border-4 hover:border-double'>
       Log Out

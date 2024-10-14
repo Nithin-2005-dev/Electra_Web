@@ -24,9 +24,12 @@ useMotionValueEvent(scrollY, "change", (latest) => {
         getResources(semester,category)
     },[])
     console.log(data);
-    const subData=data.filter((ele)=>{
+    let subData=data?.filter((ele)=>{
         return ele.subject==code;
     })
+    if(code=='all'){
+      subData=data;
+    }
   return (
     <>
     <Link

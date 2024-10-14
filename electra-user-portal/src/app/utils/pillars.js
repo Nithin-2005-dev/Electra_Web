@@ -7,12 +7,12 @@ export const PillarsData=[
 Vivekanandan S was the recipient of the Best Paper Award in Asia Flagship Conference TENCON 18. He is the Member of IEEE. He served as Editorial board member of many conference committees. Published his research articles in high impact journals such as, IEEE Transaction, IET, Elsevier etc., He served as guest editor for SCOPUS and Web of Science Journals. He organized Scopus index conferences, IEEE conferences and supported many workshops and training programs conducted by the government organization.`,
 name:'Dr. Vivekanandan S',
 post:'Faculty In Charge',
-image:'https://i.imghippo.com/files/5CrfN1727663203.png'
+image:'https://res.cloudinary.com/dqa3ov76r/image/upload/v1728873552/favoritePhotos/ubcjix1n1fp3gv1uj1y3.png'
     },
     {
         Info:`Dr. Goswami obtained his Bachelor of Technology in Electrical Engineering from Regional Engineering College, Kurukshetra (now, NIT Kurukshetra) in 1997. He received his Master of Engineering in Electrical and Electronics Engineering with Power Systems specializations in 2005 and Ph.D. in 2010 from BIT Mesra and Indian Institute of Technology Roorkee. He joined the National Institute of Technology Silchar as Assistant Professor in May 2010 and currently a Professor. Before joining the National Institute of Technology Silchar, he was a faculty member of National Institute of Science and Technology Odisha and Mody Institute of Technolgy and Sciences, Rajasthan. He was a Summer Research Faculty Fellow at the Indian Institute of Science Bangalore in 2013. He was a Visiting Scientist under an international collaborative/exchange program for two weeks during June 2015 sponsored by Indian National Science Academy for researching Middle East Technical University Turkey. He is a member of IEEE. He is a continuous reviewer of many IEEE Transactions, IET, Elsevier’s and Taylor & Francis Journals. Sixteen M. Tech students have completed their dissertation under him. Ten students were awarded PhD degree, and seven students are presently doing their research work for PhD degree under him. He is presently serving as an associate editor for IEEE Access Journal. He has published more than 160 publications in various international journals and conferences. He has received 2201 citations on his published works and has an H-index 25 (Google Scholar) as of September 2023. He is currently doing research in Electric Vehicle and Congestion Management, Renewable Energy Management and Smart Grid, Power Quality and Energy Markets, Condition Monitoring of Electrical Equipment.`,
         name:'Arup Kumar Goswami',
         post:'Head Of Department',
-        image:'https://i.imghippo.com/files/IfpH31727663246.png'
+        image:'https://res.cloudinary.com/dqa3ov76r/image/upload/t_transformed-hod/v1728873640/favoritePhotos/coluyumnb2hvgab0gqjm.png'
     }
 ]

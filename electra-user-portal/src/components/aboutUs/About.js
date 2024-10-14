@@ -3,6 +3,7 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import { PillarsData } from '@/app/utils/pillars'
 import styles from '../../app/styles/About.module.css'
+import { Card, CardBody, CardFooter, CardHeader, CardImg } from 'react-bootstrap'
 const AboutUs = () => {
   return (
     <div id='about'>
@@ -17,10 +18,18 @@ const AboutUs = () => {
             return <><div key={pillar.name} className='flex m-1 md:m-3 lg:m-4 flex-col items-center p-1 lg:p-4 gap-5 text-center'>
             <div>
             <div className='flex flex-col'>
-            <div className='text-2xl font-black justify-center font-serif text-red-300'>{pillar.post}</div>
-            <img src={pillar.image} alt={pillar.name} width={200} style={{borderRadius:'10%'}}/>
-            </div>
+            <Card className='bg-[#070F2B]'>
+          <CardHeader>
+          <div className='text-2xl font-black justify-center font-serif text-red-300'>{pillar.post}</div>
+          </CardHeader>
+          <CardBody>
+            <CardImg src={pillar.image} alt={pillar.name} width={200} style={{borderRadius:'10%'}} className='aspect-square'/>
+            </CardBody>
+            <CardFooter>
             <div className='font-bold text-2xl text-fuchsia-200'>{pillar.name}</div>
+            </CardFooter>
+            </Card>
+            </div>
             </div>
                 <div className={`text-left ${styles['edu-au-vic-wa-nt-guide ']} text-blue-100 font-semibold text-xs lg:text-lg`}>{pillar.Info}</div>
             </div>
