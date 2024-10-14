@@ -15,7 +15,7 @@ const TeamCardGroup= () => {
    return ele.position==='president' || ele.position==='general secretary';
   })
   const first2=team.filter((ele)=>{
-    return ele.position==='vice president' || ele.position==='assistant general secretary';
+    return ele.position==='vice president' || ele.position==='assistant general seceretary';
    })
   const second=team.filter((ele)=>{
     return ele.category==='heads';
@@ -26,11 +26,45 @@ const TeamCardGroup= () => {
    const fourth=team.filter((ele)=>{
     return ele.category==='executive%20team';
    })
-   console.log(team)
+   first2?.sort(function(a,b){
+    if(a.position>b.position){
+        return -1;
+    }else if(a.position<b.position){
+        return 1;
+    }else return 0;
+   })
+   first?.sort(function(a,b){
+    if(a.position>b.position){
+        return 1;
+    }else if(a.position<b.position){
+        return -1;
+    }else return 0;
+   })
+   second?.sort(function(a,b){
+    if(a.position>b.position){
+        return 1;
+    }else if(a.position<b.position){
+        return -1;
+    }else return 0;
+   })
+   third?.sort(function(a,b){
+    if(a.position>b.position){
+        return -1;
+    }else if(a.position<b.position){
+        return 1;
+    }else return 0;
+   })
+   fourth?.sort(function(a,b){
+    if(a.position>b.position){
+        return 1;
+    }else if(a.position<b.position){
+        return -1;
+    }else return 0;
+   })
   return (
     <>
     {teamLoad?<TeamLoader/>: <div>
-      <motion.div className='flex flex-wrap justify-center items-center relative p-5 gap-3'>
+      <motion.div className='flex flex-wrap justify-evenly items-center relative p-5 gap-3'>
       {
           first.length>0 && first.map((ele)=>{
               return <TeamCard ele={ele} key={ele._id}/>
@@ -38,7 +72,7 @@ const TeamCardGroup= () => {
       }
       </motion.div>
       <hr className='sm:mx-10 mx-5 font-black'/>
-      <motion.div className='flex flex-wrap justify-center items-center relative p-5 gap-3'>
+      <motion.div className='flex flex-wrap justify-evenly items-center relative p-5 gap-3'>
       {
           first2.length>0 && first2.map((ele)=>{
               return <TeamCard ele={ele} key={ele._id}/>
