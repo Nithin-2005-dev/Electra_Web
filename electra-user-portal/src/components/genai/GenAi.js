@@ -42,8 +42,9 @@ onTouchStart={()=>{
   setPikaAnimation(2)
 }} 
   >
-    <ToastContainer
-position="top-right"
+  <div className='z-[10000]'>
+  <ToastContainer 
+position="bottom-right"
 autoClose={5000}
 hideProgressBar={false}
 newestOnTop={false}
@@ -54,6 +55,7 @@ draggable
 pauseOnHover
 theme="dark"
 />
+  </div>
       <div className='flex flex-col'>
       <Card body className='h-[60vh] lg:h-[65vh]  overflow-hidden overflow-y-scroll bg-slate-700 my-2 rounded-2xl text-white' id='res' >
       {response==''?'Ask Questions related to your subjects ':response}
@@ -71,7 +73,7 @@ theme="dark"
             <button className={`${styles['hvr-ripple-in']} bg-blue-500 p-1 px-2 lg:px-3 font-bold rounded-xl text-xs lg:text-base`} onClick={()=>{
                 navigator.clipboard.writeText(document.getElementById('res').innerText);
                 toast.success('copied!', {
-position: "top-right",
+position: "bottom-right",
 autoClose: 5000,
 hideProgressBar: false,
 closeOnClick: true,

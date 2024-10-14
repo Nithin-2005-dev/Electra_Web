@@ -23,7 +23,7 @@ const ImgSlider = () => {
   return <>
     {
       !loading && <><div className={`${styles['res-slider']}`}>
-    <div className={`text-center font-black text-3xl p-4 ${styles['fredoka']} mt-3`}>Memorable Moments</div>
+    <div className={`text-center font-black text-3xl p-4 ${styles['fredoka']} mt-8`}>Memorable Moments</div>
     </div>
     <div className='flex justify-center w-full '>
     <Carousel
