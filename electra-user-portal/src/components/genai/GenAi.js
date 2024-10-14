@@ -29,7 +29,7 @@ const GenAi = () => {
       }
     }
   return (
-    <div className='sm:absolute top-[20vh] right-[12.5vw]  h-[60vh] lg:h-[90vh] w-[75vw] lg:w-[45vw] z-30 fixed sm:w-[50vw] sm:top-[10vh] sm:left-3' onMouseOver={()=>{
+    <div className='sm:absolute top-[15vh] right-[12.5vw]  h-[60vh] lg:h-[90vh] w-[75vw] lg:w-[45vw] z-30 fixed sm:w-[50vw] sm:top-[10vh] sm:left-3' onMouseOver={()=>{
       setPikaAnimation(1)
   }}
   onMouseLeave={()=>{
