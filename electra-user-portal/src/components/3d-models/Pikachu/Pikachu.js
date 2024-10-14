@@ -12,7 +12,14 @@ import { AnimationStore } from '@/app/store/AnimationStore';
 
 export default function Pikachu(props) {
   const {pikaAnimation}=useContext(AnimationStore)
-  const size=window.innerWidth<550?1.3:2.5;
+  let size;
+  if(window.innerWidth<550){
+    size=1.3;
+  }else if(window.innerWidth<1024 && window.innerWidth>550){
+    size=2.2;
+  }else{
+    size=2.5
+  }
   const group = useRef()
   const { nodes, materials, animations } = useGLTF('/pika.glb')
   const { actions,names } = useAnimations(animations, group)

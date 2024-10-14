@@ -4,11 +4,13 @@ import {motion} from 'framer-motion'
 import { Card, CardImg } from 'react-bootstrap'
 import { AnimationStore } from '@/app/store/AnimationStore'
 import Link from 'next/link'
+import { ResourceStore } from '@/app/store/ResourceStore'
 const Semesters = () => {
+  const {doubt,setDoubt}=useContext(ResourceStore);
   const {setPikaAnimation}=useContext(AnimationStore)
     const images=['https://i.imghippo.com/files/jTaDn1727619118.png','https://i.imghippo.com/files/RugCI1727619153.png','https://i.imghippo.com/files/TDjn01727619225.png','https://i.imghippo.com/files/0VxW11727619247.png','https://i.imghippo.com/files/HhtuQ1727619283.png','https://i.imghippo.com/files/0dr3h1727619307.png','https://i.imghippo.com/files/9qn661727619333.png','https://i.imghippo.com/files/8cj4f1727619416.png']
   return (
-    <div onMouseOver={()=>{
+    <div className={`sm:blur-0 ${!doubt?'blur-none': 'blur-sm'}`} onMouseOver={()=>{
         setPikaAnimation(1)
     }}
     onMouseLeave={()=>{

@@ -4,6 +4,7 @@ import GalleryCard from '../galleryCard/GalleryCard'
 import { ImageProvider } from '@/app/store/ImageStore';
 import ImageLoader from '../img-loader/ImageLoader'
 import { set } from 'mongoose';
+import TeamLoader from '../ui/TeamLoader';
 const PhotoGroup =() => {
   const {imgs,currentEventFilter,loading} =useContext(ImageProvider);
   imgs.sort(function(a,b){
@@ -16,7 +17,7 @@ const PhotoGroup =() => {
       }
   })
   return <>
-    {loading ?<ImageLoader/> :<div className='flex flex-wrap justify-center items-center gap-3 my-4 min-h-[100vh]' >
+    {loading ?<TeamLoader/> :<div className='flex flex-wrap justify-center items-center gap-3 my-4 min-h-[100vh]' >
       {
         imgs && imgs.length==0 && <p>No photos avalible</p>
       }

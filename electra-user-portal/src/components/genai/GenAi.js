@@ -29,7 +29,7 @@ const GenAi = () => {
       }
     }
   return (
-    <div onMouseOver={()=>{
+    <div className='sm:absolute top-[20vh] right-[12.5vw]  h-[60vh] lg:h-[90vh] w-[75vw] lg:w-[45vw] z-30 fixed sm:w-[50vw] sm:top-[10vh] sm:left-3' onMouseOver={()=>{
       setPikaAnimation(1)
   }}
   onMouseLeave={()=>{
@@ -54,14 +54,14 @@ draggable
 pauseOnHover
 theme="dark"
 />
-      <div className='relative top-[4vh]'>
-      <Card body className='h-[70vh] overflow-hidden overflow-y-scroll bg-slate-700 m-2 rounded-2xl text-white w-[55vw] lg:w-[45vw]' id='res' >
+      <div className='flex flex-col'>
+      <Card body className='h-[60vh] lg:h-[65vh]  overflow-hidden overflow-y-scroll bg-slate-700 my-2 rounded-2xl text-white' id='res' >
       {response==''?'Ask Questions related to your subjects ':response}
       </Card>
       <div className='flex flex-wrap items-center'>
-      <input type="text" placeholder="Type your doubt Here" className='w-[55vw] lg:w-[45vw] rounded-xl p-2 ml-2 mr-1 text-black' ref={queryRef}/>
+      <input type="text" placeholder="Type your doubt Here" className='w-full rounded-xl p-2 text-black' ref={queryRef}/>
       </div>
-         <div className='flex m-2 my-3 justify-between'>
+         <div className='flex m-2 my-3 justify-between '>
             <button className={`${styles['hvr-ripple-in']} bg-red-500 p-1 px-2 lg:px-3 font-bold rounded-xl text-xs lg:text-base`}
             onClick={()=>{
                 setResponse('')

@@ -6,6 +6,7 @@ export const ResourceStore = createContext();
 export const ResourceStoreProvider = ({ children }) => {
   const [resLoad,setResLoad]=useState(false);
   const [data, setData] = useState([]);
+  const [doubt,setDoubt]=useState(false)
   const getResources = async (semester,category) => {
     // setSem(sem);
     try {
@@ -19,7 +20,7 @@ export const ResourceStoreProvider = ({ children }) => {
     }
   };
   return (
-    <ResourceStore.Provider value={{ getResources ,data,setData,resLoad}}>
+    <ResourceStore.Provider value={{ getResources ,data,setData,resLoad,doubt,setDoubt}}>
       {children}
     </ResourceStore.Provider>
   );
