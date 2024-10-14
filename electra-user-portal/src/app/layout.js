@@ -1,7 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./globals.css";
 import { ClerkProvider } from '@clerk/nextjs';
-
+import { dark } from '@clerk/themes'
 export const metadata = {
   title: "Electra Society",
   description: `Discover the Electra Society of NIT Silchar. Explore event galleries, academic resources, team details, and all about the Electrical Engineering Department. Stay updated with seminars, workshops, and student activities organized by Electra Society`,
@@ -9,7 +9,7 @@ export const metadata = {
 };
 export default function RootLayout({ children }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider appearance={{baseTheme:dark}}>
     <html lang="en">
     <head>
     <link rel="icon" href="https://i.imghippo.com/files/mt3cO1728475194.png" />

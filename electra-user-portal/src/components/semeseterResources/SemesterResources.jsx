@@ -27,7 +27,7 @@ const SemesterResources = ({semester,category}) => {
     {
         name:'Labs',
         category:'labs'
-    }
+    },
   ]
   return (
     <div >

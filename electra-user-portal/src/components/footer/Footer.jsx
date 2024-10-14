@@ -11,12 +11,12 @@ const Footer = () => {
         <p className='text-sm sm:lg lg:text-xl xl:text-2xl font-extrabold text-fuchsia-600'>Contact us</p>
         <div className='flex gap-2 items-center text-slate-500'>
         <MdEmail className='inline-block text-sm sm:text-xl text-neutral-400'/>
-        <p className='text-gray-300 text-xs sm:text-base'>electra@gmail.com</p>
+        <a href='mailto:societyelectra@gmail.com' className='text-gray-300 text-xs sm:text-sm'>email</a>
         </div>
-        <div className='flex gap-2 items-center text-slate-500'>
+        <a href='tel:1234567890' className='flex gap-2 items-center text-slate-500'>
         <FaPhoneAlt className='inline-block text-sm sm:text-xl'/>
-        <p className='text-gray-300 text-xs sm:text-base'>1234567890</p>
-        </div>
+        <p className='text-gray-300 text-xs sm:text-sm'>1234567890</p>
+        </a>
       </div>
       <div>
         <img src='https://i.imghippo.com/files/mt3cO1728475194.png' alt='electra-logo' width={'150'}/>

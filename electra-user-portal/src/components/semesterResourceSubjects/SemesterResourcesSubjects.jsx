@@ -26,6 +26,7 @@ const SemesterResourcesSubjects = ({semester,category}) => {
       {subjects.map((item)=>{
        return <Link href={`/Resources/Categories/${semester}|${category}|${item.subjectCode}`} className='w-full' key={item.subjectCode}><ResourceCard item={item.subject} /></Link>
       })}
+      <Link href={`/Resources/Categories/${semester}|${category}|${'all'}`} className='w-full'><ResourceCard item={'All'} /></Link>
       </div>
       <div className='fixed right-0' onMouseOver={()=>{
           setPikaAnimation(2)
