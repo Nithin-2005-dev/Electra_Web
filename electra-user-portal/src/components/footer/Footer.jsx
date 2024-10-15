@@ -19,7 +19,7 @@ const Footer = () => {
         </a>
       </div>
       <div>
-        <img src='https://i.imghippo.com/files/mt3cO1728475194.png' alt='electra-logo' width={'150'}/>
+        <img src='https://i.imghippo.com/files/mt3cO1728475194.png' alt='electra-logo' width={'150'} className='scale-75 sm:scale-100'/>
         </div>
       <div className='flex flex-col gap-2 m-2'>
       <p className='text-sm sm:lg lg:text-xl xl:text-2xl font-extrabold text-fuchsia-600'>Social Links</p>

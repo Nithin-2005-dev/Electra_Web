@@ -8,10 +8,13 @@ import { FaLinkedin } from "react-icons/fa";
 import TeamCardBorder from '../cardBorder/TeamCardBorder';
 const TeamCard = ({ele}) => {
     const [hover,setHover]=useState(false);
+    if(ele.position=='technical team'){
+      ele.position='Development team'
+    }
   return (
     <TeamCardBorder>
     <div className='flex'>
-      <Card className='w-[60vw] lg:w-[25vw] sm:w-[30vw] xl:w-[23vw] m-2 bg-transparent border-0 md:w-[30vw]' key={ele._id}  onMouseOver={()=>{
+      <Card className='w-[65vw] lg:w-[25vw] sm:w-[30vw] xl:w-[23vw] m-2 bg-transparent border-0 md:w-[30vw]' key={ele._id}  onMouseOver={()=>{
         setHover(true)
       }} onMouseLeave={()=>{
         setHover(false)
