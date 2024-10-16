@@ -14,7 +14,7 @@ const TeamCard = ({ele}) => {
   return (
     <TeamCardBorder>
     <div className='flex'>
-      <Card className='w-[65vw] lg:w-[25vw] sm:w-[30vw] xl:w-[23vw] m-2 bg-transparent border-0 md:w-[30vw]' key={ele._id}  onMouseOver={()=>{
+      <Card className='w-[80vw] lg:w-[40vw] sm:w-[30vw] xl:w-[23vw] m-2 bg-transparent border-0 md:w-[40vw]' key={ele._id}  onMouseOver={()=>{
         setHover(true)
       }} onMouseLeave={()=>{
         setHover(false)
@@ -28,9 +28,8 @@ const TeamCard = ({ele}) => {
           width="500"
           height="600"
           src={ele.publicId}
-          sizes="100vw"
-          alt="Description of my image"
-          className={`aspect-square ${hover && 'opacity-25'}`}
+          alt={`${ele.name}+image`}
+          className={`${hover && 'opacity-25'} object-cover h-[40vh] sm:h-[30vh] lg:h-[35vh] xl:h-[40vh]`}
         />
         </div>
         <CardBody className={`text-center font-bold text-white ${hover ?'text-xl relative bottom-[50%] z-20':''} hover:underline hover:text-fuchsia-800 ${ele.name.length>14?'text-base':'text-lg'} capitalize `}>

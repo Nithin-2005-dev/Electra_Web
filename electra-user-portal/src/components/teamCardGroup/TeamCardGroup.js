@@ -64,7 +64,7 @@ const TeamCardGroup= () => {
   return (
     <>
     {teamLoad?<TeamLoader/>: <div>
-      <motion.div className='flex flex-wrap justify-evenly items-center relative p-5 gap-3'>
+      <motion.div className='flex flex-wrap justify-evenly items-center relative p-5  gap-3'>
       {
           first.length>0 && first.map((ele)=>{
               return <TeamCard ele={ele} key={ele._id}/>
