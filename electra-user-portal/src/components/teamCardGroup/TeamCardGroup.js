@@ -64,7 +64,7 @@ const TeamCardGroup= () => {
   return (
     <>
     {teamLoad?<TeamLoader/>: <div>
-      <motion.div className='flex flex-wrap justify-evenly items-center relative p-5  gap-3'>
+      <motion.div className='flex flex-wrap justify-center sm:justify-evenly items-center relative p-5  gap-3'>
       {
           first.length>0 && first.map((ele)=>{
               return <TeamCard ele={ele} key={ele._id}/>
@@ -72,7 +72,7 @@ const TeamCardGroup= () => {
       }
       </motion.div>
       <hr className='sm:mx-10 mx-5 font-black'/>
-      <motion.div className='flex flex-wrap justify-evenly items-center relative p-5 gap-3'>
+      <motion.div className='flex flex-wrap  justify-center sm:justify-evenly items-center relative p-5 gap-3'>
       {
           first2.length>0 && first2.map((ele)=>{
               return <TeamCard ele={ele} key={ele._id}/>
