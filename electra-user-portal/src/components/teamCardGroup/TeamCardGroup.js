@@ -35,16 +35,16 @@ const TeamCardGroup= () => {
    })
    first?.sort(function(a,b){
     if(a.position>b.position){
-        return 1;
-    }else if(a.position<b.position){
         return -1;
+    }else if(a.position<b.position){
+        return 1;
     }else return 0;
    })
    second?.sort(function(a,b){
     if(a.position>b.position){
-        return 1;
-    }else if(a.position<b.position){
         return -1;
+    }else if(a.position<b.position){
+        return 1;
     }else return 0;
    })
    third?.sort(function(a,b){
@@ -64,7 +64,7 @@ const TeamCardGroup= () => {
   return (
     <>
     {teamLoad?<TeamLoader/>: <div>
-      <motion.div className='flex flex-wrap justify-evenly items-center relative p-5 gap-3'>
+      <motion.div className='flex flex-wrap justify-center sm:justify-evenly items-center relative p-5  gap-3'>
       {
           first.length>0 && first.map((ele)=>{
               return <TeamCard ele={ele} key={ele._id}/>
@@ -72,7 +72,7 @@ const TeamCardGroup= () => {
       }
       </motion.div>
       <hr className='sm:mx-10 mx-5 font-black'/>
-      <motion.div className='flex flex-wrap justify-evenly items-center relative p-5 gap-3'>
+      <motion.div className='flex flex-wrap  justify-center sm:justify-evenly items-center relative p-5 gap-3'>
       {
           first2.length>0 && first2.map((ele)=>{
               return <TeamCard ele={ele} key={ele._id}/>
@@ -80,29 +80,38 @@ const TeamCardGroup= () => {
       }
       </motion.div>
       <hr  className='sm:mx-10 mx-5 font-black'/>
-      <motion.div className='flex flex-wrap justify-center items-center relative p-5 gap-3'>
+      <>
+      <p className=' text-center m-2 text-lg sm:text-2xl font-black'>Heads</p>
+      <motion.div className='flex flex-wrap justify-center items-center relative px-5 p-2 gap-3'>
       {
           second.length>0 && second.map((ele)=>{
               return <TeamCard ele={ele} key={ele._id}/>
           })
       }
       </motion.div>
+      </>
       <hr  className='sm:mx-10 mx-5 font-black'/>
-      <motion.div className='flex flex-wrap justify-center items-center relative p-5 gap-3'>
+      <>
+      <p className=' text-center m-2 text-lg sm:text-2xl font-black'>Technical Team</p>
+      <motion.div className='flex flex-wrap justify-center items-center relative px-5 p-2 gap-3'>
       {
           third.length>0 && third.map((ele)=>{
               return <TeamCard ele={ele} key={ele._id}/>
           })
       }
       </motion.div>
+      </>
       <hr  className='sm:mx-10 mx-5 font-black'/>
-      <motion.div className='flex flex-wrap justify-center items-center relative p-5 gap-3'>
+      <>
+      <p className=' text-center m-2 text-lg sm:text-2xl font-black'>Executive Team</p>
+      <motion.div className='flex flex-wrap justify-center items-center relative px-5 p-2 gap-3'>
       {
           fourth.length>0 && fourth.map((ele)=>{
               return <TeamCard ele={ele} key={ele._id}/>
           })
       }
       </motion.div>
+      </>
       </div>}
       </>
   )

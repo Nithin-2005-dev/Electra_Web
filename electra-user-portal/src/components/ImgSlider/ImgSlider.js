@@ -23,7 +23,7 @@ const ImgSlider = () => {
   return <>
     {
       !loading && <><div className={`${styles['res-slider']}`}>
-    <div className={`text-center font-black text-3xl p-4 ${styles['permanent-marker-regular']} mt-3`}>Memorable Moments</div>
+    <div className={`text-center font-black text-3xl p-4 ${styles['fredoka']} mt-8`}>Memorable Moments</div>
     </div>
     <div className='flex justify-center w-full '>
     <Carousel
@@ -31,14 +31,14 @@ const ImgSlider = () => {
         align: "start",
         loop:true
       }}
-      className={`w-full max-w-52 lg:max-w-4xl sm:max-w-sm md:max-w-2xl xl:max-w-6xl border-hidden ${styles['img-slider']}`}
+      className={`w-full max-w-52 lg:max-w-4xl sm:max-w-sm md:max-w-2xl xl:max-w-6xl border-hidden ${styles['img-slider']} sm:scale-x-[1.2]`}
     >
       <CarouselContent >
         {random && random.map((pic) => {
           if(!pic){
             return;
           }
-         return <CarouselItem key={pic?._id} className="md:basis-1/2 lg:basis-1/1">
+         return <CarouselItem key={pic?._id} className="md:basis-1/2 lg:basis-1/2 " >
             <div>
              <Card className='border-0'>
                 <CardContent className="flex aspect-square items-center justify-center p-0  border-0">
