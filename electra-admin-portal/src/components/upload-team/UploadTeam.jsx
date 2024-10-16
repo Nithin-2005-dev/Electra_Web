@@ -95,7 +95,7 @@ theme="colored"
       <CldUploadWidget uploadPreset={`${preset}`} onSuccess={handleUpload}>
           {({ open }) => {
             return <button onClick={() =>{ 
-              if(nameRef.current.value==''||yearRef.current.value==''||positionRef.current.value==''|| imageRef==''){
+              if(nameRef.current.value==''||yearRef.current.value==''||positionRef.current.value==''){
       toast.warn('please fill all the fields', {
       position: "top-right",
       autoClose: 5000,
