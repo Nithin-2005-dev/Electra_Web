@@ -38,7 +38,7 @@ const Header = () => {
     <Toggler setMenu={setMenu} menu={menu}/>
     </div>
     <div className=''>
-    <div className='h-[8vh] w-[100vw] bg-[#070F2B] fixed z-[80] top-0 sm:hidden'></div>
+    <div className='h-[7vh] w-[100vw] bg-[#070F2B] fixed z-[80] top-0 sm:hidden'></div>
     {menu &&  <header className='px-2 block sm:hidden ease-in-out '>
      <motion.nav initial={{
         x:500
