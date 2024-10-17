@@ -14,7 +14,7 @@ const AboutUs = () => {
       <br/>
       <br/>
 
-      <motion.div className={`text-4xl text-white font-semibold inline-block [text-shadow:_0_0_2rem_rgb(99_102_241_/_0.8)] px-4`} initial={{y:-10,opacity:0}} whileInView={{y:0,opacity:1,transition:{duration:2}}}>Pillars of electra society</motion.div>
+      <motion.div className='text-5xl font-bold m-2 border-b-4 inline-block border-yellow-400 mx-4' initial={{y:-10,opacity:0}} whileInView={{y:0,opacity:1,transition:{duration:2}}}>Pillars of Electra Society</motion.div>
       <div className='border-2 m-3 lg:m-5 rounded-3xl border-red-300'>
       {
         PillarsData.map((pillar)=>{
@@ -23,7 +23,7 @@ const AboutUs = () => {
             <div className='flex flex-col'>
             <Card className='bg-[#070F2B]'>
           <CardHeader>
-          <div className='text-2xl font-black justify-center font-serif text-red-300'>{pillar.post}</div>
+          <div className='text-2xl font-black justify-center font-serif text-white'>{pillar.post}</div>
           </CardHeader>
           <CardBody>
             <CardImg src={pillar.image} alt={pillar.name} width={200} style={{borderRadius:'10%'}} className='aspect-square'/>
