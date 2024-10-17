@@ -20,8 +20,8 @@ const ImageFilter = () => {
             {/* <option value="codesta" className='bg-slate-500'>codesta</option> */}
             <option value="carvaan" className='bg-slate-500'>Carvaan</option>
             <option value="Orientation" className='bg-slate-500'>Orientation</option>
-            <option value="TeachersDay" className='bg-slate-500'>Teachers Day</option>
-            <option value="OffTheHook" className='bg-slate-500'>Off the hook</option>
+            <option value="Teachers Day" className='bg-slate-500'>Teachers Day</option>
+            <option value="Off the Hook" className='bg-slate-500'>Off the hook</option>
         </select>
       </div>
     </div>

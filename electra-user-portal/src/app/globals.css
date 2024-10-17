@@ -234,10 +234,11 @@ body{
   }
 }
 .cl-formButtonPrimary{
-  background-color: rgb(192 38 211);
+  background-color: rgb(89, 69, 239);
+  color: whitesmoke;
 }
 .cl-formButtonPrimary:hover{
-  background-color: rgb(192 38 211);
+  background-color: rgba(89, 69, 239,0.7);
 }
 .cl-card{
   background-color: rgba(2, 6, 23, 0);

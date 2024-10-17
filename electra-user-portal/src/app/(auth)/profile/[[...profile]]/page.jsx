@@ -1,3 +1,4 @@
+import Header from '@/components/header/Header';
 import { UserProfile } from '@clerk/nextjs'
 import { auth, currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation';
@@ -12,7 +13,7 @@ const Profile = async() => {
         }
   return (
     <>
-    <h2 className='text-center font-black p-2 text-xl'>Profile Details</h2>
+    <Header/>
     <div className='flex justify-center absolute top-[10vh] right-[10vw] sm:top-[15vh] sm:right-[20vw]'>
       <UserProfile 
     appearance={
