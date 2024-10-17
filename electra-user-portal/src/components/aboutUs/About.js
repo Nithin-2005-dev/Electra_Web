@@ -15,9 +15,9 @@ const AboutUs = () => {
       <br/>
 
       <motion.div className='text-2xl sm:text-5xl font-bold m-2 border-b-4 inline-block border-yellow-400 mx-4' initial={{y:-10,opacity:0}} whileInView={{y:0,opacity:1,transition:{duration:2}}}>Pillars of Electra Society</motion.div>
-      <div className='border-2 m-3 lg:m-5 rounded-3xl border-red-300'>
+      <div className='border-2 m-3 lg:m-5 rounded-3xl border-slate-500'>
       {
-        PillarsData.map((pillar)=>{
+        PillarsData.map((pillar,i)=>{
             return <><div key={pillar.name} className='flex m-1 md:m-3 lg:m-4 flex-col items-center p-1 lg:p-4 gap-5 text-center'>
             <div>
             <div className='flex flex-col'>
@@ -36,7 +36,9 @@ const AboutUs = () => {
             </div>
                 <div className={`text-left ${styles['edu-au-vic-wa-nt-guide ']} text-blue-100 font-semibold text-xs lg:text-lg`}>{pillar.Info}</div>
             </div>
-            <hr className='mx-3 border-3 border-white'/>
+            {
+              i<PillarsData.length-1 && <hr className='mx-3 border-2 border-white'/>
+            }
             </>
         })
     }

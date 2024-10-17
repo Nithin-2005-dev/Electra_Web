@@ -25,7 +25,7 @@ const Semesters = () => {
 
     >
       <motion.div className='text-2xl lg:text-5xl font-bold m-2 border-b-4 inline-block border-yellow-400 mx-4' initial={{y:-10,opacity:0}} whileInView={{y:0,opacity:1,transition:{duration:2}} }>Semesters</motion.div>
-      <div className='w-[55vw] flex flex-wrap'>
+      <div className='w-[55vw] xl:w-[40vw] flex flex-wrap'>
       {
             images.map((image,i)=>{
               return   <Link href={`/Resources/semester${i+1}`} key={i}><Card.Img src={image} className='resource-res inline-block m-3 cursor-pointer hover:scale-110 w-[16vw] xl:w-[15vw]' /></Link>

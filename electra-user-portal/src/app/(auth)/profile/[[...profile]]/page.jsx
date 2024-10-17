@@ -20,7 +20,7 @@ const Profile = async() => {
       {
         elements:{
           cardBox:'w-[80vw] h-[80vh]  border-0 sm:w-[60vw] sm:h-[70vh] bg-slate-950',
-          header:'hidden'
+          // header:'hidden'
         }
       }
     }

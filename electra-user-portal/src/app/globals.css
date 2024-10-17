@@ -547,3 +547,9 @@ body{
 .cl-internal-1hp5nqm,.cl-internal-df7v37{
   display: none;
 }
+.cl-scrollBox,.cl-navbarMobileMenuRow,.cl-navbar{
+  background-color: transparent;
+}
+.cl-footer{
+  display: none;
+}
