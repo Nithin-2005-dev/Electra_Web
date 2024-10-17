@@ -14,7 +14,7 @@ const AboutUs = () => {
       <br/>
       <br/>
 
-      <motion.div className='text-5xl font-bold m-2 border-b-4 inline-block border-yellow-400 mx-4' initial={{y:-10,opacity:0}} whileInView={{y:0,opacity:1,transition:{duration:2}}}>Pillars of Electra Society</motion.div>
+      <motion.div className='text-2xl sm:text-5xl font-bold m-2 border-b-4 inline-block border-yellow-400 mx-4' initial={{y:-10,opacity:0}} whileInView={{y:0,opacity:1,transition:{duration:2}}}>Pillars of Electra Society</motion.div>
       <div className='border-2 m-3 lg:m-5 rounded-3xl border-red-300'>
       {
         PillarsData.map((pillar)=>{
