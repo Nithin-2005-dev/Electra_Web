@@ -22,7 +22,7 @@ const Footer = () => {
         <img src='https://i.imghippo.com/files/mt3cO1728475194.png' alt='electra-logo' width={'150'} className='scale-[0.6] sm:scale-100'/>
         </div>
       <div className='flex flex-col gap-2 m-2 font-semibold'>
-      <p className='text-xs sm:lg lg:text-xl xl:text-2xl font-extrabold text-sky-200'>Social Links</p>
+      <p className='text-xs sm:lg lg:text-xl xl:text-2xl font-extrabold text-sky-200'>Social media</p>
         <a href='https://www.instagram.com/electrasociety/?__pwa=1' target='_blank'  className='flex gap-2 items-center text-slate-500'>
             <FaInstagram className='inline-block text-sm sm:text-xl text-orange-400'/>
             <p className='text-gray-300 text-xs sm:text-base'>Instagram</p>
