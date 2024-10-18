@@ -36,7 +36,7 @@ const AboutUs = () => {
             </Card>
             </div>
             </div>
-                <div className={`text-left ${styles['edu-au-vic-wa-nt-guide ']} text-blue-100 font-semibold text-xs lg:text-lg`}>{pillar.Info}</div>
+                <div className={`text-center ${styles['edu-au-vic-wa-nt-guide ']} text-blue-100 font-semibold text-xs lg:text-lg`}>{pillar.Info}</div>
             </div>
             {
               i<PillarsData.length-1 && <hr className='mx-3 border-2 border-white'/>

@@ -96,11 +96,13 @@ const Header = () => {
         <FaHandshakeAngle className='inline-block'/><p className='text-xl inline-block'>Join Us</p>
     </Link>
         }
-        <div className='bg-red-500 rounded-xl text-center hover:opacity-75 mx-2'>
-        <SignOutButton className=''>
+        {
+            user && <div className='bg-red-500 rounded-xl text-center hover:opacity-75 mx-2'>
+        <SignOutButton>
             log out
         </SignOutButton>
         </div>
+        }
      </motion.nav> 
     </header>}
     </div>
