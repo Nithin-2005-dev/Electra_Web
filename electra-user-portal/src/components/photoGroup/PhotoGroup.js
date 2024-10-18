@@ -7,10 +7,11 @@ import { set } from 'mongoose';
 import TeamLoader from '../ui/TeamLoader';
 const PhotoGroup =() => {
   const {imgs,currentEventFilter,loading} =useContext(ImageProvider);
+  console.log(imgs)
   imgs.sort(function(a,b){
-      if(a.date<b.date){
+      if(a.year<b.year){
           return 1
-      }if((a.date>b.date)){
+      }if((a.year>b.year)){
         return -1;
       }else{
         return 0;
