@@ -97,7 +97,7 @@ const Header = () => {
     </Link>
         }
         {
-            user && <div className='bg-red-400 rounded-xl text-center hover:opacity-75 mx-2 border-gray-100 hover:border-2 border'>
+            user && <div className='bg-red-600 rounded-xl text-center hover:opacity-75 mx-2 border-gray-100 hover:border-2 border'>
         <SignOutButton>
             log out
         </SignOutButton>
