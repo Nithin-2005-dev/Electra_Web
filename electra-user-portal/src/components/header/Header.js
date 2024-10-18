@@ -48,7 +48,7 @@ const Header = () => {
                 {openAcc?<FaAngleUp className='inline-block'/>:<FaAngleDown className='inline-block'/>}
             </div>
             {
-                openAcc && <motion.div layout className='flex flex-col text-start bg-slate-800 p-1 border-1  rounded-[0.2rem] py-2 gap-3 my-1'>
+                openAcc && <motion.div layout className='flex flex-col text-start bg-slate-800 p-1 border-1  rounded-[0.2rem] py-2 gap-3 my-1 absolute'>
             <Link href={'/profile'} id='resource' >
         Profile
     </Link>
