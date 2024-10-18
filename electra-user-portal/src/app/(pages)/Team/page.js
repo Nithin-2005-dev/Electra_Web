@@ -8,8 +8,10 @@ import Footer from "@/components/footer/Footer"
 const Team = () => {
   return (
     <TeamStoreProvider>
+    <div className="flex flex-col pt-5">
       <Header/>
     <CoreTeamFilter/>
+    </div>
     <TeamCard/>
     <Footer/>
     </TeamStoreProvider>
