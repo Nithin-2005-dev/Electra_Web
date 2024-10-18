@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Toggler from '../ui/Toggler'
 import { RiBook2Fill, RiGalleryFill, RiHome2Fill, RiHome3Fill, RiHome4Fill, RiTeamFill } from "react-icons/ri";
+import { IoLogoWhatsapp } from "react-icons/io";
 import { FaHandshakeAngle } from "react-icons/fa6";
 import {motion} from 'framer-motion'
 import { SignOutButton, useUser } from '@clerk/nextjs'
