@@ -43,5 +43,14 @@ export const ImageUploadData=[
         event:'Orientation',
         floderName:'Orientation',
         preset:'msc4qksk'
+    },
+    {
+        event:'Teachers day',
+        floderName:'Teachers Day',
+        preset:'xsug4ewa'
+    },{
+    event:'Off the hook',
+    floderName:'Off the Hook',
+    preset:'pkteuyjm'
     }
 ]

@@ -8,9 +8,9 @@ import TeamLoader from '../ui/TeamLoader';
 const PhotoGroup =() => {
   const {imgs,currentEventFilter,loading} =useContext(ImageProvider);
   imgs.sort(function(a,b){
-      if(a.year<b.year){
+      if(a.date<b.date){
           return 1
-      }if((a.year>b.year)){
+      }if((a.date>b.date)){
         return -1;
       }else{
         return 0;

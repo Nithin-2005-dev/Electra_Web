@@ -16,7 +16,7 @@ const ImgSlider = () => {
  const {imgs,loading}=useContext(ImageProvider);
  let random;
  if(imgs.length!=0){
- random=[imgs[Math.round(Math.random()*imgs.length-2)],imgs[Math.round(Math.random()*imgs.length-2)],imgs[Math.round(Math.random()*imgs.length-2)],imgs[Math.round(Math.random()*imgs.length-2)],imgs[Math.round(Math.random()*imgs.length-2)]]
+ random=[imgs[Math.round(Math.random()*imgs.length-2)],imgs[Math.round(Math.random()*imgs.length-2)],imgs[Math.round(Math.random()*imgs.length-2)],imgs[Math.round(Math.random()*imgs.length-2)],imgs[Math.round(Math.random()*imgs.length-2)],imgs[Math.round(Math.random()*imgs.length-2)],imgs[Math.round(Math.random()*imgs.length-2)],imgs[Math.round(Math.random()*imgs.length-2)]]
  }else{
   random=[]
  }
