@@ -48,11 +48,11 @@ const Header = () => {
                 {openAcc?<FaAngleUp className='inline-block'/>:<FaAngleDown className='inline-block'/>}
             </div>
             {
-                openAcc && <motion.div layout className='flex flex-col text-start bg-slate-800 p-1 border-1  rounded-[0.2rem] py-2 gap-3 my-1 absolute'>
-            <Link href={'/profile'} id='resource' >
+                openAcc && <motion.div layout className='flex flex-col text-start bg-slate-800 p-1 border-1  rounded-[0.2rem] py-2 gap-3 my-1 absolute hover:'>
+            <Link href={'/profile'} id='resource' className='hover:bg-slate-500 px-1 rounded-[0.3rem]'>
         Profile
     </Link>
-    <SignOutButton className='text-start bg-red-500 px-1 rounded-lg hover:opacity-80 hover:scale-105'>
+    <SignOutButton className='text-start bg-red-500 px-1 rounded-[0.3rem] hover:opacity-80 hover:scale-105'>
         Log out
     </SignOutButton>
             </motion.div>
