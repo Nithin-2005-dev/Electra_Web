@@ -26,7 +26,9 @@ const AboutUs = () => {
           <div className='text-2xl font-black justify-center font-serif text-white'>{pillar.post}</div>
           </CardHeader>
           <CardBody>
-            <CardImg src={pillar.image} alt={pillar.name} width={200} style={{borderRadius:'10%'}} className='aspect-square'/>
+          <a href={pillar.link} target='_blank'>
+          <CardImg src={pillar.image} alt={pillar.name} width={200} style={{borderRadius:'10%'}} className='aspect-square'/>
+          </a>
             </CardBody>
             <CardFooter>
             <div className='font-bold text-2xl text-fuchsia-200'>{pillar.name}</div>

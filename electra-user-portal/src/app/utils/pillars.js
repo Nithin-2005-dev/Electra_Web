@@ -7,7 +7,8 @@ export const PillarsData=[
 Vivekanandan S was the recipient of the Best Paper Award in Asia Flagship Conference TENCON 18. He is the Member of IEEE. He served as Editorial board member of many conference committees. Published his research articles in high impact journals such as, IEEE Transaction, IET, Elsevier etc., He served as guest editor for SCOPUS and Web of Science Journals. He organized Scopus index conferences, IEEE conferences and supported many workshops and training programs conducted by the government organization.`,
 name:'Dr. Vivekanandan S',
 post:'Faculty In Charge',
-image:'https://res.cloudinary.com/dqa3ov76r/image/upload/v1728873552/favoritePhotos/ubcjix1n1fp3gv1uj1y3.png'
+image:'https://res.cloudinary.com/dqa3ov76r/image/upload/v1728873552/favoritePhotos/ubcjix1n1fp3gv1uj1y3.png',
+link:`http://eed.nits.ac.in/vivekanandan/`
     },
     {
         Info:`Dr. T. Malakar graduated in Electrical Engineering from Tripura Engineering College (NIT Agartala), and completed post graduation from Electrical Engineering Department, Jadavpur University, Kolkata. He has completed his PhD from NIT Silchar in association with Jadavpur University. He has joined as Lecturer in Electrical Engineering Department, NIT Silchar in 2005. Presently working as Associate Professor in Electrical Engineering Department, NIT Silchar. Dr. Malakar has about 50 research publications in various referred Journals, conferences and other publishing hoses. He is reviewer of Elsevier, IEEE, Taylor & Francis, Springers etc.
@@ -15,6 +16,7 @@ image:'https://res.cloudinary.com/dqa3ov76r/image/upload/v1728873552/favoritePho
 `,
         name:'Dr. Tanmoy Malakar',
         post:'Head Of Department',
-        image:'https://i.imghippo.com/files/Ffwlz1728918340.jpg'
+        image:'https://i.imghippo.com/files/Ffwlz1728918340.jpg',
+        link:`http://eed.nits.ac.in/tanmoy-malakar/`
     }
 ]
