@@ -6,11 +6,12 @@ import { FaFacebook } from "react-icons/fa";
 import { FaInstagram } from "react-icons/fa";
 import { FaLinkedin } from "react-icons/fa";
 import TeamCardBorder from '../cardBorder/TeamCardBorder';
+import {motion} from 'framer-motion'
 const TeamCard = ({ele}) => {
     const [hover,setHover]=useState(false);
   return (
     <TeamCardBorder>
-    <div className='flex'>
+    <motion.div layout className='flex'>
       <Card className='w-[80vw] lg:w-[40vw] sm:w-[30vw] xl:w-[23vw] m-2 bg-transparent border-0 md:w-[40vw]' key={ele._id}  onMouseOver={()=>{
         setHover(true)
       }} onMouseLeave={()=>{
@@ -44,7 +45,7 @@ const TeamCard = ({ele}) => {
         </a>
         </CardLink>
       </Card>
-    </div>
+    </motion.div>
     </TeamCardBorder>
   )
 }
