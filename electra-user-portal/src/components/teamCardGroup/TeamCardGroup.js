@@ -79,8 +79,9 @@ const TeamCardGroup= () => {
           })
       }
       </motion.div>
+      {
+        second.length!=0 &&     <>
       <hr  className='sm:mx-10 mx-5 font-black'/>
-      <>
       <p className=' text-center m-2 text-lg sm:text-2xl font-black'>Heads</p>
       <motion.div className='flex flex-wrap justify-center items-center relative px-5 p-2 gap-3'>
       {
@@ -89,9 +90,11 @@ const TeamCardGroup= () => {
           })
       }
       </motion.div>
-      </>
       <hr  className='sm:mx-10 mx-5 font-black'/>
-      <>
+      </>
+      }
+      {
+        third.length!=0 && <>
       <p className=' text-center m-2 text-lg sm:text-2xl font-black'>Technical Team</p>
       <motion.div className='flex flex-wrap justify-center items-center relative px-5 p-2 gap-3'>
       {
@@ -100,9 +103,12 @@ const TeamCardGroup= () => {
           })
       }
       </motion.div>
-      </>
       <hr  className='sm:mx-10 mx-5 font-black'/>
-      <>
+      </>
+      }
+      
+      {
+        fourth.length!=0 && <>
       <p className=' text-center m-2 text-lg sm:text-2xl font-black'>Executive Team</p>
       <motion.div className='flex flex-wrap justify-center items-center relative px-5 p-2 gap-3'>
       {
@@ -112,6 +118,7 @@ const TeamCardGroup= () => {
       }
       </motion.div>
       </>
+      }
       </div>}
       </>
   )

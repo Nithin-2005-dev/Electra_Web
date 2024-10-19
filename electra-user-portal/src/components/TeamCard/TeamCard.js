@@ -8,9 +8,6 @@ import { FaLinkedin } from "react-icons/fa";
 import TeamCardBorder from '../cardBorder/TeamCardBorder';
 const TeamCard = ({ele}) => {
     const [hover,setHover]=useState(false);
-    if(ele.position=='technical team'){
-      ele.position='Development team'
-    }
   return (
     <TeamCardBorder>
     <div className='flex'>
