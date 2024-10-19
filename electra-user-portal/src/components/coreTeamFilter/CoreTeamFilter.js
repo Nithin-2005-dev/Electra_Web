@@ -10,7 +10,7 @@ const CoreTeamFilter = () => {
   }
   useEffect(()=>{getTeamByYear('2024')},[])
   return (
-    <div className='mx-3 relative top-[6vh]'>
+    <div className='mx-3 my-5 relative top-[6vh]'>
       <div className={`text-center text-3xl text-white [text-shadow:_0_0rem_1rem_rgb(99_102_255_/_0.8)] ${styles['fredoka']}`}>Meet Our Team</div>
       <div className='flex justify-end'>
         <select name="" id="" className='bg-blue-400 rounded-xl hover:opacity-80 lg:p-2 lg:px-3 md:p-3 md:px-3 sm:p-3 sm:px-3 p-1 px-1 m-2 font-bold text-sm z-[3000]' ref={yearRef} onChange={handleFilter}>
