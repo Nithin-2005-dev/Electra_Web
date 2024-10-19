@@ -42,9 +42,9 @@ const TeamCardGroup= () => {
    })
    second?.sort(function(a,b){
     if(a.position>b.position){
-        return -1;
-    }else if(a.position<b.position){
         return 1;
+    }else if(a.position<b.position){
+        return -1;
     }else return 0;
    })
    third?.sort(function(a,b){
