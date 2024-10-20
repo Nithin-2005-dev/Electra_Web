@@ -5,6 +5,7 @@ import { MdOutlineSportsHandball } from "react-icons/md";
 import { FaLaptopCode } from "react-icons/fa";
 import { PiStudentFill } from "react-icons/pi";
 import { FaChild } from "react-icons/fa";
+import { GiGameConsole } from "react-icons/gi";
 export const EventData = [
     {
       title: "Udvega",
@@ -13,6 +14,17 @@ export const EventData = [
       eventTagline: `The Grand Kick-Off Event`,
       icon:<FaChild />,
       description:`Udvega, the annual kick-starter for our society's vibrant culture! Post the grand induction of the latest batch, we organize this spectacular shindig. Bursting with talent, the fresh faces showcase their moves in dance and music extravaganzas. The excitement crescendos with riveting games, ensuring an electrifying ambiance.`,
+    },
+    {
+      title:'Off the Hook',
+      description:`Off the Hook is an electrifying celebration that brings together the new Batch  to showcase their hidden talents and vibrant energy. Designed to encourage freshmen to step out of their comfort zones
+`,
+      eventDescription:`Off the Hook is an electrifying celebration that brings together the new Batch  to showcase their hidden talents and vibrant energy. Designed to encourage freshmen to step out of their comfort zones
+`,
+      eventElaboration:`This event features a thrilling lineup of performances, a talent showcase, and competitive e-games with exciting prizes. As Sections F and G face off in a spirited rivalry, the atmosphere is charged with creativity and camaraderie. Off the Hook is more than just an event; it’s a platform for emerging stars to shine and make their mark, marking the beginning of their journey at EE Freshmen .  a day filled with inspiration, excitement, and unforgettable moments!
+`,
+      eventTagline:`Unleash the Potential`,
+      icon:<GiGameConsole />
     },
     {
       title: `Blitzsurge`,

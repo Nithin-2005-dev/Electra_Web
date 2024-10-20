@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Toggler from '../ui/Toggler'
 import { RiBook2Fill, RiGalleryFill, RiHome2Fill, RiHome3Fill, RiHome4Fill, RiTeamFill } from "react-icons/ri";
+import { IoLogoWhatsapp } from "react-icons/io";
 import { FaHandshakeAngle } from "react-icons/fa6";
 import {motion} from 'framer-motion'
 import { SignOutButton, useUser } from '@clerk/nextjs'
@@ -48,11 +49,11 @@ const Header = () => {
                 {openAcc?<FaAngleUp className='inline-block'/>:<FaAngleDown className='inline-block'/>}
             </div>
             {
-                openAcc && <motion.div layout className='flex flex-col text-start bg-slate-800 p-1 border-1  rounded-[0.2rem] py-2 gap-3 my-1 absolute'>
-            <Link href={'/profile'} id='resource' >
+                openAcc && <motion.div layout className={`flex flex-col text-start bg-slate-800 p-1 border-1  rounded-[0.2rem] py-2 gap-3 my-1 absolute ${styles['dropD']} `}>
+            <Link href={'/profile'} id='resource' className='hover:bg-slate-500 px-1 rounded-[0.3rem]'>
         Profile
     </Link>
-    <SignOutButton className='text-start bg-red-500 px-1 rounded-lg hover:opacity-80 hover:scale-105'>
+    <SignOutButton className='text-start bg-red-500 px-1 rounded-[0.3rem] hover:opacity-80 hover:scale-105'>
         Log out
     </SignOutButton>
             </motion.div>
@@ -76,7 +77,7 @@ const Header = () => {
         transition:{
             type:"tween"
         }
-     }} layout className={` flex flex-col gap-6 justify-start mx-2 p-2 m-4 ${styles['fredoka']} text-white text-3xl lg:text-lg md:text-base p-2 w-[40vw] fixed top-[5vh] right-[2vw] bg-slate-950 z-[100] h-[60vh] bg-opacity-70 shadow-[0.2rem_0rem_0.5rem] shadow-slate-500 rounded-xl`}>
+     }} layout className={` flex flex-col gap-6 justify-start mx-2 p-2 m-4 ${styles['fredoka']} text-white text-3xl lg:text-lg md:text-base p-2 w-[40vw] fixed top-[5vh] right-[2vw] bg-slate-950 z-[4000] min-h-fit bg-opacity-70 shadow-[0.2rem_0rem_0.5rem] shadow-slate-500 rounded-xl`}>
         <Link href='/' className={isActive('/')?'text-orange-400 ':'text-white'}>
             <RiHome4Fill className='inline-block'/><p className='text-xl inline-block'>Home</p>
         </Link>
@@ -97,7 +98,7 @@ const Header = () => {
     </Link>
         }
         {
-            user && <div className='bg-red-500 rounded-xl text-center hover:opacity-75 mx-2'>
+            user && <div className='bg-red-600 rounded-xl text-center hover:opacity-75 mx-2 border-gray-100 hover:border-2 border'>
         <SignOutButton>
             log out
         </SignOutButton>
