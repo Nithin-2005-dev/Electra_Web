@@ -22,7 +22,7 @@ const Header = () => {
     <>
     <div className='fixed top-0 left-0 mx-3 my-1 z-[1000]'>
     <Link href={'/'}>
-    <img src='https://i.imghippo.com/files/mt3cO1728475194.png' alt='electra-logo' width={'55'} className='rounded-full'/>
+    <img src='https://res.cloudinary.com/dqa3ov76r/image/upload/v1729535469/favoritePhotos/rdemjabrfg8mxrlb2nfo.jpg' alt='electra-logo' width={'55'} className='rounded-full'/>
     </Link>
     </div>
     <header className='px-2 hidden sm:block'>
