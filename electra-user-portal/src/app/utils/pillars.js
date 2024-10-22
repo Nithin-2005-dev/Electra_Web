@@ -16,7 +16,7 @@ link:`http://eed.nits.ac.in/vivekanandan/`
 `,
         name:'Dr. Tanmoy Malakar',
         post:'Head Of Department',
-        image:'https://i.imghippo.com/files/Ffwlz1728918340.jpg',
+        image:'https://res.cloudinary.com/dqa3ov76r/image/upload/v1729624869/favoritePhotos/ne7swirjwcqvydgnvjur.jpg',
         link:`http://eed.nits.ac.in/tanmoy-malakar/`
     }
 ]
