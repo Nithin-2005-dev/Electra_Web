@@ -41,16 +41,19 @@ npm run build
 npm start
 
 project structure
-.src
-├── components   # Reusable components
-├── database     # database folder
-├── api          # API routes
-├── controllers  # API controllers
+.app
+├──src
+      
+      ├── database       # database folder
+      ├── api            # API routes
+      ├── external_apis  # third party apis
+      ├── auth           #pages belongs to authantication 
+      ├── pages          # pages
+      ├── store          # context apis
+      ├── styles         # custom styles with css modules
+      └── utils          # utility files
+├── components   # Reusable ui components
 ├── models       # data models
-├── page.js      # Homepage
-├── public       # Static assets
-├── styles       # custom styles with css modules
-└── README.md    # Project documentation
 
 packages
 ->three.js three/fibre three/drei #3d model rendering
@@ -58,3 +61,10 @@ packages
 ->react icons #custom icons
 ->hover.css #for hovering effect of buttons [https://github.com/IanLunn/Hover]
 ->react-verticle-components #event-timeline
+->clerk #for authentication
+->file-saver #to save images
+->framer-motion #animation library
+->mongoose #for data validating and modelling
+->cloudinary #images store
+->type writer #typing effect library
+->react-toastify #to show toasts
