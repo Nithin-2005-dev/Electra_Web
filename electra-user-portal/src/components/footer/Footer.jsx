@@ -21,7 +21,7 @@ const Footer = () => {
         <a href="https://wa.me/916291090769?text=Hello!%20%F0%9F%91%8B%0A%0AI%20visited%20the%20Electra%20Society%20website%20and%20really%20appreciate%20the%20information%20and%20resources%20available.%20Thank%20you!%20%E2%9A%A1" target='_blank' className='flex gap-2 items-center text-gray-300 text-xs sm:text-sm'><IoLogoWhatsapp className='inline-block text-green-500 text-sm sm:text-xl' />Whatsapp</a>
       </div>
       <div>
-        <img src='https://i.imghippo.com/files/mt3cO1728475194.png' alt='electra-logo' width={'150'} className='scale-[0.6] sm:scale-100'/>
+        <img src='https://res.cloudinary.com/dqa3ov76r/image/upload/v1729535834/favoritePhotos/ldlchr4ijcpgfq8nu2gx.jpg' alt='electra-logo' width={'120'} className='scale-[0.6] sm:scale-100'/>
         </div>
       <div className='flex flex-col gap-2 m-2 font-semibold'>
       <p className='text-xs sm:lg lg:text-xl xl:text-2xl font-extrabold text-sky-200'>Social media</p>
