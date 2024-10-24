@@ -8,7 +8,7 @@ import { ResourceStore } from '@/app/store/ResourceStore'
 const Semesters = () => {
   const {doubt,setDoubt}=useContext(ResourceStore);
   const {setPikaAnimation}=useContext(AnimationStore)
-    const images=['https://i.imghippo.com/files/jTaDn1727619118.png','https://i.imghippo.com/files/RugCI1727619153.png','https://i.imghippo.com/files/TDjn01727619225.png','https://i.imghippo.com/files/0VxW11727619247.png','https://i.imghippo.com/files/HhtuQ1727619283.png','https://i.imghippo.com/files/0dr3h1727619307.png','https://i.imghippo.com/files/9qn661727619333.png','https://i.imghippo.com/files/8cj4f1727619416.png']
+    const images=['https://res.cloudinary.com/dqa3ov76r/image/upload/v1729626099/favoritePhotos/gambjxx3fsep5jqfpmr1.png','https://res.cloudinary.com/dqa3ov76r/image/upload/v1729626098/favoritePhotos/jbiuw5dit5a17lyjnxsi.png','https://res.cloudinary.com/dqa3ov76r/image/upload/v1729626098/favoritePhotos/curolj2uoo2w8uoejazf.png','https://res.cloudinary.com/dqa3ov76r/image/upload/v1729626099/favoritePhotos/pqxguvsapcx3dkbutaev.png','https://res.cloudinary.com/dqa3ov76r/image/upload/v1729626099/favoritePhotos/dmo66pymqhtmwh29xjec.png','https://res.cloudinary.com/dqa3ov76r/image/upload/v1729626098/favoritePhotos/znb84ao2drpezh8hquk4.png','https://res.cloudinary.com/dqa3ov76r/image/upload/v1729626098/favoritePhotos/okfgkso1wuxiuohtabg7.png','https://res.cloudinary.com/dqa3ov76r/image/upload/v1729626098/favoritePhotos/inqjtg1epkmnyyg1dfsk.png']
   return (
     <div className={`sm:blur-0 ${!doubt?'blur-none': 'blur-sm'}`} onMouseOver={()=>{
         setPikaAnimation(1)
