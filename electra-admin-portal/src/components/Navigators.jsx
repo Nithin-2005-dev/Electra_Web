@@ -1,8 +1,10 @@
-import Link from "next/link";
-export default function Home() {
+'use client'
+import Link from 'next/link'
+import React from 'react'
+const Navigators = () => {
   return (
-    <>
-    <h1 className="text-white text-center p-4 font-black text-2xl capitalize">Electra Admin panel</h1>
+    <div>
+       <h1 className="text-white text-center p-4 font-black text-2xl capitalize">Electra Admin panel</h1>
     <div className="flex justify-center items-center h-[80vh]">
    <div className="flex flex-col justify-center text-center gap-6">
     <Link href={'/pages/Upload'} className="bg-slate-800 shadow-lg shadow-slate-500 text-white p-2 rounded-xl px-4 font-bold">Upload gallery images</Link>
@@ -13,6 +15,8 @@ export default function Home() {
     <Link href={'/pages/getResources'} className="bg-slate-800 shadow-lg shadow-slate-500 text-white p-2 rounded-xl px-4 font-bold">see resources</Link>
    </div>
    </div>
-   </>
-  );
+    </div>
+  )
 }
+
+export default Navigators
