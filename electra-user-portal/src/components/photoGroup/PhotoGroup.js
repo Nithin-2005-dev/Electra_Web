@@ -17,7 +17,7 @@ const PhotoGroup =() => {
         return 0;
       }
   })
-  return <>
+  return <section>
     {loading ?<TeamLoader/> :<div className='flex flex-wrap justify-center items-center gap-3 my-4 min-h-[100vh]' >
       {
         imgs && imgs.length==0 && <p>No photos avalible</p>
@@ -28,7 +28,7 @@ const PhotoGroup =() => {
         </>
       })}
       </div>}
-  </>
+  </section>
 }
 
 export default PhotoGroup

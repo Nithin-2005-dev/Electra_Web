@@ -37,7 +37,7 @@ const Landing = () => {
   });
   return (
     <>
-       <div className={`flex items-center h-[100vh]`}>
+       <section className={`flex items-center h-[100vh]`}>
        <div className="w-1/2 flex flex-col p-4 gap-3 flex-wrap">
       <motion.div className="border-l-4 border-yellow-300" initial={{
         x:-1000,
@@ -51,7 +51,7 @@ const Landing = () => {
         }
       }}
       >
-      <span className='font-bold text-lg lg:text-5xl sm:text-lg text-blue-200 md:text-3xl'>Electra Society:
+      <h1 className='font-bold text-lg lg:text-5xl sm:text-lg text-blue-200 md:text-3xl'>Electra Society:
       <span className='text-red-200 inline-block'>
       <Typewriter options={
         {
@@ -67,7 +67,7 @@ const Landing = () => {
   }}
 />
       </span>
-      </span>
+      </h1>
       </motion.div>
       <motion.div className="text-lg lg:text-2xl sm:text-base font-serif capitalize" initial={{
         x:-1000,
@@ -102,7 +102,7 @@ const Landing = () => {
       <Environment preset="park"/>
       </Canvas>
       </motion.div>
-      </div>
+      </section>
     </>
   )
 }

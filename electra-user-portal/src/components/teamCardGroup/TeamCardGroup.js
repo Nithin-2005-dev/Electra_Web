@@ -62,7 +62,7 @@ const TeamCardGroup= () => {
     }else return 0;
    })
   return (
-    <>
+    <section>
     {teamLoad?<TeamLoader/>: <div>
       <motion.div className='flex flex-wrap justify-center sm:justify-evenly items-center relative p-5  gap-3'>
       {
@@ -120,7 +120,7 @@ const TeamCardGroup= () => {
       </>
       }
       </div>}
-      </>
+      </section>
   )
 }
 

@@ -17,7 +17,7 @@ useMotionValueEvent(scrollY, "change", (latest) => {
   setPikaAnimation(0)
 })
   return (
-    <>
+    <section>
     <div className={`flex flex-col sm:blur-0 ${!doubt?'blur-none': 'blur-sm'}`}>
     <div className='flex w-[50vw] h-[70vh] md:h-[100vh]'>
       {
@@ -49,7 +49,7 @@ useMotionValueEvent(scrollY, "change", (latest) => {
     }}>{doubt? 'Doubt cleared?':'Ask Pikachu'}</button>
   {
         doubt && <GenAi/>
-      }</>
+      }</section>
   )
 }
 
