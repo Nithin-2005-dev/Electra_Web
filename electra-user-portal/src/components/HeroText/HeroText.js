@@ -25,8 +25,8 @@ const HeroText = () => {
   }} 
 
       >
-      <div className='text-xl font-bold md:text-2xl lg:text-3xl text-fuchsia-400 [text-shadow:_0.2rem_-0.2rem_0.3rem_rgb(99_102_241_/_0.8)] '>Welcome to the Academic Resources Hub</div>
-      <div className='lg:text-base md:text-sm text-xs text-blue-100'>Welcome to the Academic Resources Hub of the Electrical Engineering Department at NIT Silchar. This dedicated platform is designed to support our students in their academic journey by providing easy access to a comprehensive collection of study materials, class notes, and essential resources.
+      <div className='text-xl font-bold md:text-2xl lg:text-3xl text-fuchsia-400 [text-shadow:_0.2rem_-0.2rem_0.3rem_rgb(99_102_241_/_0.8)]'>Welcome to the Academic Resources Hub</div>
+      <div className='lg:text-base md:text-sm text-xs text-blue-100 text-justify'>Welcome to the Academic Resources Hub of the Electrical Engineering Department at NIT Silchar. This dedicated platform is designed to support our students in their academic journey by providing easy access to a comprehensive collection of study materials, class notes, and essential resources.
 </div>
 <div className='text-xl font-bold md:text-2xl lg:text-3xl text-red-300  [text-shadow:_0.2rem_-0.2rem_0.3rem_rgb(255_0_0_/_0.8)] hidden sm:inline-block'>
 Our Commitment:
