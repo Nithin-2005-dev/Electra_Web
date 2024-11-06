@@ -19,7 +19,7 @@ const Header = () => {
     const {user}=useUser();
     const [openAcc,setAcc]=useState(false);
   return (
-    <>
+    <header>
     <div className='fixed top-0 left-0 mx-3 my-1 z-[1000]'>
     <Link href={'/'}>
     <img src='https://res.cloudinary.com/dqa3ov76r/image/upload/v1729535834/favoritePhotos/ldlchr4ijcpgfq8nu2gx.jpg' alt='electra-logo' width={'45'} className='rounded-full'/>
@@ -107,7 +107,7 @@ const Header = () => {
      </motion.nav> 
     </header>}
     </div>
-    </>
+    </header>
   )
 }
 

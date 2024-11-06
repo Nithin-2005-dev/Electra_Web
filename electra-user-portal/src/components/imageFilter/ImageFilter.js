@@ -4,10 +4,10 @@ import styles from '../../app/styles/ImageFilter.module.css'
 import { ImageProvider } from '@/app/store/ImageStore'
 const ImageFilter = () => {
   const {setCurrentEventFilter,loading}=useContext(ImageProvider)
-  return <>
+  return <section>
     {
       !loading &&     <div className='my-5 mx-3 flex border-1 p-2 rounded-xl text-xs lg:text-xl font-bold shadow-xl shadow-slate-800 justify-between'>
-      <div className={`${styles['fredoka']} text-blue-200 text-base lg:text-2xl md:text-lg place-self-center`}>Electra Gallery</div>
+      <h3 className={`${styles['fredoka']} text-blue-200 text-base lg:text-2xl md:text-lg place-self-center`}>Electra Gallery</h3>
       <div className='place-self-end'>
       <select name="" id="" className='bg-blue-400 rounded-xl hover:opacity-80 lg:p-2 lg:px-3 md:p-2 md:px-3 sm:p-3 sm:px-3 p-1 px-1 text-xs lg:text-lg font-bold z-[3000]' onChange={(e)=>{
           setCurrentEventFilter(e.target.value)
@@ -26,7 +26,7 @@ const ImageFilter = () => {
       </div>
     </div>
     }
-    </>
+    </section>
 }
 
 export default ImageFilter

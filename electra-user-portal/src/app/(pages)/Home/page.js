@@ -7,13 +7,13 @@ import AboutUs from "@/components/aboutUs/About"
 import Footer from "@/components/footer/Footer"
 const Home = () => {
   return (
-    <div>
+    <main>
     <Header/>
       <Landing/>
       <AboutUs/>
       <Events/>
       <Footer/>
-    </div>
+    </main>
   )
 }
 

@@ -20,7 +20,7 @@ const ImgSlider = () => {
  }else{
   random=[]
  }
-  return <>
+  return <section>
     {
       !loading && <><div className={`${styles['res-slider']}`}>
     <div className={`text-center font-black text-3xl p-4 ${styles['fredoka']} mt-8`}>Memorable Moments</div>
@@ -61,7 +61,7 @@ const ImgSlider = () => {
     </Carousel>
     </div></>
     }
-    </>
+    </section>
 }
 
 export default ImgSlider

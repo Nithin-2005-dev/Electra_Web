@@ -5,7 +5,7 @@ import { Card } from 'react-bootstrap';
 import { IoLogoWhatsapp } from 'react-icons/io';
 const Footer = () => {
   return (
-    <div className='my-2'>
+    <footer className='my-2'>
     <hr className='m-1 sm:m-3 text-xl font-black'/>
     <div className='flex justify-between items-center m-3'>
       <div className='flex flex-col gap-2 m-2'>
@@ -45,7 +45,7 @@ const Footer = () => {
 
 <p className='text-center text-xs sm:text-base'>Designed & Developed by Development Team@Electra society⚡</p>
     </div>
-    </div>
+    </footer>
   )
 }
 

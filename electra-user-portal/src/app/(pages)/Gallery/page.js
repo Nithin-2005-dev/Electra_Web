@@ -7,6 +7,7 @@ import ImgSlider from "@/components/ImgSlider/ImgSlider"
 import PhotoGroup from "@/components/photoGroup/PhotoGroup"
 const Gallery = () => {
   return (
+    <main>
     <ImageStoreProvider>
     <Header/>
     <ImgSlider/>
@@ -14,6 +15,7 @@ const Gallery = () => {
     <PhotoGroup/>
     <Footer/>
     </ImageStoreProvider>
+    </main>
   )
 }
 

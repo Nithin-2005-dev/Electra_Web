@@ -13,8 +13,8 @@ const Events = () => {
   const [openMore,setOpenMore]=useState(false);
   const [dataToShow,setData]=useState({});
   return (
-    <>
-        <motion.div className='text-5xl font-bold m-2 border-b-4 inline-block border-yellow-400 ' initial={{y:-10,opacity:0}} whileInView={{y:0,opacity:1,transition:{duration:2}}}>Events</motion.div>
+    <section>
+        <motion.h2 className='text-5xl font-bold m-2 border-b-4 inline-block border-yellow-400 ' initial={{y:-10,opacity:0}} whileInView={{y:0,opacity:1,transition:{duration:2}}}>Events</motion.h2>
         <VerticalTimeline lineColor='white'>
         {
           EventData.map((event)=>{
@@ -41,7 +41,7 @@ const Events = () => {
         }
         </VerticalTimeline>
         <KnowMore openMore={openMore} setOpenMore={setOpenMore} dataToShow={dataToShow}/>
-    </>
+    </section>
   )
 }
 
