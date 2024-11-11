@@ -1,4 +1,3 @@
 User-agent:*
-Disallow:/Resources/
 Crawl-delay:28
 Sitemap:https://www.electrasocietynits.com/sitemap.xml
