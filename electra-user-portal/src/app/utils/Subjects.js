@@ -111,7 +111,7 @@ export const SubjectData=[
             },
             {
                 subject:"Analog Electronics Laboratory",
-                subjectCode:'hs-226'
+                subjectCode:'ec-226'
             }
         ],
         [
