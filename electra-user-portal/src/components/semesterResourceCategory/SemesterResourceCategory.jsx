@@ -23,7 +23,6 @@ useMotionValueEvent(scrollY, "change", (latest) => {
     useEffect(()=>{
         getResources(semester,category)
     },[])
-    console.log(data);
     let subData=data?.filter((ele)=>{
         return ele.subject==code;
     })

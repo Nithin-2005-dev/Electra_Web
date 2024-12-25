@@ -6,8 +6,7 @@ import ImageLoader from '../img-loader/ImageLoader'
 import { set } from 'mongoose';
 import TeamLoader from '../ui/TeamLoader';
 const PhotoGroup =() => {
-  const {imgs,currentEventFilter,loading} =useContext(ImageProvider);
-  console.log(imgs)
+  const {imgs,loading} =useContext(ImageProvider);
   imgs.sort(function(a,b){
       if(a.year<b.year){
           return 1
@@ -24,7 +23,7 @@ const PhotoGroup =() => {
       }
       {imgs && imgs.map((pic)=>{
         return  <>
-        <GalleryCard pic={pic} key={pic._id}/>
+        <GalleryCard pic={pic} key={pic._id+new Date().toISOString()}/>
         </>
       })}
       </div>}

@@ -9,7 +9,6 @@ export const TeamStoreProvider=({children})=>{
         try{
             setTeamLoad(true);
             const response=await axios.get(`/api/getTeam?team=${year}`);
-            console.log(response.data)
             setTeam(response.data);
             setTeamLoad(false);
         }catch(err){
