@@ -37,7 +37,7 @@ Whether you’re looking for lecture notes, preparing for exams, or working on y
 </div>
 <div>
 <button className={`bg-[#AD49E1] font-bold p-1 px-2 rounded-xl ${styles['hvr-buzz-out']} hover:border-white hover:border-2 text-sm md:text-lg lg:text-2xl`} onClick={()=>{
-  saveAs('https://pdfupload.io/docs/ac74e0c9','eed_nits_btech_course_structure.pdf')
+  saveAs(`http://eed.nits.ac.in/wp-content/uploads/2022/04/UG_EED_Syllabus-1.pdf`,'eed_nits_btech_course_structure.pdf')
 }}>Course structure<IoCloudDownloadSharp className={`inline mx-1`}/></button>
 </div>
     </div> 
