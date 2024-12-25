@@ -1,3 +1,2 @@
-User-agent:*
-Crawl-delay:28
-Sitemap:https://www.electrasocietynits.com/sitemap.xml
+User-agent: *
+Allow: /
