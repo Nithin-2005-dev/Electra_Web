@@ -14,6 +14,7 @@ export const EventData = [
       eventTagline: `The Grand Kick-Off Event`,
       icon:<FaChild />,
       description:`Udvega, the annual kick-starter for our society's vibrant culture! Post the grand induction of the latest batch, we organize this spectacular shindig. Bursting with talent, the fresh faces showcase their moves in dance and music extravaganzas. The excitement crescendos with riveting games, ensuring an electrifying ambiance.`,
+      link:"",
     },
     {
       title:'Off the Hook',
@@ -24,7 +25,8 @@ export const EventData = [
       eventElaboration:`This event features a thrilling lineup of performances, a talent showcase, and competitive e-games with exciting prizes. As Sections F and G face off in a spirited rivalry, the atmosphere is charged with creativity and camaraderie. Off the Hook is more than just an event; it’s a platform for emerging stars to shine and make their mark, marking the beginning of their journey at EE Freshmen .  a day filled with inspiration, excitement, and unforgettable moments!
 `,
       eventTagline:`Unleash the Potential`,
-      icon:<GiGameConsole />
+      icon:<GiGameConsole />,
+      link:"",
     },
     {
       title: `Blitzsurge`,
@@ -33,6 +35,7 @@ export const EventData = [
       eventTagline: `A Fusion of Fun and Creativity`,
       icon:<CgGames />,
       description:`Blitzsurge is a fun event hosted by the society. It includes exciting events like Call of Duty, Meme war, Picture Perception  and many more events that allows the students to explore their talents with fun and joy.`,
+      link:"",
     },
     {
       title: "Power Surge",
@@ -41,6 +44,7 @@ export const EventData = [
       eventTagline: "A Technical Challenge Extravaganza",
       icon:<GrTechnology />,
       description:`Power Surge is the technical event hosted by the society. It includes exciting events like Crack the Job, Logo Designing, IPL Auction voice of Electra and many more events that allows the students to explore their talents with fun and joy.`,
+      link:"/Registration/hackOverse",
     },
     {
       title: "Electra Cup",
@@ -49,6 +53,7 @@ export const EventData = [
       eventTagline: `Uniting Through Sports`,
       icon:<MdOutlineSportsHandball />,
       description:`Electra Cup is the sports event arranged by Electra Society. It is the inter batch sports competition that includes games like cricket, futsal, badminton, chess, and so on.`,
+      link:"",
     },
     {
       title: `Electra-Dev Module`,
@@ -57,6 +62,7 @@ export const EventData = [
       eventTagline: `Where Web Development Thrives`,
       icon:<GiTeacher />,
       description:`Electra-Dev module is the Web Development module under Electra Society. Students of the department who are interested in Web development are part of this module.`,
+      link:"",
     },
     {
       title: "Codesta",
@@ -65,6 +71,7 @@ export const EventData = [
       eventTagline: `A Coding Powerhouse`,
       icon:<FaLaptopCode />,
       description:`Codesta is the coding module of Electra Society. Codenza is the Coding Competition arranged by Electra Society under Codesta. Electrical Engineering students unleash and showcase their coding skills in this competition.`,
+      link:"",
     },
     {
       title: "Carvaan",
@@ -73,6 +80,7 @@ export const EventData = [
       eventTagline: `A Farewell to Remember`,
       icon:<PiStudentFill />,
       description:`After completion of B.Tech in four years every batch pass out from the college. Electra Society arranges Carvaan each year to bid farewell to the outgoing batch from our department.`,
+      link:"",
     }
   ];
  

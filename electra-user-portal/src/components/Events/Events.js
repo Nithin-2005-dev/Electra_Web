@@ -9,6 +9,7 @@ import { useInView } from 'react-intersection-observer';
 import {motion} from 'framer-motion'
 import KnowMore from '../knowMore/KnowMore';
 import { Scale } from 'lucide-react';
+import Link from 'next/link';
 const Events = () => {
   const [openMore,setOpenMore]=useState(false);
   const [dataToShow,setData]=useState({});
@@ -29,13 +30,18 @@ const Events = () => {
             >
                 <div className={`text-yellow-500 font-semibold text-2xl ${styles['sofadi-']} text-center`} style={{fontFamily:'Lucida Sans'}}>{event.title}</div>
                 <div className={`text-[#bed3de] font-mono ${styles['space-grotesk']} ${styles['dec-shadow']} text-justify`}>{event.description}</div>
-                <div className='flex justify-center mt-2'>
+                {event.link==""?<div className='flex justify-center mt-2'>
                 <Button className={`bg-[#0F4C75] rounded-xl hover:opacity-80 hover:bg-[#0F4C75] ${styles['hvr-float-shadow']} font-bold px-4 ${styles['card-button']}`} onClick={()=>{
                   setOpenMore(true)
                   setData(event)
                 }}>Know More</Button>
-                {/* <Button className={`bg-[#0F4C75] rounded-xl hover:opacity-80 hover:bg-[#0F4C75] ${styles['hvr-float-shadow']} font-bold px-4 ${styles['card-button']}`}>Register</Button> */}
-                </div>
+                </div>:<div className='flex justify-between mt-2'>
+                <Button className={`bg-[#0F4C75] rounded-xl hover:opacity-80 hover:bg-[#0F4C75] ${styles['hvr-float-shadow']} font-bold px-4 ${styles['card-button']}`} onClick={()=>{
+                  setOpenMore(true)
+                  setData(event)
+                }}>Know More</Button>
+                <Link href={event.link} className={`bg-[#0F4C75] rounded-xl hover:opacity-80 hover:bg-[#0F4C75] ${styles['hvr-float-shadow']} font-bold px-4 ${styles['card-button']}`}>Register</Link>
+                </div>}
               </VerticalTimelineElement>
           })
         }
