@@ -1,9 +1,11 @@
 'use client'
 import React from 'react'
 import FormfacadeEmbed from "@formfacade/embed-react";
+import Header from "@/components/header/Header"
 const page = () => {
   return (
     <div>
+    <Header/>
       <FormfacadeEmbed
 
 formFacadeURL="https://formfacade.com/include/118295645637140833162/form/1FAIpQLScUZ-n8cjv9E3aySvg5wOywxfTjpQhMsqx9XAiPHp3cgIpstg/classic.js/?div=ff-compose"
