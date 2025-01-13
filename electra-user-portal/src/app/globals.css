@@ -553,3 +553,10 @@ body{
 .cl-footer{
   display: none;
 }
+.ff-watermark{
+  visibility: hidden;
+}
+#g-form-reg a{
+    color: yellow;
+    text-decoration: underline;
+}
