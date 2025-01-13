@@ -6,13 +6,15 @@ const page = () => {
   return (
     <div>
     <Header/>
-      <FormfacadeEmbed
+    <div className='sm:mt-8 mt-14'>
+    <FormfacadeEmbed
 
-formFacadeURL="https://formfacade.com/include/118295645637140833162/form/1FAIpQLScUZ-n8cjv9E3aySvg5wOywxfTjpQhMsqx9XAiPHp3cgIpstg/classic.js/?div=ff-compose"
+formFacadeURL="https://formfacade.com/include/118295645637140833162/form/1FAIpQLScUZ-n8cjv9E3aySvg5wOywxfTjpQhMsqx9XAiPHp3cgIpstg/classic.js/?div=ff-compose" 
 
 onSubmitForm={() => console.log('Form submitted')}
 
 />
+    </div>
     </div>
   )
 }
