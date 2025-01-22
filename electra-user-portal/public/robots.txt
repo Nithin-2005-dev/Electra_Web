@@ -1,2 +1,3 @@
 User-agent: *
 Allow: /
+Sitemap:https://electrasocietynits.com/sitemap.xml
