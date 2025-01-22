@@ -9,7 +9,7 @@ const page = () => {
     <div className='sm:mt-8 mt-14' id='g-form-reg'>
     <FormfacadeEmbed
 
-formFacadeURL="https://formfacade.com/include/118295645637140833162/form/1FAIpQLScUZ-n8cjv9E3aySvg5wOywxfTjpQhMsqx9XAiPHp3cgIpstg/classic.js/?div=ff-compose" 
+formFacadeURL="https://formfacade.com/include/103141431770556571946/form/1FAIpQLScUZ-n8cjv9E3aySvg5wOywxfTjpQhMsqx9XAiPHp3cgIpstg/classic.js/?div=ff-compose"
 
 onSubmitForm={() => console.log('Form submitted')}
 
