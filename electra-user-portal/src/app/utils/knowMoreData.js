@@ -44,7 +44,7 @@ export const EventData = [
       eventTagline: "A Technical Challenge Extravaganza",
       icon:<GrTechnology />,
       description:`Power Surge is the technical event hosted by the society. It includes exciting events like Crack the Job, Logo Designing, IPL Auction voice of Electra and many more events that allows the students to explore their talents with fun and joy.`,
-      link:"/Registration/hackOverse",
+      link:"",
     },
     {
       title: "Electra Cup",
