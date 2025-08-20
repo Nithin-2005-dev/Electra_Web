@@ -11,9 +11,11 @@ import TeamLoader from '../ui/TeamLoader';
 import { TeamStore } from '@/app/store/TeamStore';
 const TeamCardGroup= () => {
   const {team,teamLoad}=useContext(TeamStore)
-  const first=team.filter((ele)=>{
-   return ele.position==='president' || ele.position==='general secretary';
-  })
+let first = [
+  ...team.filter(ele => ele.position === "president"),
+  ...team.filter(ele => ele.position === "general secretary"),
+  ...team.filter(ele => ele.position === "treasurer"),
+];
   const first2=team.filter((ele)=>{
     return ele.position==='vice president' || ele.position==='assistant general seceretary';
    })
@@ -65,11 +67,25 @@ const TeamCardGroup= () => {
     <section>
     {teamLoad?<TeamLoader/>: <div>
       <motion.div className='flex flex-wrap justify-center sm:justify-evenly items-center relative p-5  gap-3'>
-      {
-          first.length>0 && first.map((ele)=>{
-              return <TeamCard ele={ele} key={ele._id}/>
-          })
-      }
+     <>
+  {team
+    .filter(ele => ele.position === "president")
+    .map(ele => (
+      <TeamCard ele={ele} key={ele._id} />
+    ))}
+
+  {team
+    .filter(ele => ele.position === "general secretary")
+    .map(ele => (
+      <TeamCard ele={ele} key={ele._id} />
+    ))}
+
+  {team
+    .filter(ele => ele.position === "treasurer")
+    .map(ele => (
+      <TeamCard ele={ele} key={ele._id} />
+    ))}
+</>
       </motion.div>
       <hr className='sm:mx-10 mx-5 font-black'/>
       <motion.div className='flex flex-wrap  justify-center sm:justify-evenly items-center relative p-5 gap-3'>
