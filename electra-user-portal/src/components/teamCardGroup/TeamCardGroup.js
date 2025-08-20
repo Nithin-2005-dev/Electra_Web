@@ -11,9 +11,19 @@ import TeamLoader from '../ui/TeamLoader';
 import { TeamStore } from '@/app/store/TeamStore';
 const TeamCardGroup= () => {
   const {team,teamLoad}=useContext(TeamStore)
-  const first=team.filter((ele)=>{
-   return ele.position==='president' || ele.position==='general secretary' || ele.position==='treasurer';
-  })
+  const order = {
+  "president": 1,
+  "general secretary": 2,
+  "treasurer": 3
+};
+const first = team
+  .filter(ele =>
+    ele.position === "president" ||
+    ele.position === "general secretary" ||
+    ele.position === "treasurer"
+  )
+  .sort((a, b) => order[a.position] - order[b.position]);
+
   const first2=team.filter((ele)=>{
     return ele.position==='vice president' || ele.position==='assistant general seceretary';
    })
