@@ -8,7 +8,7 @@ const CoreTeamFilter = () => {
   const handleFilter=()=>{
     getTeamByYear(yearRef.current.value);
   }
-  useEffect(()=>{getTeamByYear('2024')},[])
+  useEffect(()=>{getTeamByYear('2025')},[])
   return (
     <section className={`mx-3 relative top-[6vh] ${styles['heading-res']}`}>
       <h2 className={`text-center text-3xl text-white [text-shadow:_0_0rem_1rem_rgb(99_102_255_/_0.8)] ${styles['fredoka']}`}>Meet Our Team</h2>
