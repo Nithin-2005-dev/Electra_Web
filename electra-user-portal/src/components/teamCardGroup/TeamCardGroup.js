@@ -12,7 +12,7 @@ import { TeamStore } from '@/app/store/TeamStore';
 const TeamCardGroup= () => {
   const {team,teamLoad}=useContext(TeamStore)
   const first=team.filter((ele)=>{
-   return ele.position==='president' || ele.position==='general secretary';
+   return ele.position==='president' || ele.position==='general secretary' || ele.position==='treasurer';
   })
   const first2=team.filter((ele)=>{
     return ele.position==='vice president' || ele.position==='assistant general seceretary';
