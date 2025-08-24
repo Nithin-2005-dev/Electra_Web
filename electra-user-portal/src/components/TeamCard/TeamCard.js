@@ -34,15 +34,19 @@ const TeamCard = ({ele}) => {
             {ele.name}
         </CardBody>
         <CardLink className={`flex justify-evenly mx-2 lg:text-3xl text-4xl pb-2 ${hover && 'relative bottom-[30%]'} relative z-30`}>
-        <a href={ele?.insta} target='_blank'>
+        {
+          ele.insta && <a href={ele?.insta} target='_blank'>
         <FaInstagram className='text-[#FCAF45] hover:scale-125 font-black'/>
         </a>
-        <a href={ele?.fb} target='_blank'>
+        }
+        {ele.fb && <a href={ele?.fb} target='_blank'>
         <FaFacebook className='text-[#6d9dfd] hover:scale-125'/>
-        </a>
-        <a href={ele.linkdin} target='_blank'>
+        </a>}
+        {
+          ele.linkdin && <a href={ele.linkdin} target='_blank'>
         <FaLinkedin className='text-[#0077B5] hover:scale-125' />
         </a>
+        }
         </CardLink>
       </Card>
     </motion.div>
