@@ -5,7 +5,7 @@ import axios from 'axios'
 import { Bounce, toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 const UploadTeam = ({preset,team}) => {
-  const teamData=["president","vice president","general secretary","assistant general seceretary","technical head","social media management head","marketing head","content head","design head","event management head","executive head","cultural head","technical team","executive team"]
+  const teamData=["president","vice president","general secretary","assistant general seceretary","technical head","social media management head","marketing head","content head","design head","event management head","executive head","cultural head","design team","development team","event management team","social media management team","content team","marketing team"];
   const nameRef=useRef();
   const yearRef=useRef();
   let imageRef='';
