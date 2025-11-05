@@ -1,6 +1,6 @@
 import { NextResponse } from "next/dist/server/web/spec-extension/response";
 import {ConnectDb} from '../../database/dbConfig'
-import { Team } from "@/models/team.model.js";
+import { Team } from "../../../models/team.model";
 export async function GET(req) {
     await ConnectDb();
     try{

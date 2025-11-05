@@ -1,24 +1,14 @@
-
-import { AnimationStoreProvider } from "@/app/store/AnimationStore"
-import Header from "@/components/header/Header"
-import ResourcesHero from "@/components/pikachu/ResourcesHero"
-import Semesters from "@/components/Semesters/Semesters"
-import Loader from "./loading"
-import Footer from "@/components/footer/Footer"
-import { ResourceStore, ResourceStoreProvider } from "@/app/store/ResourceStore"
+import { ResourceStoreProvider } from '../../store/ResourceStore'
+import KnowledgeGrid from '../../../components/Resources'
+import React from 'react'
 
 const Resources = () => {
   return (
+    <main>
     <ResourceStoreProvider>
-    <AnimationStoreProvider>
-    <div className="flex flex-col gap-0 sm:gap-10 md:gap-6">
-    <Header/>
-    <ResourcesHero/>
-    </div>    
-    <Semesters/>
-    <Footer/>
-    </AnimationStoreProvider>
+      <KnowledgeGrid/>
     </ResourceStoreProvider>
+    </main>
   )
 }
 

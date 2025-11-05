@@ -1,22 +1,13 @@
-'use server'
-import { ImageStoreProvider } from "@/app/store/ImageStore"
-import Footer from "@/components/footer/Footer"
-import Header from "@/components/header/Header"
-import ImageFilter from "@/components/imageFilter/ImageFilter"
-import ImgSlider from "@/components/ImgSlider/ImgSlider"
-import PhotoGroup from "@/components/photoGroup/PhotoGroup"
-const Gallery = () => {
+import GallerySectionOne from "../../../components/GallaryImages";
+import MainGallerySlider from "../../../components/GallerySlider";
+import { ImageStoreProvider } from "../../store/ImageStore";
+export default function Gallery() {
   return (
-    <main>
     <ImageStoreProvider>
-    <Header/>
-    <ImgSlider/>
-    <ImageFilter/>
-    <PhotoGroup/>
-    <Footer/>
+      <main className="min-h-screen">
+        <MainGallerySlider/>
+        <GallerySectionOne/>
+      </main>
     </ImageStoreProvider>
-    </main>
-  )
+  );
 }
-
-export default Gallery

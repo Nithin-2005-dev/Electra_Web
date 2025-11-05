@@ -1,7 +1,8 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
+// src/app/layout.tsx
+import BackgroundElectric from "../components/BackgroundElectric.jsx";
 import "./globals.css";
-import { ClerkProvider } from '@clerk/nextjs';
-import { dark } from '@clerk/themes'
+import Header from "../components/Header.jsx";
+import Footer from "../components/Footer.jsx";
 export const metadata = {
   title: "Electra Society",
   description: `Discover the Electra Society of NIT Silchar. Explore event galleries, academic resources, team details, and all about the Electrical Engineering Department.`,
@@ -9,18 +10,14 @@ export const metadata = {
 };
 export default function RootLayout({ children }) {
   return (
-    <ClerkProvider appearance={{baseTheme:dark}}>
     <html lang="en">
-    <head>
-    <link rel="icon" href="https://i.imghippo.com/files/mt3cO1728475194.png" />
-      <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<meta name="robots" content="index, follow"></meta>
-    </head>
-      <body
-      >
-      {children}
+      <link rel="icon" href="https://res.cloudinary.com/dqa3ov76r/image/upload/v1729535834/favoritePhotos/ldlchr4ijcpgfq8nu2gx.jpg" />
+      <body className="bg-background text-textPrimary antialiased">
+        <Header />
+        <BackgroundElectric />
+        <main className="pt-16">{children}</main>
+        <Footer/>
       </body>
     </html>
-    </ClerkProvider>
   );
 }

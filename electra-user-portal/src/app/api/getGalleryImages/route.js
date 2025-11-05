@@ -1,5 +1,5 @@
-import { ConnectDb } from "@/app/database/dbConfig";
-import { ImageUpload } from "@/models/Image.model";
+import { ConnectDb } from "../../database/dbConfig";
+import { ImageUpload } from "../../../models/Image.model";
 import { NextResponse } from "next/server";
 export async function GET(req) {
   await ConnectDb();

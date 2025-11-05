@@ -1,21 +1,30 @@
-import { ConnectDb } from "@/app/database/dbConfig";
-import { Resource } from "@/models/resources.model";
+// app/api/getRes/route.js
 import { NextResponse } from "next/server";
-export async function POST(req) {
-    await ConnectDb();
-    try{
-        const reqBody=await req.json();
-        const {semester,category}=reqBody
+import { ConnectDb } from "../../../app/database/dbConfig";
+import { Resource } from "../../../models/resources.model";
 
-      const data= await Resource.find({semester});
-      const newData=data.filter((ele)=>{
-        return category===ele.category
-      })
-      return NextResponse.json(newData)
-    }catch(err){
-        return NextResponse.json({
-            message:'something went wrong!'+err,
-            status:500,
-        })
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+export async function POST(req) {
+  await ConnectDb();
+  try {
+    const body = await req.json();            // parse once
+    const { semester, category } = body || {};
+    if (!semester) {
+      return NextResponse.json({ message: "semester required" }, { status: 400 });
     }
+
+    const all = await Resource.find({ semester });
+    const list = category && category !== "all" ? all.filter((e) => e.category === category) : all;
+
+    return NextResponse.json(list, { headers: { "Cache-Control": "no-store" } });
+  } catch (err) {
+    console.error("getRes route error:", err?.message || err);
+    return NextResponse.json({ message: "something went wrong!" }, { status: 500 });
+  }
+}
+
+export async function GET() {
+  return NextResponse.json({ message: "Use POST" }, { status: 405 });
 }

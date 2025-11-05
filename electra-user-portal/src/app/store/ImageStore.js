@@ -12,6 +12,7 @@ export const ImageStoreProvider=({children})=>{
      try{
        const response=await axios.get(`/api/getGalleryImages?event=${currentEventFilter}`);
        getImgs(response.data)
+       console.log(response.data);
      setLoading(false)
        
      }catch(err){

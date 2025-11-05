@@ -1,20 +1,12 @@
-import CoreTeamFilter from "@/components/coreTeamFilter/CoreTeamFilter";
-import Header from "@/components/header/Header";
-import TeamCard from "@/components/teamCardGroup/TeamCardGroup";
-import { TeamStoreProvider } from "@/app/store/TeamStore";
-import Footer from "@/components/footer/Footer";
+import { TeamStoreProvider } from "../../store/TeamStore"
+import CoreTeam from "../../../components/Team"
 
-const Team = () => {
-  return (
-    <main>
-      <TeamStoreProvider>
-        <Header />
-        <CoreTeamFilter />
-        <TeamCard />
-        <Footer />
-      </TeamStoreProvider>
-    </main>
-  );
-};
-
-export default Team;
+export default function Team(){
+    return (
+        <main className="min-h-screen">
+        <TeamStoreProvider>
+               <CoreTeam/>
+        </TeamStoreProvider>
+              </main>
+    )
+}
