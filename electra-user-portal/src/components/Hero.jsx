@@ -6,8 +6,8 @@ export default function HeroElectraExecutive() {
     <section id="hero" aria-labelledby="hero-heading" className="relative">
       <style jsx>{`
         :root{
-          --primary:#00B8D9; --secondary:#14F7FF;
-          --textPrimary:#E0E0E0; --textMuted:#9E9E9E;
+          --primary:var(--accent-primary); --secondary:var(--accent-secondary);
+          --textPrimary:var(--text-primary); --textMuted:var(--text-secondary);
         }
 
         /* Container: clip both axes to prevent any scrollbars from deco layers */
@@ -20,8 +20,8 @@ export default function HeroElectraExecutive() {
           position:absolute; inset:0; pointer-events:none; z-index:-1;
           filter:blur(22px); opacity:.45;
           background:
-            radial-gradient(520px 220px at 24% 34%, rgba(20,247,255,.12), transparent 60%),
-            radial-gradient(520px 220px at 76% 66%, rgba(0,184,217,.10), transparent 60%);
+            radial-gradient(520px 220px at 24% 34%, rgba(0,229,255,.12), transparent 60%),
+            radial-gradient(520px 220px at 76% 66%, rgba(0,119,255,.10), transparent 60%);
           transform: translate3d(0,0,0) scale(1.08);
           will-change: transform;
           animation: fieldFloat 22s ease-in-out infinite alternate;
@@ -30,15 +30,15 @@ export default function HeroElectraExecutive() {
         .field2{
           opacity:.28; filter:blur(28px);
           background:
-            radial-gradient(520px 220px at 34% 70%, rgba(20,247,255,.09), transparent 60%),
-            radial-gradient(520px 220px at 80% 28%, rgba(0,184,217,.08), transparent 60%);
+            radial-gradient(520px 220px at 34% 70%, rgba(255,255,255,.09), transparent 60%),
+            radial-gradient(520px 220px at 80% 28%, rgba(0,229,255,.08), transparent 60%);
           transform: translate3d(0,0,0) scale(1.1);
           animation: fieldFloat2 28s ease-in-out infinite alternate;
         }
 
         /* Accent cap */
         .cap{ height:.7rem; width:.25rem; border-radius:.375rem; background:var(--secondary);
-          box-shadow:0 0 8px rgba(20,247,255,.6); margin-bottom:.9rem;
+          box-shadow:0 0 8px rgba(0,229,255,.6); margin-bottom:.9rem;
         }
 
         /* Title system */
@@ -58,9 +58,9 @@ export default function HeroElectraExecutive() {
           background: linear-gradient(90deg, var(--primary), var(--secondary));
           -webkit-background-clip:text; background-clip:text; color:transparent;
           text-shadow:
-            0 0 0 rgba(20,247,255,0),
-            .6px 0 rgba(20,247,255,.14),
-            -0.6px 0 rgba(0,184,217,.12);
+            0 0 0 rgba(255,255,255,0),
+            .6px 0 rgba(0,229,255,.14),
+            -0.6px 0 rgba(0,119,255,.12);
           animation: chromaPulse 6s ease-in-out infinite;
         }
 
@@ -70,7 +70,7 @@ export default function HeroElectraExecutive() {
         }
         .specular:before{
           content:""; position:absolute; top:-30%; left:-25%; width:42%; height:160%;
-          background: linear-gradient(112deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.28) 45%, rgba(255,255,255,0) 100%);
+          background: linear-gradient(112deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.22) 45%, rgba(255,255,255,0) 100%);
           filter: blur(8px); transform: rotate(5deg);
           animation: specSweep 3.6s linear infinite;
         }
@@ -105,7 +105,7 @@ export default function HeroElectraExecutive() {
         @keyframes fieldFloat2{ 0%{ transform:translate3d(0,0,0) scale(1.1) } 100%{ transform:translate3d(-10px,8px,0) scale(1.1) } }
         @keyframes chromaPulse{
           0%,100%{ filter:none }
-          50%{ filter:saturate(112%) contrast(104%) drop-shadow(0 0 10px rgba(20,247,255,.28)) }
+          50%{ filter:saturate(112%) contrast(104%) drop-shadow(0 0 10px rgba(0,229,255,.28)) }
         }
         @keyframes specSweep{ 0%{ transform:translate3d(0,0,0) rotate(5deg) } 100%{ transform:translate3d(230%,0,0) rotate(5deg) } }
         @keyframes glint{ 0%{ transform: translateX(0) } 100%{ transform: translateX(460%) } }

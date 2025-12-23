@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
     </head>
       <body className="bg-background text-textPrimary antialiased">
         <Header />
-        <BackgroundElectric />
+        {/* <BackgroundElectric /> */}
         <main className="pt-16">{children}</main>
         <Footer/>
       </body>

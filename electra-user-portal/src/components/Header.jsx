@@ -10,44 +10,33 @@ const NAV = [
   { href: "/Gallery", label: "Gallery" },
   { href: "/Resources", label: "Resources" },
   { href: "/Team", label: "Team" },
-  { href: "/Merch", label: "Merch" },
-  // { href: "/Join", label: "Join Us", cta: true },
+  { href: "/gotyourmerch", label: "Merch" },
 ];
 
 export default function Header() {
   const pathname = usePathname() || "/";
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [routePct, setRoutePct] = useState(0);
-  const [routeActive, setRouteActive] = useState(false);
   const btnRef = useRef(null);
   const firstLinkRef = useRef(null);
 
-  // Scroll progress
+  /* Scroll shadow */
   useEffect(() => {
-    const onScroll = () => {
-      const h = document.documentElement;
-      const pct = (h.scrollTop / Math.max(1, h.scrollHeight - h.clientHeight)) * 100;
-      setProgress(pct);
-      setScrolled(window.scrollY > 8);
-    };
+    const onScroll = () => setScrolled(window.scrollY > 10);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Lock body scroll on mobile menu
+  /* Lock body scroll on mobile */
   useEffect(() => {
-    const body = document.body;
-    if (open) {
-      const prev = body.style.overflow;
-      body.style.overflow = "hidden";
-      return () => (body.style.overflow = prev || "");
-    }
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => (document.body.style.overflow = prev);
   }, [open]);
 
-  // Focus management
+  /* Focus + Escape */
   useEffect(() => {
     if (!open) return;
     firstLinkRef.current?.focus();
@@ -61,109 +50,38 @@ export default function Header() {
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
 
-  // Close on route change
+  /* Close menu on route change */
   useEffect(() => setOpen(false), [pathname]);
-
-  // Page load progress
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    let done = false;
-    setRouteActive(true);
-    setRoutePct(5);
-
-    const ramp = setInterval(() => {
-      setRoutePct((p) => (p < 90 ? p + (90 - p) * 0.05 : p));
-    }, 120);
-
-    const root = document.querySelector("main") || document.body;
-    const imgs = Array.from(root.querySelectorAll("img"));
-    const total = imgs.length;
-    let loaded = imgs.filter((i) => i.complete).length;
-
-    const update = () => {
-      if (done) return;
-      if (total > 0) {
-        const mapped = 10 + (loaded / total) * 85;
-        setRoutePct((p) => Math.max(p, Math.min(95, mapped)));
-      }
-    };
-
-    const listeners = [];
-    imgs.forEach((img) => {
-      if (img.complete) return;
-      const onDone = () => {
-        loaded++;
-        update();
-        img.removeEventListener("load", onDone);
-        img.removeEventListener("error", onDone);
-      };
-      img.addEventListener("load", onDone, { once: true });
-      img.addEventListener("error", onDone, { once: true });
-      listeners.push([img, onDone]);
-    });
-
-    const finish = () => {
-      if (done) return;
-      done = true;
-      clearInterval(ramp);
-      setRoutePct(100);
-      setTimeout(() => {
-        setRouteActive(false);
-        setRoutePct(0);
-      }, 400);
-    };
-
-    const finCheck = setInterval(() => {
-      if (loaded >= total) finish();
-    }, 150);
-
-    const hardCap = setTimeout(finish, 6000);
-
-    update();
-    if (total === 0) finish();
-
-    return () => {
-      done = true;
-      clearInterval(ramp);
-      clearInterval(finCheck);
-      clearTimeout(hardCap);
-      listeners.forEach(([img, fn]) => {
-        img.removeEventListener("load", fn);
-        img.removeEventListener("error", fn);
-      });
-    };
-  }, [pathname]);
 
   return (
     <header
       className={[
-        "fixed inset-x-0 top-0 z-50 transition-all duration-200",
-        "bg-surface/80 backdrop-blur supports-[backdrop-filter]:bg-surface/60 border-b border-white/10",
-        scrolled ? "py-1 sm:py-2" : "py-2 sm:py-3 md:py-4",
+        "fixed inset-x-0 top-0 z-50 transition-all duration-300",
+        "bg-surface/70 backdrop-blur-xl supports-[backdrop-filter]:bg-surface/50",
+        "border-b border-white/10",
       ].join(" ")}
+      style={{
+        boxShadow: scrolled
+          ? "0 10px 30px rgba(0,0,0,0.45)"
+          : "0 0 0 rgba(0,0,0,0)",
+      }}
     >
-      {/* Top scroll progress */}
-      <span aria-hidden className="absolute inset-x-0 top-0 h-[2px] bg-white/0">
-        <span
-          className="block h-full bg-gradient-to-r from-primary via-secondary to-primary transition-[width] duration-200"
-          style={{ width: `${progress}%` }}
-        />
-      </span>
-
-      {/* Navbar container */}
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-2 sm:px-3 md:px-4">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between px-3 sm:px-4 py-2 sm:py-3">
         {/* Logo */}
-        <Link href="/" className="group flex min-w-0 items-center gap-1 sm:gap-2 shrink-0">
-          <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_12px_theme(colors.glow)] motion-safe:animate-pulse" />
-          <span className="truncate text-sm sm:text-base md:text-lg font-semibold text-textPrimary tracking-tight">
+        <Link
+          href="/"
+          className="group flex items-center gap-2 transition-transform duration-300 hover:scale-[1.02]"
+        >
+          <span className="h-2.5 w-2.5 rounded-full bg-primary shadow-[0_0_14px_rgba(20,247,255,0.7)]" />
+          <span className="text-sm sm:text-base md:text-lg font-semibold text-textPrimary tracking-tight">
             Electra
           </span>
         </Link>
 
-        {/* Hamburger button */}
+        {/* Hamburger */}
         <button
           ref={btnRef}
-          className="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-md text-textMuted hover:text-textPrimary focus:outline-none focus:ring-2 focus:ring-primary shrink-0"
+          className="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-md text-textMuted hover:text-textPrimary focus:outline-none focus:ring-2 focus:ring-primary"
           onClick={() => setOpen((v) => !v)}
           aria-label="Toggle menu"
         >
@@ -178,104 +96,85 @@ export default function Header() {
           )}
         </button>
 
-        {/* Desktop links */}
-        <div className="hidden lg:flex items-center gap-4 xl:gap-8">
-          {NAV.slice(0, 5).map((item) => {
+        {/* Desktop Nav */}
+        <div className="hidden lg:flex items-center gap-2 xl:gap-4">
+          {NAV.map((item) => {
             const current = pathname === item.href;
+
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 aria-current={current ? "page" : undefined}
-                className="group relative text-sm text-textMuted hover:text-textPrimary transition"
+                className={[
+                  "group relative px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-300",
+                  current
+                    ? "text-textPrimary bg-white/5 shadow-[0_0_12px_rgba(20,247,255,0.35)]"
+                    : "text-textMuted hover:text-textPrimary",
+                ].join(" ")}
               >
-                {item.label}
+                <span className="relative z-10">{item.label}</span>
+
+                {/* Animated underline */}
                 <span
                   className={[
-                    "absolute -bottom-1 left-0 h-0.5 w-0 bg-gradient-to-r from-primary to-secondary transition-all duration-200",
+                    "absolute left-1/2 bottom-0 h-[2px] w-0 -translate-x-1/2",
+                    "bg-gradient-to-r from-primary via-accent to-secondary",
+                    "transition-all duration-300",
                     current ? "w-full" : "group-hover:w-full",
                   ].join(" ")}
                 />
+
+                {current && (
+                  <span
+                    aria-hidden
+                    className="absolute inset-0 rounded-md ring-1 ring-primary/40"
+                  />
+                )}
               </Link>
             );
           })}
-
-          {/* <Link
-            href="/join"
-            className="relative overflow-hidden rounded-md bg-primary px-3 sm:px-4 py-2 text-sm font-semibold text-background hover:bg-secondary transition group/cta"
-          >
-            <span className="relative z-10">Join Us</span>
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-200 group-hover/cta:opacity-100"
-              style={{
-                background:
-                  "radial-gradient(160px circle at var(--x,50%) var(--y,50%), rgba(20,247,255,0.35), transparent 60%)",
-              }}
-            />
-          </Link> */}
         </div>
       </nav>
 
-      {/* Mobile dropdown */}
+      {/* Mobile Menu */}
       <div
         className={[
-          "lg:hidden absolute left-0 right-0 top-full z-40 transition-all duration-200",
+          "lg:hidden absolute left-0 right-0 top-full z-40",
+          "transition-all duration-300 ease-out",
           open
-            ? "opacity-100 translate-y-0 pointer-events-auto visible"
-            : "opacity-0 -translate-y-2 pointer-events-none invisible",
+            ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
+            : "opacity-0 -translate-y-2 scale-[0.98] pointer-events-none",
         ].join(" ")}
       >
-        <div className="w-full">
-          <div className="px-2 sm:px-3">
-            <div className="mt-2 rounded-2xl border border-white/10 bg-surface/95 backdrop-blur shadow-[0_20px_40px_rgba(0,0,0,.35)] max-h-[85svh] overflow-y-auto">
-              {/* <div className="sticky top-0 z-10 flex items-center justify-between px-3 py-2 border-b border-white/10 bg-surface/95">
-                <span className="text-textPrimary text-sm font-semibold">Menu</span>
-                <Link
-                  href="/join"
-                  className="rounded-md bg-primary px-3 py-1.5 text-sm font-semibold text-background hover:bg-secondary transition"
-                >
-                  Join Us
-                </Link>
-              </div> */}
-              <div className="py-1">
-                {NAV.map((item, i) => {
-                  const current = pathname === item.href;
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      ref={i === 0 ? firstLinkRef : undefined}
-                      aria-current={current ? "page" : undefined}
-                      className={[
-                        "block rounded-md px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-primary",
-                        item.cta
-                          ? "bg-primary text-background font-semibold hover:bg-secondary"
-                          : "text-textMuted hover:text-textPrimary",
-                      ].join(" ")}
-                    >
-                      {item.label}
-                    </Link>
-                  );
-                })}
-              </div>
-              <div className="h-[max(env(safe-area-inset-bottom),10px)]" />
+        <div className="px-3">
+          <div className="mt-2 rounded-2xl border border-white/10 bg-surface/95 backdrop-blur shadow-[0_20px_40px_rgba(0,0,0,.35)]">
+            <div className="py-2">
+              {NAV.map((item, i) => {
+                const current = pathname === item.href;
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    ref={i === 0 ? firstLinkRef : undefined}
+                    aria-current={current ? "page" : undefined}
+                    className={[
+                      "block rounded-md px-4 py-2.5 text-base transition",
+                      "focus:outline-none focus:ring-2 focus:ring-primary",
+                      current
+                        ? "text-textPrimary bg-white/10 ring-1 ring-primary/40"
+                        : "text-textMuted hover:text-textPrimary",
+                    ].join(" ")}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>
       </div>
-
-      {/* Bottom loading bar */}
-      <div aria-hidden className="absolute inset-x-0 bottom-0 h-[3px] bg-white/0 overflow-hidden">
-        <div
-          className={[
-            "h-full origin-left transition-[width,opacity] duration-200",
-            routeActive ? "opacity-100" : "opacity-0",
-            "bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-cyan-400",
-          ].join(" ")}
-          style={{ width: `${routePct}%` }}
-        />
-      </div>
     </header>
   );
-} 
+}

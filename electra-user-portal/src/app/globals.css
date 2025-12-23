@@ -1,38 +1,52 @@
 @import "tailwindcss";
 @theme {
-  --color-primary: #00b8d9;
-  --color-secondary: #14f7ff;
-  --color-background: #0d1117;
-  --color-surface: #1e1e2e;
-  --color-textPrimary: #e0e0e0;
-  --color-textMuted: #9e9e9e;
-  --colorAccent: #ff3366;
-  --colorGlow: #0ff0fc;
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #121212;
+  --bg-tertiary: #1a1a1a;
+
+  --text-primary: #e6e6e6;
+  --text-secondary: #a0a0a0;
+
+  --accent-primary: #00e5ff;
+  --accent-secondary: #0077ff;
+
+  --border-subtle: rgba(255, 255, 255, 0.08);
+
+  --glow-accent: 0 0 12px rgba(0, 229, 255, 0.35);
 }
 /* src/app/globals.css (add or merge) */
-html, body { height: 100%; }
-body { background: #0D1117; color: #E0E0E0; }
+html,
+body {
+  height: 100%;
+}
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
 
 /* Respect user motion preferences */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation: none !important;
     transition: none !important;
     scroll-behavior: auto !important;
   }
 }
-html, body {
+html,
+body {
   max-width: 100%;
   overflow-x: hidden;
 }
 /* Firefox */
 :root {
   /* colors you can tweak to match your palette */
-  --scroll-thumb: #18eaff;
-  --scroll-thumb-hover: #63f1ff;
-  --scroll-track: rgba(12, 18, 28, 0.6);
-  --scroll-track-hover: rgba(12, 18, 28, 0.8);
-  --scroll-shadow: rgba(24, 234, 255, 0.28);
+  --scroll-thumb: var(--accent-primary);
+  --scroll-thumb-hover: var(--accent-secondary);
+  --scroll-track: rgba(18, 18, 18, 0.6);
+  --scroll-track-hover: rgba(18, 18, 18, 0.8);
+  --scroll-shadow: rgba(0, 229, 255, 0.28);
 }
 
 /* Firefox uses scrollbar-color and scrollbar-width */
@@ -65,19 +79,31 @@ html {
 }
 
 *::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #14f7ff, #00b8d9);
+  background: linear-gradient(
+    180deg,
+    var(--scroll-thumb),
+    var(--scroll-thumb-hover)
+  );
   border-radius: 12px;
-  box-shadow: 0 0 14px var(--scroll-shadow);
-  border: 2px solid rgba(8, 14, 20, 0.6); /* inner gap on dark bg */
+  box-shadow: var(--glow-accent);
+  border: 2px solid rgba(18, 18, 18, 0.6); /* inner gap on dark bg */
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, var(--scroll-thumb-hover), #14e0ff);
+  background: linear-gradient(
+    180deg,
+    var(--scroll-thumb-hover),
+    var(--scroll-thumb)
+  );
   box-shadow: 0 0 18px var(--scroll-shadow);
 }
 
 *::-webkit-scrollbar-thumb:active {
-  background: linear-gradient(180deg, #7af6ff, #22d3ee);
+  background: linear-gradient(
+    180deg,
+    var(--accent-secondary),
+    var(--accent-primary)
+  );
   box-shadow: 0 0 22px var(--scroll-shadow);
 }
 
@@ -94,4 +120,69 @@ html {
 }
 body {
   overscroll-behavior-x: none;
+}
+
+/* Header depth, nav link hover, and theme utility fallbacks */
+header {
+  border-color: var(--border-subtle);
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.6), var(--glow-accent);
+}
+
+/* Fallback utility classes used across components (map legacy classnames to variables)
+   These keep us from changing many component files while ensuring colors are consistent. */
+.text-textPrimary {
+  color: var(--text-primary) !important;
+}
+.text-textMuted {
+  color: var(--text-secondary) !important;
+}
+.bg-background {
+  background: var(--bg-primary) !important;
+}
+.bg-surface {
+  background: var(--bg-secondary) !important;
+}
+.text-background {
+  color: var(--bg-primary) !important;
+}
+
+/* Stronger nav link hover for visibility */
+header nav a.group {
+  color: var(--text-secondary);
+  transition: color 0.16s ease, text-shadow 0.16s ease, transform 0.12s ease;
+}
+header nav a.group:hover,
+header nav a.group[aria-current="page"] {
+  color: var(--text-primary);
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+/* Enhanced focus rings for keyboard accessibility (uses theme accent) */
+.focus-ring-primary:focus {
+  box-shadow: 0 0 0 4px rgba(0, 229, 255, 0.06), var(--glow-accent);
+  outline: none;
+}
+
+/* Buttons, cards and interactive items: subtle surface lift on hover */
+.card,
+.hit,
+.btn {
+  transition: box-shadow 0.16s ease, transform 0.12s ease,
+    border-color 0.12s ease;
+}
+.card:hover,
+.hit:hover,
+.btn:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 229, 255, 0.04);
+  transform: translateY(-3px);
+}
+
+/* Ensure gradient underlines use theme colors (for small-underline rail used in header) */
+.underline-rail {
+  background: linear-gradient(
+    90deg,
+    var(--accent-primary),
+    var(--accent-secondary)
+  );
 }

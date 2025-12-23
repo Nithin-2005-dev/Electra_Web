@@ -5,7 +5,7 @@ import { MdEmail } from "react-icons/md";
 import { FaFacebook, FaInstagram, FaLinkedin, FaPhoneAlt } from "react-icons/fa";
 import { IoLogoWhatsapp } from "react-icons/io";
 
-const COLORS = { neon1: "#14f7ff", neon2: "#00b8d9" };
+const COLORS = { neon1: "#00e5ff", neon2: "#0077ff" };
 
 export default function Footer() {
   return (
@@ -22,28 +22,28 @@ export default function Footer() {
           margin-left: -50vw; margin-right: -50vw; width: 100vw;
         }
         .panel {
-          border: 1px solid rgba(141,255,255,.16);
+          border: 1px solid var(--border-subtle);
           background:
-            radial-gradient(900px 600px at -10% -20%, rgba(20,247,255,.06), transparent 65%),
-            radial-gradient(900px 600px at 110% 120%, rgba(80,180,255,.06), transparent 65%),
-            linear-gradient(180deg, rgba(13,24,41,.9), rgba(13,24,41,.62));
-          box-shadow: inset 0 0 28px rgba(0,255,255,.05), 0 18px 46px rgba(0,0,0,.45);
+            radial-gradient(900px 600px at -10% -20%, rgba(0,229,255,.06), transparent 65%),
+            radial-gradient(900px 600px at 110% 120%, rgba(0,119,255,.06), transparent 65%),
+            linear-gradient(180deg, rgba(18,18,18,.9), rgba(10,10,10,.62));
+          box-shadow: inset 0 0 28px rgba(0,229,255,.03), 0 18px 46px rgba(0,0,0,.45);
           border-radius: 0;
           padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
         }
         .inner { max-width: 1150px; margin: 0 auto; padding: 1rem 1rem; }
         @media (min-width: 640px) { .inner { padding: 2rem 1.5rem; } }
 
-        .sectionTitle { color: #d9f7ff; text-transform: uppercase; letter-spacing: .08em; text-shadow: 0 0 14px rgba(20,247,255,.25); }
-        .icon { color: ${COLORS.neon1}; filter: drop-shadow(0 0 6px rgba(20,247,255,.35)); flex-shrink: 0; }
+        .sectionTitle { color: var(--text-primary); text-transform: uppercase; letter-spacing: .08em; text-shadow: 0 0 14px rgba(0,229,255,.16); }
+        .icon { color: ${COLORS.neon1}; filter: drop-shadow(0 0 6px rgba(0,229,255,.35)); flex-shrink: 0; }
         .hit { padding: 10px 12px; border-radius: 10px; transition: background .15s ease, color .15s ease, text-shadow .15s ease; }
-        .hit:where(:hover,:focus-visible) { background: rgba(255,255,255,.05); outline: none; }
-        .link { color: #cfeaf2; } .link:hover { color: ${COLORS.neon1}; text-shadow: 0 0 8px ${COLORS.neon1}; }
-        .mobileDivider { height:1px; border:none; background:linear-gradient(90deg,transparent,rgba(141,255,255,.25),transparent); margin:14px 0; }
+        .hit:where(:hover,:focus-visible) { background: rgba(255,255,255,.02); outline: none; }
+        .link { color: var(--text-secondary); } .link:hover { color: ${COLORS.neon1}; text-shadow: 0 0 8px ${COLORS.neon1}; }
+        .mobileDivider { height:1px; border:none; background:linear-gradient(90deg,transparent,rgba(0,229,255,.18),transparent); margin:14px 0; }
         @media (min-width:768px){ .mobileDivider{ display:none; } }
-        .divider { height:1px; border:none; background:linear-gradient(90deg,transparent,rgba(141,255,255,.25),transparent); }
-        .power{ position:absolute; right:12px; bottom:12px; z-index:1; width:44px; height:44px; border-radius:12px; border:1px solid rgba(20,247,255,.35); background:rgba(13,17,23,.66); color:${COLORS.neon1}; box-shadow:0 0 0 1px rgba(255,255,255,.04), 0 12px 28px rgba(0,0,0,.45), inset 0 0 10px rgba(20,247,255,.18); display:flex; align-items:center; justify-content:center; transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease; }
-        .power:hover{ transform:translateY(-2px); border-color:rgba(20,247,255,.55); box-shadow:0 0 0 1px rgba(20,247,255,.25), 0 16px 36px rgba(0,0,0,.55), inset 0 0 14px rgba(20,247,255,.28); }
+        .divider { height:1px; border:none; background:linear-gradient(90deg,transparent,rgba(0,229,255,.18),transparent); }
+        .power{ position:absolute; right:12px; bottom:12px; z-index:1; width:44px; height:44px; border-radius:12px; border:1px solid rgba(255,255,255,.08); background:rgba(18,18,18,.66); color:${COLORS.neon1}; box-shadow:0 0 0 1px rgba(255,255,255,.02), 0 12px 28px rgba(0,0,0,.45), inset 0 0 10px rgba(0,229,255,.12); display:flex; align-items:center; justify-content:center; transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease; }
+        .power:hover{ transform:translateY(-2px); border-color:rgba(255,255,255,.12); box-shadow:0 0 0 1px rgba(0,229,255,.12), 0 16px 36px rgba(0,0,0,.55), inset 0 0 14px rgba(0,229,255,.18); }
 
         /* Reduce motion */
         @media (prefers-reduced-motion: reduce) { .icon{filter:none} .panel{box-shadow:0 18px 46px rgba(0,0,0,.45)} }
