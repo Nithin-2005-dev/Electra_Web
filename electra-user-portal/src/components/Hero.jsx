@@ -1,143 +1,227 @@
-// src/components/HeroElectraExecutive.jsx
 "use client";
 
-export default function HeroElectraExecutive() {
+import { useEffect, useRef } from "react";
+
+export default function Hero() {
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (v) v.play().catch(() => {});
+  }, []);
+
   return (
-    <section id="hero" aria-labelledby="hero-heading" className="relative">
-      <style jsx>{`
-        :root{
-          --primary:var(--accent-primary); --secondary:var(--accent-secondary);
-          --textPrimary:var(--text-primary); --textMuted:var(--text-secondary);
-        }
+    <section className="hero">
+      {/* VIDEO */}
+      <video
+        ref={videoRef}
+        src="/merch-drop.mp4"
+        muted
+        autoPlay
+        loop
+        playsInline
+        className="video"
+      />
 
-        /* Container: clip both axes to prevent any scrollbars from deco layers */
-        #hero{ isolation:isolate; overflow:hidden; }
-        .wrap{ max-width:80rem; margin-inline:auto; padding:6.75rem 1rem 4.75rem; position:relative; }
-        @media (min-width:768px){ .wrap{ padding:7.75rem 1rem 5.25rem } }
+      {/* AMBIENT LIGHT */}
+      <div className="glow" />
 
-        /* Ambient glow field (kept inside hero; moved via transform only) */
-        .field, .field2{
-          position:absolute; inset:0; pointer-events:none; z-index:-1;
-          filter:blur(22px); opacity:.45;
-          background:
-            radial-gradient(520px 220px at 24% 34%, rgba(0,229,255,.12), transparent 60%),
-            radial-gradient(520px 220px at 76% 66%, rgba(0,119,255,.10), transparent 60%);
-          transform: translate3d(0,0,0) scale(1.08);
-          will-change: transform;
-          animation: fieldFloat 22s ease-in-out infinite alternate;
-          contain: paint; /* ensure painting is contained */
-        }
-        .field2{
-          opacity:.28; filter:blur(28px);
-          background:
-            radial-gradient(520px 220px at 34% 70%, rgba(255,255,255,.09), transparent 60%),
-            radial-gradient(520px 220px at 80% 28%, rgba(0,229,255,.08), transparent 60%);
-          transform: translate3d(0,0,0) scale(1.1);
-          animation: fieldFloat2 28s ease-in-out infinite alternate;
-        }
+      {/* OVERLAY */}
+      <div className="overlay" />
 
-        /* Accent cap */
-        .cap{ height:.7rem; width:.25rem; border-radius:.375rem; background:var(--secondary);
-          box-shadow:0 0 8px rgba(0,229,255,.6); margin-bottom:.9rem;
-        }
+      {/* GRAIN */}
+      <div className="grain" />
 
-        /* Title system */
-        .title{
-          margin:0; color:var(--textPrimary); font-weight:900; letter-spacing:-0.02em;
-          font-size:clamp(1.45rem,3.1vw,2.25rem); line-height:1.06;
-        }
-        .kicker{
-          display:block; color:var(--textMuted);
-          font-weight:600; letter-spacing:.08em; text-transform:uppercase;
-          font-size:clamp(.68rem,1.3vw,.8rem);
-        }
-        .headline{ display:block; margin-top:.4rem; position:relative; }
+      {/* CONTENT */}
+      <div className="content">
+        <span className="pill">ELECTRA SOCIETY</span>
 
-        /* Dual gradient + subtle chroma edge */
-        .chromatic{
-          background: linear-gradient(90deg, var(--primary), var(--secondary));
-          -webkit-background-clip:text; background-clip:text; color:transparent;
-          text-shadow:
-            0 0 0 rgba(255,255,255,0),
-            .6px 0 rgba(0,229,255,.14),
-            -0.6px 0 rgba(0,119,255,.12);
-          animation: chromaPulse 6s ease-in-out infinite;
-        }
-
-        /* Specular highlight sweep (kept inside headline box) */
-        .specular{
-          position:absolute; inset:0; pointer-events:none; mix-blend-mode:screen; overflow:hidden;
-        }
-        .specular:before{
-          content:""; position:absolute; top:-30%; left:-25%; width:42%; height:160%;
-          background: linear-gradient(112deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.22) 45%, rgba(255,255,255,0) 100%);
-          filter: blur(8px); transform: rotate(5deg);
-          animation: specSweep 3.6s linear infinite;
-        }
-
-        .tag{
-          margin-top:.8rem; color:var(--textMuted);
-          max-width:48rem; font-size:clamp(.92rem,1.6vw,1.06rem); line-height:1.58;
-        }
-
-        /* Overflow-safe underline rail using a fixed-width glint */
-        .rail{
-          margin-top:1rem;
-          position:relative;
-          height:2px;
-          width:min(44ch, 70vw);
-          max-width:100%;
-          border-radius:999px;
-          background:rgba(255,255,255,.06);
-          overflow:hidden; /* clip shimmer inside */
-        }
-        .rail::before{
-          content:"";
-          position:absolute; top:0; bottom:0;
-          width:28%;
-          left:-28%;
-          background: linear-gradient(90deg, rgba(0,184,217,0), rgba(0,184,217,.5), rgba(20,247,255,.5), rgba(20,247,255,0));
-          animation: glint 2.4s linear infinite;
-        }
-
-        /* Animations (transform-only so they don't affect layout size) */
-        @keyframes fieldFloat{ 0%{ transform:translate3d(0,0,0) scale(1.08) } 100%{ transform:translate3d(10px,10px,0) scale(1.08) } }
-        @keyframes fieldFloat2{ 0%{ transform:translate3d(0,0,0) scale(1.1) } 100%{ transform:translate3d(-10px,8px,0) scale(1.1) } }
-        @keyframes chromaPulse{
-          0%,100%{ filter:none }
-          50%{ filter:saturate(112%) contrast(104%) drop-shadow(0 0 10px rgba(0,229,255,.28)) }
-        }
-        @keyframes specSweep{ 0%{ transform:translate3d(0,0,0) rotate(5deg) } 100%{ transform:translate3d(230%,0,0) rotate(5deg) } }
-        @keyframes glint{ 0%{ transform: translateX(0) } 100%{ transform: translateX(460%) } }
-
-        /* Motion preferences */
-        @media (prefers-reduced-motion: reduce){
-          .field,.field2{ display:none !important; }
-          .specular:before,.chromatic{ animation:none !important }
-          .rail::before{ animation:none !important }
-        }
-      `}</style>
-
-      <div className="wrap">
-        <div className="field" aria-hidden />
-        <div className="field2" aria-hidden />
-
-        <div className="cap" aria-hidden />
-
-        <h1 id="hero-heading" className="title">
-          <span className="kicker">Electra Society</span>
-          <span className="headline">
-            <span className="chromatic">Powering Innovation & Excellence</span>
-            <span className="specular" aria-hidden />
-          </span>
+        <h1 className="headline">
+          Powering <span>Innovation</span>
+          <br />
+          Through <span>Engineering</span>
         </h1>
 
-        <p className="tag">
-          Official society of the Electrical Engineering Department, NIT Silchar — uniting research, projects, and events to turn ideas into engineered impact.
+        <p>
+          Official society of the Electrical Engineering Department,
+          <br />
+          NIT Silchar — where ideas become impact.
         </p>
 
-        <div className="rail" aria-hidden />
+        <div className="actions">
+          <button className="primary">Explore Events</button>
+          <button className="secondary">Join Electra</button>
+        </div>
       </div>
+
+      <style jsx>{`
+        .hero {
+          position: relative;
+          min-height: 100vh;
+          background: #000;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          padding: 0 6vw;
+        }
+
+        /* VIDEO */
+        .video {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          z-index: 0;
+          filter: saturate(0.9) contrast(1.05);
+        }
+
+        /* MOVING GLOW (Framer-style) */
+        .glow {
+          position: absolute;
+          width: 1200px;
+          height: 1200px;
+          background: radial-gradient(
+            circle,
+            rgba(20, 247, 255, 0.12),
+            transparent 60%
+          );
+          top: -30%;
+          left: -20%;
+          animation: drift 16s ease-in-out infinite alternate;
+          filter: blur(140px);
+          z-index: 1;
+        }
+
+        @keyframes drift {
+          0% {
+            transform: translate(0, 0);
+          }
+          100% {
+            transform: translate(25%, 20%);
+          }
+        }
+
+        /* DARK OVERLAY */
+        .overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 0.55),
+            rgba(0, 0, 0, 0.9)
+          );
+          z-index: 2;
+        }
+
+        /* FILM GRAIN */
+        .grain {
+          position: absolute;
+          inset: 0;
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+          pointer-events: none;
+          z-index: 3;
+        }
+
+        /* CONTENT */
+        .content {
+          position: relative;
+          z-index: 4;
+          max-width: 820px;
+          color: #fff;
+          animation: fadeUp 1.1s ease-out both;
+        }
+
+        @keyframes fadeUp {
+          from {
+            opacity: 0;
+            transform: translateY(26px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .pill {
+          display: inline-block;
+          margin-bottom: 1.1rem;
+          padding: 0.45rem 0.95rem;
+          font-size: 0.7rem;
+          letter-spacing: 0.18em;
+          border-radius: 999px;
+          color: #7df9ff;
+          border: 1px solid rgba(125, 249, 255, 0.35);
+        }
+
+        h1 {
+          font-size: clamp(2.8rem, 6vw, 4.6rem);
+          font-weight: 900;
+          line-height: 1.05;
+          letter-spacing: -0.04em;
+          margin-bottom: 1.6rem;
+        }
+
+        h1 span {
+          background: linear-gradient(90deg, #14f7ff, #00b8d9);
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+        }
+
+        p {
+          font-size: 1.05rem;
+          line-height: 1.6;
+          color: #cfd8df;
+          margin-bottom: 2.4rem;
+        }
+
+        .actions {
+          display: flex;
+          gap: 1.2rem;
+          flex-wrap: wrap;
+        }
+
+        button {
+          padding: 0.9rem 1.6rem;
+          border-radius: 999px;
+          font-size: 0.75rem;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .primary {
+          background: #fff;
+          color: #000;
+          border: none;
+        }
+
+        .primary:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+        }
+
+        .secondary {
+          background: transparent;
+          color: #fff;
+          border: 1px solid rgba(255, 255, 255, 0.35);
+        }
+
+        .secondary:hover {
+          border-color: #7df9ff;
+          color: #7df9ff;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .glow,
+          .grain,
+          .content {
+            animation: none;
+          }
+        }
+      `}</style>
     </section>
   );
 }

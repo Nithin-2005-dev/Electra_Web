@@ -1,4 +1,3 @@
-// src/components/Header.jsx
 "use client";
 
 import Link from "next/link";
@@ -17,18 +16,35 @@ export default function Header() {
   const pathname = usePathname() || "/";
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [progress, setProgress] = useState(0);
+
   const btnRef = useRef(null);
   const firstLinkRef = useRef(null);
 
-  /* Scroll shadow */
+  /* ---------------- Scroll shadow ---------------- */
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10);
+    const onScroll = () => setScrolled(window.scrollY > 12);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* Lock body scroll on mobile */
+  /* ---------------- Scroll progress ---------------- */
+  useEffect(() => {
+    const onScroll = () => {
+      const scrollTop = window.scrollY;
+      const docHeight =
+        document.documentElement.scrollHeight -
+        document.documentElement.clientHeight;
+      setProgress(docHeight > 0 ? (scrollTop / docHeight) * 100 : 0);
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [pathname]);
+
+  /* ---------------- Lock body scroll (mobile) ---------------- */
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -36,145 +52,268 @@ export default function Header() {
     return () => (document.body.style.overflow = prev);
   }, [open]);
 
-  /* Focus + Escape */
+  /* ---------------- Escape key ---------------- */
   useEffect(() => {
     if (!open) return;
     firstLinkRef.current?.focus();
+
     const onKey = (e) => {
       if (e.key === "Escape") {
         setOpen(false);
         btnRef.current?.focus();
       }
     };
+
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
 
-  /* Close menu on route change */
+  /* ---------------- Close on route change ---------------- */
   useEffect(() => setOpen(false), [pathname]);
 
+  /* ---------------- Active route (robust) ---------------- */
+  const isActive = (href) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
+
   return (
-    <header
-      className={[
-        "fixed inset-x-0 top-0 z-50 transition-all duration-300",
-        "bg-surface/70 backdrop-blur-xl supports-[backdrop-filter]:bg-surface/50",
-        "border-b border-white/10",
-      ].join(" ")}
-      style={{
-        boxShadow: scrolled
-          ? "0 10px 30px rgba(0,0,0,0.45)"
-          : "0 0 0 rgba(0,0,0,0)",
-      }}
-    >
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-3 sm:px-4 py-2 sm:py-3">
-        {/* Logo */}
-        <Link
-          href="/"
-          className="group flex items-center gap-2 transition-transform duration-300 hover:scale-[1.02]"
-        >
-          <span className="h-2.5 w-2.5 rounded-full bg-primary shadow-[0_0_14px_rgba(20,247,255,0.7)]" />
-          <span className="text-sm sm:text-base md:text-lg font-semibold text-textPrimary tracking-tight">
-            Electra
-          </span>
+    <header className={`header ${scrolled ? "scrolled" : ""}`}>
+      {/* PROGRESS BAR (ABSOLUTE, NO LAYOUT IMPACT) */}
+      <div className="progress">
+        <span style={{ width: `${progress}%` }} />
+      </div>
+
+      <nav className="nav">
+        {/* LOGO */}
+        <Link href="/" className="logo flex justify-between gap-1 items-center">
+          <div className="logo-badge">
+            <img src="/logo.png" alt="Electra Logo" />
+          </div>
+          <span className="logo-text">Electra</span>
         </Link>
 
-        {/* Hamburger */}
+        {/* HAMBURGER */}
         <button
           ref={btnRef}
-          className="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-md text-textMuted hover:text-textPrimary focus:outline-none focus:ring-2 focus:ring-primary"
+          className={`hamburger ${open ? "open" : ""}`}
           onClick={() => setOpen((v) => !v)}
           aria-label="Toggle menu"
         >
-          {open ? (
-            <svg width="26" height="26" viewBox="0 0 24 24">
-              <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" d="M6 6l12 12M6 18L18 6" />
-            </svg>
-          ) : (
-            <svg width="26" height="26" viewBox="0 0 24 24">
-              <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
-            </svg>
-          )}
+          <span />
+          <span />
+          <span />
         </button>
 
-        {/* Desktop Nav */}
-        <div className="hidden lg:flex items-center gap-2 xl:gap-4">
-          {NAV.map((item) => {
-            const current = pathname === item.href;
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={current ? "page" : undefined}
-                className={[
-                  "group relative px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-300",
-                  current
-                    ? "text-textPrimary bg-white/5 shadow-[0_0_12px_rgba(20,247,255,0.35)]"
-                    : "text-textMuted hover:text-textPrimary",
-                ].join(" ")}
-              >
-                <span className="relative z-10">{item.label}</span>
-
-                {/* Animated underline */}
-                <span
-                  className={[
-                    "absolute left-1/2 bottom-0 h-[2px] w-0 -translate-x-1/2",
-                    "bg-gradient-to-r from-primary via-accent to-secondary",
-                    "transition-all duration-300",
-                    current ? "w-full" : "group-hover:w-full",
-                  ].join(" ")}
-                />
-
-                {current && (
-                  <span
-                    aria-hidden
-                    className="absolute inset-0 rounded-md ring-1 ring-primary/40"
-                  />
-                )}
-              </Link>
-            );
-          })}
+        {/* DESKTOP NAV */}
+        <div className="nav-links">
+          {NAV.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={isActive(item.href) ? "active" : ""}
+            >
+              {item.label}
+            </Link>
+          ))}
         </div>
       </nav>
 
-      {/* Mobile Menu */}
-      <div
-        className={[
-          "lg:hidden absolute left-0 right-0 top-full z-40",
-          "transition-all duration-300 ease-out",
-          open
-            ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
-            : "opacity-0 -translate-y-2 scale-[0.98] pointer-events-none",
-        ].join(" ")}
-      >
-        <div className="px-3">
-          <div className="mt-2 rounded-2xl border border-white/10 bg-surface/95 backdrop-blur shadow-[0_20px_40px_rgba(0,0,0,.35)]">
-            <div className="py-2">
-              {NAV.map((item, i) => {
-                const current = pathname === item.href;
-
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    ref={i === 0 ? firstLinkRef : undefined}
-                    aria-current={current ? "page" : undefined}
-                    className={[
-                      "block rounded-md px-4 py-2.5 text-base transition",
-                      "focus:outline-none focus:ring-2 focus:ring-primary",
-                      current
-                        ? "text-textPrimary bg-white/10 ring-1 ring-primary/40"
-                        : "text-textMuted hover:text-textPrimary",
-                    ].join(" ")}
-                  >
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
+      {/* MOBILE MENU — CONDITIONALLY RENDERED (NO BLACK BOX) */}
+      {open && (
+        <div className="mobile">
+          {NAV.map((item, i) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              ref={i === 0 ? firstLinkRef : null}
+              className={isActive(item.href) ? "active" : ""}
+              style={{ transitionDelay: `${i * 60}ms` }}
+            >
+              {item.label}
+            </Link>
+          ))}
         </div>
-      </div>
+      )}
+
+      <style jsx>{`
+        /* HEADER */
+        .header {
+          position: fixed;
+          inset: 0 0 auto 0;
+          z-index: 50;
+          background: rgba(0, 0, 0, 0.55);
+          backdrop-filter: blur(18px);
+          transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .header.scrolled {
+          background: rgba(0, 0, 0, 0.85);
+          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75);
+        }
+
+        /* PROGRESS */
+        .progress {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background: rgba(255, 255, 255, 0.06);
+        }
+
+        .progress span {
+          display: block;
+          height: 100%;
+          background: linear-gradient(90deg, #14f7ff, #00b8d9);
+          transition: width 0.15s ease-out;
+        }
+
+        .nav {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0.9rem 1.4rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        /* LOGO */
+        .logo {
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+          text-decoration: none;
+        }
+
+        .logo-badge {
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          border: 1px solid rgba(20, 247, 255, 0.6);
+          box-shadow: 0 0 18px rgba(20, 247, 255, 0.35);
+        }
+
+        .logo-badge img {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+        }
+
+        .logo-text {
+          color: #fff;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          font-size: 0.9rem;
+        }
+
+        /* DESKTOP NAV */
+        .nav-links {
+          display: none;
+          gap: 1.2rem;
+        }
+
+        .nav-links a {
+          position: relative;
+          padding: 0.45rem 0.9rem;
+          font-size: 0.7rem;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: #9aa7b2;
+          text-decoration: none;
+          transition: color 0.25s ease;
+        }
+
+        .nav-links a.active {
+          color: #fff;
+        }
+
+        /* STRONG ACTIVE INDICATOR */
+        .nav-links a.active::after {
+          content: "";
+          position: absolute;
+          left: 12%;
+          right: 12%;
+          bottom: -8px;
+          height: 2px;
+          border-radius: 2px;
+          background: linear-gradient(90deg, #14f7ff, #00b8d9);
+          box-shadow: 0 0 12px rgba(20, 247, 255, 0.8);
+        }
+
+        /* HAMBURGER */
+        .hamburger {
+          width: 28px;
+          height: 20px;
+          position: relative;
+          border: none;
+          background: none;
+          cursor: pointer;
+        }
+
+        .hamburger span {
+          position: absolute;
+          width: 100%;
+          height: 2px;
+          background: #fff;
+          border-radius: 2px;
+          transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hamburger span:nth-child(1) { top: 0; }
+        .hamburger span:nth-child(2) { top: 9px; }
+        .hamburger span:nth-child(3) { bottom: 0; }
+
+        .hamburger.open span:nth-child(1) {
+          transform: rotate(45deg);
+          top: 9px;
+        }
+
+        .hamburger.open span:nth-child(2) {
+          opacity: 0;
+        }
+
+        .hamburger.open span:nth-child(3) {
+          transform: rotate(-45deg);
+          bottom: 9px;
+        }
+
+        /* MOBILE MENU */
+        .mobile {
+          background: rgba(0, 0, 0, 0.95);
+          backdrop-filter: blur(22px);
+          padding: 1.8rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1.4rem;
+        }
+
+        .mobile a {
+          opacity: 0;
+          transform: translateY(8px);
+          animation: slideIn 0.35s ease forwards;
+          color: #9aa7b2;
+          font-size: 1rem;
+          letter-spacing: 0.14em;
+          text-decoration: none;
+        }
+
+        .mobile a.active {
+          color: #fff;
+          text-shadow: 0 0 14px rgba(20, 247, 255, 0.6);
+        }
+
+        @keyframes slideIn {
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @media (min-width: 1024px) {
+          .hamburger { display: none; }
+          .nav-links { display: flex; }
+          .mobile { display: none; }
+        }
+      `}</style>
     </header>
   );
 }
