@@ -16,7 +16,7 @@
     "dotenv": "^16.4.5",
     "mongodb": "^6.9.0",
     "mongoose": "^8.7.0",
-    "next": "14.2.14",
+    "next": "14.2.35",
     "next-cloudinary": "^6.14.0",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.5",
