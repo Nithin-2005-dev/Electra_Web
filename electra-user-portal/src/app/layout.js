@@ -17,11 +17,7 @@ const playfair = Playfair_Display({
   variable: "--font-playfair",
 });
 
-export const metadata = {
-  title: "Electra Society",
-  description:
-    "Discover the Electra Society of NIT Silchar. Explore events, resources, team details, and the Electrical Engineering Department.",
-};
+export const metadata = { title: "Electra Society", description: "Discover the Electra Society of NIT Silchar. Explore events, resources, team details, and the Electrical Engineering Department.", keywords: "Electrical Engineering, NIT Silchar, Electra Society, engineering events, technical workshops, academic resources", icons: { icon: "https://res.cloudinary.com/dqa3ov76r/image/upload/v1729535834/favoritePhotos/ldlchr4ijcpgfq8nu2gx.jpg", }, };
 
 export default function RootLayout({ children }) {
   return (
