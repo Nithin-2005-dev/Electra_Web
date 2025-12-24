@@ -1,32 +1,33 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function AppSplash() {
+  const [visible, setVisible] = useState(true);
+
   useEffect(() => {
-    const removeLoader = () => {
-      const loader = document.getElementById("electra-static-loader");
-      if (!loader) return;
-
-      loader.style.opacity = "0";
-      loader.style.transition = "opacity 0.8s ease";
-
-      setTimeout(() => {
-        loader.remove();
-      }, 800);
+    const onLoad = () => {
+      setVisible(false);
     };
 
-    // ✅ wait until EVERYTHING loads (images, video, fonts)
     if (document.readyState === "complete") {
-      removeLoader();
+      onLoad();
     } else {
-      window.addEventListener("load", removeLoader);
+      window.addEventListener("load", onLoad);
     }
 
-    return () => {
-      window.removeEventListener("load", removeLoader);
-    };
+    return () => window.removeEventListener("load", onLoad);
   }, []);
 
-  return null;
+  if (!visible) return null;
+
+  return (
+    <div className="electra-loader">
+      <div className="content">
+        <h1>Electra</h1>
+        <span className="line" />
+        <p>Preparing the experience</p>
+      </div>
+    </div>
+  );
 }

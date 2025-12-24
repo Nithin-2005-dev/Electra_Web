@@ -2,7 +2,7 @@
 
 import React from "react";
 import { CldImage } from "next-cloudinary";
-import { sponsors } from "../app/utils/sponsers";
+import { sponsors } from "../../app/utils/sponsers";
 
 export default function SponsorsSection() {
   return (

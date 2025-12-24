@@ -1,5 +1,5 @@
 import { ResourceStoreProvider } from '../../store/ResourceStore'
-import KnowledgeGrid from '../../../components/Resources'
+import KnowledgeGrid from '../../../components/Resources/KnowledgeGrid'
 import React from 'react'
 
 const Resources = () => {

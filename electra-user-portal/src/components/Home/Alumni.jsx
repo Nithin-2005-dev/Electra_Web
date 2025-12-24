@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { CldImage } from "next-cloudinary";
-import { alumni } from "../app/utils/alumni";
+import { alumni } from "../../app/utils/alumni";
 
 export default function AlumniEmbla() {
   const autoplayRef = useRef(
