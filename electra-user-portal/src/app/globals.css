@@ -14,6 +14,14 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+:root {
+  --font-sans: var(--font-inter);
+  --font-script: var(--font-playfair);
+}
+
+body {
+  font-family: var(--font-sans);
+}
 
 *,
 *::before,
@@ -182,4 +190,51 @@ header nav a.group[aria-current="page"] {
     var(--accent-primary),
     var(--accent-secondary)
   );
+}
+/* ===== STATIC FIRST PAINT LOADER ===== */
+#electra-static-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(
+      120% 80% at 50% 0%,
+      rgba(255, 255, 255, 0.06),
+      transparent 60%
+    ),
+    #000;
+}
+
+#electra-static-loader .loader-content {
+  text-align: center;
+}
+
+#electra-static-loader h1 {
+  font-size: clamp(3.2rem, 8vw, 6rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: #fff;
+  margin: 0;
+}
+
+#electra-static-loader .line {
+  display: block;
+  width: 64px;
+  height: 2px;
+  margin: 18px auto 14px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #7dd3fc,
+    transparent
+  );
+}
+
+#electra-static-loader p {
+  font-size: 0.85rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
 }

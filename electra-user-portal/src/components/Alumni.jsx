@@ -40,17 +40,27 @@ export default function AlumniEmbla() {
   return (
     <section className="alumni-section">
       <div className="container">
-        <h2 className="title">
-          Our <span>Alumni</span>
-        </h2>
+        {/* ===== AluminuHeader ===== */}
+        <div className="AluminuHeader">
+          <span className="eyebrow">ALUMNI</span>
+          <h2 className="title">
+            Our{" "}
+            <span className="">
+              Alumni
+            </span>
+          </h2>
+          <p className="subtitle">
+            Shaping industries, advancing research, and mentoring the next generation.
+          </p>
+        </div>
 
+        {/* ===== CAROUSEL ===== */}
         <div className="embla">
           <div className="embla__viewport" ref={emblaRef}>
             <div className="embla__container">
               {alumni.map((alum, i) => (
                 <div className="embla__slide" key={i}>
                   <article className="alumni-card">
-                    {/* IMAGE */}
                     <div className="image-frame">
                       <CldImage
                         fill
@@ -61,12 +71,9 @@ export default function AlumniEmbla() {
                         format="auto"
                         draggable={false}
                       />
-
-                      {/* cinematic fade */}
                       <div className="image-fade" />
                     </div>
 
-                    {/* TEXT */}
                     <div className="card-body">
                       <h3>{alum.name}</h3>
                       <p>{alum.jobTitle}</p>
@@ -83,24 +90,51 @@ export default function AlumniEmbla() {
       <style jsx global>{`
         .alumni-section {
           background: #000;
-          padding: 5rem 0 6rem;
+          padding: 7rem 0 6.5rem;
         }
 
         .container {
           max-width: 1150px;
           margin: 0 auto;
-          padding: 0 1rem;
+          padding: 0 6vw;
+        }
+
+        /* ===== AluminuHeader ===== */
+        .AluminuHeader {
+          margin-bottom: 3.5rem;
+          max-width: 720px;
+        }
+
+        .eyebrow {
+          display: block;
+          font-size: 0.72rem;
+          letter-spacing: 0.28em;
+          color: #9aa4b2;
+          margin-bottom: 0.6rem;
         }
 
         .title {
-          font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+          font-size: clamp(2.6rem, 5vw, 3.9rem);
           font-weight: 900;
-          color: #fff;
-          margin-bottom: 3rem;
+          letter-spacing: -0.03em;
+          color: #f9fbff;
+          margin-bottom: 1rem;
         }
 
-        .title span {
-          color: #7ddfff;
+        .accent {
+          background: linear-gradient(
+            180deg,
+            #9ee7ff 0%,
+            #6fd3ff 100%
+          );
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+          font-size: 1.05rem;
+          color: #a8b3c2;
+          line-height: 1.6;
         }
 
         /* ===== EMBLA ===== */
@@ -151,7 +185,6 @@ export default function AlumniEmbla() {
           box-shadow: 0 30px 70px rgba(0, 0, 0, 0.75);
         }
 
-        /* ===== IMAGE FRAME (RATIO SAFE) ===== */
         .image-frame {
           position: relative;
           height: 280px;
@@ -160,14 +193,11 @@ export default function AlumniEmbla() {
             rgba(30, 30, 30, 0.9),
             #000 70%
           );
-          display: flex;
-          align-items: center;
-          justify-content: center;
           overflow: hidden;
         }
 
         .image {
-          object-fit: contain; /* 🔥 KEY FIX */
+          object-fit: contain;
           padding: 12px;
           transition: transform 0.6s ease;
         }
@@ -184,7 +214,6 @@ export default function AlumniEmbla() {
           pointer-events: none;
         }
 
-        /* ===== TEXT ===== */
         .card-body {
           padding: 1.6rem 1.6rem 2rem;
           text-align: center;

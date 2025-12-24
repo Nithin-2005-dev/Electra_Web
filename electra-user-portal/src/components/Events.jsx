@@ -41,11 +41,16 @@ export default function Events() {
 
   return (
     <section ref={sectionRef} className="events">
-      <div className="header">
+      {/* EventsHeader */}
+      <div className="EventsHeader">
         <span className="eyebrow">EVENTS</span>
         <h2>Signature experiences</h2>
+        <p className="sub">
+          Flagship initiatives crafted to challenge, inspire, and elevate.
+        </p>
       </div>
 
+      {/* TRACK */}
       <div className="track-wrapper">
         <div className="track" ref={trackRef}>
           {EventData.map((event, idx) => (
@@ -60,105 +65,132 @@ export default function Events() {
       </div>
 
       <style jsx>{`
-        /* SECTION */
+        /* ===== SECTION ===== */
         .events {
           position: relative;
-          background: radial-gradient(circle at top, #0c1016, #000 65%);
+          background: radial-gradient(
+              120% 80% at 50% 0%,
+              rgba(255, 255, 255, 0.05),
+              transparent 60%
+            ),
+            #000;
           padding: 8rem 0;
           overflow: hidden;
         }
 
-        /* HEADER */
-        .header {
-          padding: 0 6vw 3.5rem;
+        /* ===== EventsHeader ===== */
+        .EventsHeader {
+          max-width: 1150px;
+          margin: 0 auto 4rem;
+          padding: 0 6vw;
         }
 
         .eyebrow {
           display: block;
-          font-size: 0.72rem;
-          letter-spacing: 0.28em;
-          color: #14f7ff;
-          margin-bottom: 0.9rem;
+          font-size: 0.7rem;
+          letter-spacing: 0.32em;
+          color: #9ca3af;
+          margin-bottom: 1rem;
         }
 
-        h2 {
+        .EventsHeader h2 {
           font-size: clamp(2.6rem, 5vw, 4rem);
-          font-weight: 800;
-          color: #f2f6ff;
+          font-weight: 900;
+          letter-spacing: -0.04em;
+          color: #ffffff;
+          margin-bottom: 0.8rem;
         }
 
-        /* TRACK */
+        .sub {
+          max-width: 520px;
+          font-size: 1rem;
+          color: #9ca3af;
+        }
+
+        /* ===== TRACK ===== */
         .track-wrapper {
           overflow: hidden;
         }
 
         .track {
           display: flex;
-          gap: 48px;
-          padding: 0 6vw;
+          gap: 3rem;
+          padding: 0 max(6vw, calc((100vw - 1150px) / 2));
           will-change: transform;
         }
 
-        /* CARD – UPDATED SIZE */
+        /* ===== CARD ===== */
         .card {
-          min-width: 400px;   /* wider */
-          height: 380px;      /* shorter */
-          padding: 2.4rem 2.6rem;
-          border-radius: 24px;
+          flex: 0 0 auto;
+          width: 420px;
+          min-height: 360px;
+          padding: 2.6rem 2.8rem;
+          border-radius: 26px;
           background: linear-gradient(
             180deg,
-            rgba(255, 255, 255, 0.075),
+            rgba(255, 255, 255, 0.06),
             rgba(255, 255, 255, 0.015)
           );
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          backdrop-filter: blur(10px);
+          box-shadow: 0 35px 80px rgba(0, 0, 0, 0.75);
           display: flex;
           flex-direction: column;
           justify-content: center;
           transition:
-            transform 0.3s ease,
-            box-shadow 0.3s ease,
-            border-color 0.3s ease;
+            transform 0.35s ease,
+            box-shadow 0.35s ease,
+            border-color 0.35s ease;
         }
 
         .card:hover {
-          transform: translateY(-10px);
-          border-color: rgba(20, 247, 255, 0.6);
-          box-shadow:
-            0 30px 70px rgba(0, 0, 0, 0.85),
-            0 0 22px rgba(20, 247, 255, 0.35);
+          transform: translateY(-8px);
+          border-color: rgba(255, 255, 255, 0.35);
+          box-shadow: 0 45px 100px rgba(0, 0, 0, 0.85);
         }
 
+        /* ===== CONTENT ===== */
         .icon {
-          font-size: 2.4rem;
-          color: #14f7ff;
-          margin-bottom: 1.4rem;
-          text-shadow: 0 0 14px rgba(20, 247, 255, 0.5);
+          font-size: 2.2rem;
+          color: #ffffff;
+          margin-bottom: 1.6rem;
+          opacity: 0.9;
         }
 
-        h3 {
-          font-size: 1.7rem;
-          font-weight: 700;
+        .card h3 {
+          font-size: 1.6rem;
+          font-weight: 800;
           color: #ffffff;
-          margin-bottom: 0.5rem;
+          margin-bottom: 0.6rem;
         }
 
         .tagline {
-          font-size: 1rem;
-          color: #7df9ff;
+          font-size: 0.95rem;
+          color: #9ca3af;
           margin-bottom: 1.2rem;
         }
 
         .desc {
-          font-size: 0.98rem;
-          line-height: 1.65;
-          color: #b6c3cf;
+          font-size: 0.95rem;
+          line-height: 1.7;
+          color: #cbd5e1;
         }
 
-        /* MOBILE */
-        @media (max-width: 768px) {
+        /* ===== MOBILE ===== */
+        @media (max-width: 900px) {
+          .track {
+            gap: 1.5rem;
+            padding: 0 6vw;
+          }
+
           .card {
-            min-width: 300px;
-            height: 320px;
+            width: 300px;
+            min-height: 320px;
+            padding: 2rem;
+          }
+
+          .EventsHeader {
+            margin-bottom: 3rem;
           }
         }
       `}</style>
