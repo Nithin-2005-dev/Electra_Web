@@ -1,73 +1,64 @@
 "use client";
-import MerchCard from "./MerchCard";
 
-const PRODUCTS = [
-  {
-    id: 1,
-    name: "Water On The Rocks",
-    price: "₹1,190",
-    frontImage:
-      "https://spankersindia.com/cdn/shop/files/back_nbg.png?v=1764075361&width=990",
-    backImage:
-      "https://spankersindia.com/cdn/shop/files/front_nbg.png?v=1764075361&width=990",
-    slug: "water-on-the-rocks",
-  },
-  {
-    id: 2,
-    name: "Potter Tee",
-    price: "₹1,290",
-    frontImage:
-      "https://spankersindia.com/cdn/shop/files/WEB_NBG_W_d_BACK.png?v=1740389789&width=990",
-    backImage:
-      "https://spankersindia.com/cdn/shop/files/WEB_NBG_W_d_FRONT.png?v=1740389789&width=990",
-    slug: "potter",
-  },
-];
+import { useEffect, useMemo, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../app/lib/firebase";
+import MerchCard from "../components/MerchCard";
 
-export default function MerchGrid() {
+export default function MerchPage() {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    getDocs(collection(db, "products")).then((snap) => {
+      setProducts(
+        snap.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+        }))
+      );
+    });
+  }, []);
+
+  /* 🔒 SORT: AVAILABLE FIRST, SOLD OUT LAST */
+  const sortedProducts = useMemo(() => {
+    return [...products].sort((a, b) => {
+      if (a.available === b.available) return 0;
+      return a.available ? -1 : 1;
+    });
+  }, [products]);
+
   return (
-    <section className="merchSection">
-      <h2>Currently Available Merch</h2>
+    <main className="wrap">
+      <h1 className="title">Merch</h1>
 
-      <div className="grid">
-        {PRODUCTS.map((p) => (
+      <section className="grid">
+        {sortedProducts.map((p) => (
           <MerchCard key={p.id} product={p} />
         ))}
-      </div>
+      </section>
 
       <style jsx>{`
-        .merchSection {
-          padding: 5rem 3rem 6rem;
-          background: linear-gradient(180deg, var(--bg-primary), var(--bg-secondary));
-          color: var(--text-primary);
+        .wrap {
+          min-height: 100vh;
+          background: #000;
+          padding: 3rem 2rem;
         }
 
-        h2 {
-          font-size: 1.4rem;
-          font-weight: 500;
-          letter-spacing: 0.14em;
+        .title {
+          color: #e5e7eb;
+          font-size: 1.2rem;
+          letter-spacing: 0.25em;
           text-transform: uppercase;
-          margin-bottom: 3.5rem;
-          color: #cfd8e3;
+          margin-bottom: 2.5rem;
+          text-align: center;
         }
 
         .grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-          gap: 3rem;
-        }
-
-        @media (max-width: 768px) {
-          .merchSection {
-            padding: 3rem 1.5rem 4rem;
-          }
-
-          h2 {
-            font-size: 1.2rem;
-            margin-bottom: 2.5rem;
-          }
+          gap: 2.2rem;
         }
       `}</style>
-    </section>
+    </main>
   );
 }

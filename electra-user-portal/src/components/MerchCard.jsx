@@ -1,59 +1,101 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
-import { useState } from "react";
+import { cloudinaryUrl } from "../app/lib/cloudinary";
 
 export default function MerchCard({ product }) {
-  const [hovered, setHovered] = useState(false);
+  const disabled = !product.available;
+  const Wrapper = disabled ? "div" : Link;
 
   return (
-    <Link href={`/gotyourmerch/${product.slug}`} className="link">
-      <motion.div
-        className="card"
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        whileHover={{ scale: 1.03 }}
-        transition={{ type: "spring", stiffness: 160, damping: 20 }}
-      >
-        {/* IMAGE */}
+    <Wrapper
+      href={disabled ? undefined : `/gotyourmerch/${product.id}`}
+      className={`link ${disabled ? "disabled-link" : ""}`}
+    >
+      <div className={`card ${disabled ? "disabled" : ""}`}>
+        {/* IMAGE STAGE */}
         <div className="imageWrap">
+          {disabled && <span className="sold">SOLD OUT</span>}
+
           <img
-            src={hovered ? product.backImage : product.frontImage}
+            src={cloudinaryUrl(product.imageMain, "q_auto,f_auto,w_900/")}
             alt={product.name}
+            loading="lazy"
           />
+
+          <div className="imageGlow" />
         </div>
 
-        {/* TEXT */}
+        {/* INFO */}
         <div className="info">
           <p className="name">{product.name}</p>
-          <p className="price">{product.price}</p>
+          <p className="price">₹{product.price}</p>
         </div>
-      </motion.div>
+      </div>
 
       <style jsx>{`
+        /* ───────── LINK ───────── */
         .link {
           text-decoration: none;
+          display: block;
         }
 
+        .disabled-link {
+          pointer-events: none;
+        }
+
+        /* ───────── CARD ───────── */
         .card {
-          max-width: 260px;
-          margin: auto;
-          cursor: pointer;
-          color: var(--text-primary);
-          border-radius: 12px;
-          transition: box-shadow .16s ease, transform .12s ease;
+          border-radius: 26px;
+          padding: 1rem;
+
+          background: linear-gradient(
+            180deg,
+            #0e1111,
+            #070808
+          );
+
+          box-shadow:
+            0 10px 20px rgba(0, 0, 0, 0.6),
+            0 30px 70px rgba(0, 0, 0, 0.85),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+          transform: translateY(18px) scale(0.97);
+          opacity: 0;
+
+          animation: cardEnter 0.65s ease-out forwards;
+          transition:
+            transform 0.35s ease,
+            box-shadow 0.35s ease;
         }
 
+        /* HOVER (ONLY IF AVAILABLE) */
+        .card:not(.disabled):hover {
+          transform: translateY(-6px) scale(1.03);
+          box-shadow:
+            0 18px 40px rgba(0, 0, 0, 0.75),
+            0 60px 140px rgba(0, 0, 0, 0.95),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        .card.disabled {
+          opacity: 0.45;
+          filter: grayscale(0.25);
+        }
+
+        /* ───────── IMAGE STAGE ───────── */
         .imageWrap {
+          position: relative;
           width: 100%;
-          height: 320px;
+          aspect-ratio: 1 / 1.25;
+          border-radius: 20px;
+
           background: radial-gradient(
-            circle at top,
-            rgba(0,229,255,0.06),
-            rgba(10,10,10,0.9)
+            120% 90% at 50% 0%,
+            #1a1f1f,
+            #060707
           );
-          border-radius: 16px;
+
           overflow: hidden;
           display: flex;
           align-items: center;
@@ -61,39 +103,79 @@ export default function MerchCard({ product }) {
         }
 
         img {
-          height: 100%;
-          width: auto;
+          max-width: 82%;
+          max-height: 82%;
           object-fit: contain;
-          transition: transform 0.4s ease;
+
+          filter:
+            drop-shadow(0 20px 35px rgba(0, 0, 0, 0.7))
+            drop-shadow(0 6px 12px rgba(0, 0, 0, 0.8));
+
+          transition: transform 0.45s ease;
         }
 
-        .card:hover img {
-          transform: scale(1.05);
+        .card:not(.disabled):hover img {
+          transform: scale(1.06);
         }
 
-        .card:hover {
-          box-shadow: 0 14px 40px rgba(0,0,0,0.6), 0 0 24px rgba(0,229,255,0.04);
+        /* LUXURY GLOW */
+        .imageGlow {
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(
+            circle at center,
+            rgba(0, 229, 255, 0.045),
+            transparent 60%
+          );
+          pointer-events: none;
         }
 
+        /* ───────── SOLD OUT TAG ───────── */
+        .sold {
+          position: absolute;
+          top: 14px;
+          left: 14px;
+          z-index: 3;
+
+          background: rgba(10, 10, 10, 0.85);
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          backdrop-filter: blur(8px);
+
+          color: #f9fafb;
+          font-size: 0.65rem;
+          letter-spacing: 0.22em;
+          padding: 0.45rem 0.8rem;
+          border-radius: 999px;
+        }
+
+        /* ───────── INFO ───────── */
         .info {
           text-align: center;
-          margin-top: 0.9rem;
+          padding: 1.1rem 0.3rem 0.4rem;
         }
 
         .name {
-          font-size: 0.95rem;
-          font-weight: 500;
-          letter-spacing: 0.04em;
-          margin-bottom: 0.25rem;
+          font-size: 0.85rem;
+          letter-spacing: 0.22em;
           text-transform: uppercase;
-          color: #cfd8e3;
+          color: #e5e7eb;
+          margin-bottom: 0.35rem;
         }
 
         .price {
-          font-size: 0.85rem;
-          color: #cfd8e3;
+          font-size: 0.75rem;
+          color: #9ca3af;
+          letter-spacing: 0.14em;
+        }
+
+        /* ───────── ENTRANCE ANIMATION ───────── */
+        @keyframes cardEnter {
+          to {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+          }
         }
       `}</style>
-    </Link>
+    </Wrapper>
   );
 }

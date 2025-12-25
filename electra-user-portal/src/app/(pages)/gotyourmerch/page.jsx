@@ -7,7 +7,6 @@ export default function MerchPage() {
     <main style={{ background: "#000" }}>
       <MerchHeroVideo />
       <MerchGrid />
-      <PreviousMerch/>
     </main>
   );
 }

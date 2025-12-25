@@ -1,6 +1,58 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { auth, db } from "../../app/lib/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import Link from "next/link";
+
 export default function Hero() {
+  const router = useRouter();
+
+  const [checking, setChecking] = useState(true);
+  const [user, setUser] = useState(null);
+  const [hasProfile, setHasProfile] = useState(false);
+
+  /* ---------- AUTH + PROFILE CHECK ---------- */
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (!firebaseUser) {
+        setUser(null);
+        setHasProfile(false);
+        setChecking(false);
+        return;
+      }
+
+      setUser(firebaseUser);
+
+      const ref = doc(db, "users", firebaseUser.uid);
+      const snap = await getDoc(ref);
+
+      setHasProfile(snap.exists());
+      setChecking(false);
+    });
+
+    return () => unsub();
+  }, []);
+
+  /* ---------- CTA HANDLER ---------- */
+  const handleJoin = () => {
+    if (checking) return;
+
+    if (!user) {
+      router.push("/auth/sign-in");
+      return;
+    }
+
+    if (!hasProfile) {
+      router.push("/auth/profile");
+      return;
+    }
+
+    router.push("/dashboard");
+  };
+
   return (
     <section className="hero">
       {/* BACKGROUND VIDEO */}
@@ -29,10 +81,24 @@ export default function Hero() {
           <br />
           NIT Silchar — where ideas become impact.
         </p>
-
         <div className="actions">
-          <button className="primary">Explore events</button>
-          <button className="secondary">Join Electra</button>
+        <Link href={'/gotyourmerch'}>
+<button className="primary">Explore Merch</button>
+        </Link>
+
+          <button
+            className="secondary"
+            onClick={handleJoin}
+            disabled={checking}
+          >
+            {checking
+              ? "Loading…"
+              : user
+              ? hasProfile
+                ? "Go to Dashboard"
+                : "Complete Profile"
+              : "Join Electra"}
+          </button>
         </div>
       </div>
 
@@ -47,7 +113,6 @@ export default function Hero() {
           justify-content: center;
         }
 
-        /* VIDEO (lowest layer) */
         .video {
           position: absolute;
           inset: 0;
@@ -58,7 +123,6 @@ export default function Hero() {
           filter: brightness(0.7) contrast(1.05);
         }
 
-        /* DARK OVERLAY */
         .overlay {
           position: absolute;
           inset: 0;
@@ -76,7 +140,6 @@ export default function Hero() {
           pointer-events: none;
         }
 
-        /* CONTENT */
         .content {
           position: relative;
           z-index: 2;
@@ -91,7 +154,6 @@ export default function Hero() {
           line-height: 1;
         }
 
-        /* SCRIPT WORD */
         .script {
           display: block;
           font-family: "Playfair Display", serif;
@@ -100,11 +162,8 @@ export default function Hero() {
           font-size: clamp(5.2rem, 10vw, 7.4rem);
           line-height: 1;
           transform: translateY(0.6rem);
-          position: relative;
-          z-index: 2;
         }
 
-        /* MASSIVE WORD */
         .block {
           display: block;
           font-family: "Inter", system-ui, sans-serif;
@@ -112,8 +171,6 @@ export default function Hero() {
           letter-spacing: -0.04em;
           font-size: clamp(6rem, 13vw, 9.5rem);
           line-height: 1;
-          position: relative;
-          z-index: 1;
         }
 
         .subtitle {
@@ -141,14 +198,15 @@ export default function Hero() {
           transition: all 0.2s ease;
         }
 
+        button:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
         .primary {
           background: #fff;
           color: #000;
           border: none;
-        }
-
-        .primary:hover {
-          transform: translateY(-1px);
         }
 
         .secondary {
@@ -159,12 +217,6 @@ export default function Hero() {
 
         .secondary:hover {
           border-color: rgba(255, 255, 255, 0.6);
-        }
-
-        @media (max-width: 768px) {
-          .block {
-            font-size: clamp(4.8rem, 16vw, 6.8rem);
-          }
         }
       `}</style>
     </section>

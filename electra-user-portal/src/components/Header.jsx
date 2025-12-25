@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { auth } from "../app/lib/firebase";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 
 const NAV = [
   { href: "/", label: "Home" },
@@ -14,7 +16,24 @@ const NAV = [
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState(null);
+
+  /* ---------- AUTH STATE ---------- */
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+    });
+    return () => unsub();
+  }, []);
+
+  /* ---------- LOGOUT ---------- */
+  const handleLogout = async () => {
+    await signOut(auth);
+    setOpen(false);
+    router.push("/");
+  };
 
   return (
     <>
@@ -37,6 +56,30 @@ export default function Header() {
                 {item.label}
               </Link>
             ))}
+
+            {/* AUTH LINKS (DESKTOP) */}
+            {!user && (
+              <Link
+                href="/auth/sign-in"
+                className={pathname === "/auth/sign-in" ? "active" : ""}
+              >
+                Sign in
+              </Link>
+            )}
+
+            {user && (
+              <>
+                <Link
+                  href="/dashboard"
+                  className={pathname === "/dashboard" ? "active" : ""}
+                >
+                  Dashboard
+                </Link>
+                <a onClick={handleLogout} style={{ cursor: "pointer" }}>
+                  Sign out
+                </a>
+              </>
+            )}
           </nav>
 
           {/* RIGHT — 2-LINE MENU */}
@@ -76,10 +119,35 @@ export default function Header() {
                 {item.label}
               </Link>
             ))}
+
+            {/* AUTH LINKS (MOBILE) */}
+            {!user && (
+              <Link
+                href="/auth/sign-in"
+                className={pathname === "/auth/sign-in" ? "active" : ""}
+                onClick={() => setOpen(false)}
+              >
+                Sign in
+              </Link>
+            )}
+
+            {user && (
+              <>
+                <Link
+                  href="/dashboard"
+                  className={pathname === "/dashboard" ? "active" : ""}
+                  onClick={() => setOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <a onClick={handleLogout}>Sign out</a>
+              </>
+            )}
           </nav>
         </div>
       )}
 
+      {/* ================= STYLES (UNCHANGED) ================= */}
       <style jsx>{`
         /* ================= HEADER ================= */
         .header {
@@ -96,19 +164,15 @@ export default function Header() {
           max-width: 1200px;
           margin: 0 auto;
           padding: 0 20px;
-
           display: grid;
           grid-template-columns: auto 1fr auto;
           align-items: center;
         }
 
-        /* ================= LOGO ================= */
         .logo img {
           height: 28px;
-          width: auto;
         }
 
-        /* ================= DESKTOP NAV ================= */
         .nav {
           display: none;
           justify-self: center;
@@ -137,7 +201,6 @@ export default function Header() {
           background: #ffffff;
         }
 
-        /* ================= 2-LINE MENU ================= */
         .menu {
           width: 22px;
           height: 14px;
@@ -164,7 +227,6 @@ export default function Header() {
           bottom: 0;
         }
 
-        /* ================= MOBILE OVERLAY ================= */
         .overlay {
           position: fixed;
           inset: 0;
@@ -213,7 +275,6 @@ export default function Header() {
           font-weight: 500;
         }
 
-        /* ================= BREAKPOINT ================= */
         @media (min-width: 1024px) {
           .nav {
             display: flex;
