@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   FaInstagram,
   FaLinkedin,
@@ -8,6 +9,26 @@ import {
 import { MdEmail } from "react-icons/md";
 
 export default function Footer() {
+  const navs = [{
+    name: "Home",
+    link: "/",
+  }, {
+    name: "Gallery",
+    link: "/Gallery",
+  },{
+    name: "Resources",
+    link: "/Resources",
+  },{
+    name: "Team",
+    link: "/Team",
+  },{
+    name: "Merch",
+    link: "/gotyourmerch",
+  },{
+    name:"Dashboard",
+    link:"/dashboard",
+  }
+]
   return (
     <footer className="relative bg-black overflow-hidden">
       {/* soft top divider */}
@@ -20,9 +41,9 @@ export default function Footer() {
           <div className="space-y-5">
             <div className="flex items-center gap-3">
               <img
-                src="https://res.cloudinary.com/dqa3ov76r/image/upload/v1729535834/favoritePhotos/ldlchr4ijcpgfq8nu2gx.jpg"
+                src="https://res.cloudinary.com/dqa3ov76r/image/upload/v1766745932/dawnld1jgn6kzelqpg03.png"
                 alt="Electra Society Logo"
-                className="w-11 h-11 rounded-full ring-1 ring-white/20"
+                className="w-11"
               />
               <span className="text-xl font-semibold text-white tracking-tight">
                 Electra Society
@@ -42,16 +63,16 @@ export default function Footer() {
               Navigation
             </h4>
 
-            <ul className="space-y-2 text-slate-300">
-              {["Home", "Gallery", "Resources", "Team", "Merch"].map((item) => (
-                <li
-                  key={item}
+            <div className=" text-slate-300 flex flex-col gap-1">
+              {navs.map((item) => (
+                <Link href={item.link}
+                  key={item.name}
                   className="w-fit cursor-pointer transition hover:text-white"
                 >
-                  {item}
-                </li>
+                  {item.name}
+                </Link>
               ))}
-            </ul>
+            </div>
           </div>
 
           {/* CONNECT */}

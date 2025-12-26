@@ -41,8 +41,8 @@ export default function Header() {
       <header className="header">
         <div className="inner">
           {/* LEFT — LOGO */}
-          <Link href="/" className="logo">
-            <img src="/logo.png" alt="Logo" />
+          <Link href="/" className="">
+            <img className="w-12" src="https://res.cloudinary.com/dqa3ov76r/image/upload/v1766745932/dawnld1jgn6kzelqpg03.png" alt="Logo" />
           </Link>
 
           {/* CENTER — DESKTOP NAV */}
@@ -169,9 +169,10 @@ export default function Header() {
           align-items: center;
         }
 
-        .logo img {
-          height: 28px;
-        }
+        {/* .logo img {
+          height: 2px;
+          width: 2px;
+        } */}
 
         .nav {
           display: none;

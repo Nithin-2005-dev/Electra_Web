@@ -50,7 +50,7 @@ export default function ProfilePage() {
     name.trim().length >= 2 &&
     college.trim().length >= 3 &&
     stream.trim().length >= 2 &&
-    ["1", "2", "3", "4"].includes(year) &&
+    ["1", "2", "3", "4","m.tech","phd","mba","faculty","alumni"].includes(year) &&
     phone.trim().length >= 10; // ✅ phone mandatory
 
   /* ---------- SUBMIT ---------- */
@@ -68,7 +68,7 @@ export default function ProfilePage() {
         phone, // ✅ from input
         college,
         stream,
-        year: Number(year),
+        year: year,
         role: "member",
         createdAt: serverTimestamp(),
       });
@@ -144,6 +144,7 @@ export default function ProfilePage() {
             <option value="phd">PHD</option>
             <option value="mba">MBA</option>
             <option value="faculty">Faculty</option>
+            <option value="alumni">Alumni</option>
           </select>
         </label>
 
