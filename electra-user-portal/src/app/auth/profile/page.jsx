@@ -140,6 +140,10 @@ export default function ProfilePage() {
             <option value="2">2nd Year</option>
             <option value="3">3rd Year</option>
             <option value="4">4th Year</option>
+            <option value="m.tech">M.tech</option>
+            <option value="phd">PHD</option>
+            <option value="mba">MBA</option>
+            <option value="faculty">Faculty</option>
           </select>
         </label>
 

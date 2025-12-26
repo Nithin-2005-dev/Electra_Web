@@ -204,6 +204,11 @@ function OrderCard({ order }) {
   const router = useRouter();
   const state = getOrderState(order);
 
+  const continuePayment = (e) => {
+    e.stopPropagation(); // ⛔ prevent card click
+    router.push(`/checkout/${order.orderId}`);
+  };
+
   return (
     <div
       className="card clickable"
@@ -226,6 +231,16 @@ function OrderCard({ order }) {
         <Timeline label="Shipped" date={formatDate(order.shippedAt)} />
         <Timeline label="Delivered" date={formatDate(order.deliveredAt)} />
       </div>
+
+      {/* ✅ CONTINUE PAYMENT BUTTON */}
+      {order.paymentStatus === "pending_payment" && (
+        <button
+          className="payBtn"
+          onClick={continuePayment}
+        >
+          Continue payment
+        </button>
+      )}
 
       <div className="meta">
         Order ID: {order.orderId}
@@ -274,7 +289,24 @@ function OrderCard({ order }) {
           margin-bottom: 0.6rem;
         }
 
+        .payBtn {
+          margin-top: 0.6rem;
+          background: #fff;
+          color: #000;
+          border: none;
+          border-radius: 999px;
+          padding: 0.45rem 1rem;
+          font-size: 0.7rem;
+          letter-spacing: 0.12em;
+          cursor: pointer;
+        }
+
+        .payBtn:hover {
+          opacity: 0.9;
+        }
+
         .meta {
+          margin-top: 0.6rem;
           font-size: 0.7rem;
           color: #6b7280;
         }

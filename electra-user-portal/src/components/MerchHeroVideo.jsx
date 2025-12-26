@@ -47,8 +47,8 @@ export default function MerchHeroVideo() {
         audio.play().catch(() => {});
       }
     } else {
-      video.pause();
-      audio.pause();
+      // video.pause();
+      // audio.pause();
     }
   }, [isInView, audioUnlocked]);
 

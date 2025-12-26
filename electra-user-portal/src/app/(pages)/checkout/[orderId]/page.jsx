@@ -18,18 +18,33 @@ export default function CheckoutPage() {
   const [user, setUser] = useState(null);
   const [order, setOrder] = useState(null);
 
-  // 🔐 Payment + customization
+  // payment
   const [txnId, setTxnId] = useState("");
   const [file, setFile] = useState(null);
   const [size, setSize] = useState("");
+
+  // print
   const [printName, setPrintName] = useState(false);
   const [printedName, setPrintedName] = useState("");
+
+  // delivery
+  const [outside, setOutside] = useState(false);
+  const [address, setAddress] = useState({
+    fullName: "",
+    phone: "",
+    addressLine: "",
+    city: "",
+    pincode: "",
+  });
+
+  const DELIVERY_CHARGE = 100;
+  const PRINT_NAME_CHARGE = 50;
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  /* ───────────────── AUTH + ORDER LOAD ───────────────── */
+  /* ───────── AUTH + ORDER LOAD ───────── */
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
       if (!firebaseUser) {
@@ -39,9 +54,7 @@ export default function CheckoutPage() {
 
       setUser(firebaseUser);
 
-      const ref = doc(db, "orders", orderId);
-      const snap = await getDoc(ref);
-
+      const snap = await getDoc(doc(db, "orders", orderId));
       if (!snap.exists()) {
         setError("Order not found");
         setLoading(false);
@@ -50,14 +63,12 @@ export default function CheckoutPage() {
 
       const data = snap.data();
 
-      // 🔒 STRICT OWNERSHIP CHECK
       if (data.userId !== firebaseUser.uid) {
         setError("Unauthorized access");
         setLoading(false);
         return;
       }
 
-      // 🔒 BLOCK ACCESS IF PAYMENT ALREADY MOVED FORWARD
       if (data.paymentStatus !== "pending_payment") {
         router.replace("/dashboard");
         return;
@@ -70,7 +81,7 @@ export default function CheckoutPage() {
     return () => unsub();
   }, [orderId, router]);
 
-  /* ───────────────── CLOUDINARY UPLOAD ───────────────── */
+  /* ───────── CLOUDINARY ───────── */
   const uploadToCloudinary = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -81,21 +92,23 @@ export default function CheckoutPage() {
 
     const res = await fetch(
       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-      {
-        method: "POST",
-        body: formData,
-      }
+      { method: "POST", body: formData }
     );
 
-    if (!res.ok) throw new Error("Image upload failed");
+    if (!res.ok) throw new Error("Upload failed");
     return res.json();
   };
 
-  /* ───────────────── SUBMIT PAYMENT PROOF ───────────────── */
-  const submitProof = async () => {
-    if (!order || !user) return;
+  /* ───────── PRICE CALC ───────── */
+  const deliveryFee = outside ? DELIVERY_CHARGE : 0;
+  const printFee = printName ? PRINT_NAME_CHARGE : 0;
+  const finalAmount =
+    (order?.amount || 0) + deliveryFee + printFee;
 
-    // 🔴 HARD VALIDATIONS
+  /* ───────── SUBMIT ───────── */
+  const submitProof = async () => {
+    if (!order || submitting) return;
+
     if (!txnId || !file || !size) {
       setError("Please fill all required fields");
       return;
@@ -106,47 +119,55 @@ export default function CheckoutPage() {
       return;
     }
 
+    if (outside) {
+      const { fullName, phone, addressLine, city, pincode } = address;
+      if (!fullName || !phone || !addressLine || !city || !pincode) {
+        setError("Please complete delivery address");
+        return;
+      }
+    }
+
     try {
       setSubmitting(true);
       setError("");
 
-      // 1️⃣ Upload screenshot
-      const uploadResult = await uploadToCloudinary(file);
+      const upload = await uploadToCloudinary(file);
 
-      // 2️⃣ Update order atomically
       await updateDoc(doc(db, "orders", orderId), {
         txnId: txnId.trim(),
         size,
         printName,
         printedName: printName ? printedName.trim() : null,
-        paymentScreenshotUrl: uploadResult.secure_url,
-        paymentScreenshotPublicId: uploadResult.public_id,
+
+        isOutsideCampus: outside,
+        deliveryCharge: deliveryFee,
+        printNameCharge: printFee,
+        deliveryAddress: outside ? address : null,
+
+        totalAmountPaid: finalAmount,
+
+        paymentScreenshotUrl: upload.secure_url,
+        paymentScreenshotPublicId: upload.public_id,
         paymentStatus: "pending_verification",
         updatedAt: serverTimestamp(),
       });
 
-      // 3️⃣ Notify admin + user (server side)
-      const res = await fetch("/api/notify-payment", {
+      fetch("/api/notify-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderId }),
-      });
+      }).catch(() => {});
 
-      if (!res.ok) {
-        throw new Error("Admin notification failed");
-      }
-
-      // 4️⃣ Redirect
-      router.push("/dashboard");
+      router.push(`/dashboard/orders/${orderId}`);
     } catch (err) {
       console.error(err);
-      setError("Failed to submit payment proof. Please try again.");
+      setError("Failed to submit payment. Try again.");
     } finally {
       setSubmitting(false);
     }
   };
 
-  /* ───────────────── LOADING / ERROR ───────────────── */
+  /* ───────── LOADING ───────── */
   if (loading) {
     return (
       <main className="loading">
@@ -164,52 +185,41 @@ export default function CheckoutPage() {
     );
   }
 
-  if (!order) {
-    return <main className="loading">{error}</main>;
-  }
+  if (!order) return <main>{error}</main>;
 
-  /* ───────────────── UI ───────────────── */
+  /* ───────── UI ───────── */
   return (
     <main className="wrap">
       <div className="card">
         <h1>Complete Payment</h1>
 
+        <p className="info">Base price: ₹{order.amount}</p>
+        {printName && <p className="info">Name print: ₹50</p>}
+        {outside && <p className="info">Delivery: ₹100</p>}
         <p className="info">
-          Order ID: <strong>{order.orderId}</strong>
-        </p>
-
-        <p className="info">
-          Amount: <strong>₹{order.amount}</strong>
+          <strong>Total payable: ₹{finalAmount}</strong>
         </p>
 
         <img src="/upi-qr.png" alt="UPI QR" className="qr" />
 
-        <p className="note">
-          Pay the <strong>exact amount</strong> and mention
-          <br />
-          <strong>{order.orderId}</strong> in the UPI note
-        </p>
-
-        {/* ───── SIZE ───── */}
         <label>
           T-Shirt Size *
           <select value={size} onChange={(e) => setSize(e.target.value)}>
             <option value="">Select size</option>
-            <option value="S">Small</option>
-            <option value="M">Medium</option>
-            <option value="L">Large</option>
-            <option value="XL">XL</option>
+            <option>S</option>
+            <option>M</option>
+            <option>L</option>
+            <option>XL</option>
           </select>
         </label>
 
-        {/* ───── PRINT NAME ───── */}
         <label className="checkbox">
           <input
             type="checkbox"
             checked={printName}
             onChange={(e) => setPrintName(e.target.checked)}
           />
-          Print name on T-shirt
+          Print name on T-shirt (+₹50)
         </label>
 
         {printName && (
@@ -218,18 +228,78 @@ export default function CheckoutPage() {
             <input
               value={printedName}
               onChange={(e) => setPrintedName(e.target.value)}
-              placeholder="Enter name"
             />
           </label>
         )}
 
-        {/* ───── PAYMENT DETAILS ───── */}
+        <label className="checkbox">
+          <input
+            type="checkbox"
+            checked={outside}
+            onChange={(e) => setOutside(e.target.checked)}
+          />
+          I am outside campus (+₹100 delivery)
+        </label>
+
+        {outside && (
+          <>
+            <label>
+              Full Name *
+              <input
+                value={address.fullName}
+                onChange={(e) =>
+                  setAddress({ ...address, fullName: e.target.value })
+                }
+              />
+            </label>
+
+            <label>
+              Phone *
+              <input
+                value={address.phone}
+                onChange={(e) =>
+                  setAddress({ ...address, phone: e.target.value })
+                }
+              />
+            </label>
+
+            <label>
+              Address *
+              <input
+                value={address.addressLine}
+                onChange={(e) =>
+                  setAddress({ ...address, addressLine: e.target.value })
+                }
+              />
+            </label>
+
+            <label>
+              City *
+              <input
+                value={address.city}
+                onChange={(e) =>
+                  setAddress({ ...address, city: e.target.value })
+                }
+              />
+            </label>
+
+            <label>
+              Pincode *
+              <input
+                value={address.pincode}
+                onChange={(e) =>
+                  setAddress({ ...address, pincode: e.target.value })
+                }
+              />
+            </label>
+          </>
+        )}
+
         <label>
           Transaction ID *
           <input
             value={txnId}
             onChange={(e) => setTxnId(e.target.value)}
-            placeholder="Enter UPI transaction ID"
           />
         </label>
 
@@ -244,10 +314,7 @@ export default function CheckoutPage() {
 
         {error && <p className="error">{error}</p>}
 
-        <button
-          onClick={submitProof}
-          disabled={submitting}
-        >
+        <button onClick={submitProof} disabled={submitting}>
           {submitting ? "Submitting…" : "Submit for verification"}
         </button>
       </div>
@@ -283,12 +350,6 @@ export default function CheckoutPage() {
           border-radius: 12px;
         }
 
-        .note {
-          font-size: 0.8rem;
-          color: #facc15;
-          margin-bottom: 1rem;
-        }
-
         label {
           display: flex;
           flex-direction: column;
@@ -312,7 +373,6 @@ export default function CheckoutPage() {
           flex-direction: row;
           align-items: center;
           gap: 0.6rem;
-          font-size: 0.8rem;
         }
 
         button {

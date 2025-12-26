@@ -16,52 +16,119 @@ export default function OrderCard({ order, onApprove, onReject }) {
         hover:border-cyan-400/30
       "
     >
-      {/* Top row */}
+      {/* ───── HEADER ───── */}
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className="text-white font-semibold text-lg leading-tight">
             {order.productName}
           </h3>
           <p className="text-slate-400 text-sm mt-0.5">
-            Order ID: <span className="text-slate-300">{order.orderId}</span>
+            Order ID:{" "}
+            <span className="text-slate-300">{order.orderId}</span>
           </p>
         </div>
 
         <div className="text-right shrink-0">
-          <span className="text-cyan-300 font-bold text-lg">
-            ₹{order.amount}
-          </span>
+          <div className="text-cyan-300 font-bold text-lg">
+            ₹{order.totalAmountPaid ?? order.amount}
+          </div>
+          <div className="text-xs text-slate-400">
+            Base ₹{order.amount}
+          </div>
         </div>
       </div>
 
-      {/* Divider */}
-      <div className="my-4 h-px bg-white/10" />
+      {/* ───── STATUS PILLS ───── */}
+      <div className="mt-3 flex flex-wrap gap-2">
+        <StatusPill
+          label={`Payment: ${order.paymentStatus}`}
+          tone={
+            order.paymentStatus === "confirmed"
+              ? "green"
+              : order.paymentStatus === "rejected"
+              ? "red"
+              : "yellow"
+          }
+        />
 
-      {/* Meta info */}
-      <div className="grid gap-1 text-sm text-slate-400">
-        <span>
-          Email: <span className="text-slate-200">{order.email}</span>
-        </span>
-
-        {order.txnId && (
-          <span>
-            Txn ID: <span className="text-slate-200">{order.txnId}</span>
-          </span>
-        )}
-
-        {order.paymentScreenshotUrl && (
-          <a
-            href={order.paymentScreenshotUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 text-cyan-300 hover:underline w-fit"
-          >
-            View payment screenshot →
-          </a>
-        )}
+        <StatusPill
+          label={`Fulfillment: ${order.fulfillmentStatus ?? "placed"}`}
+          tone="blue"
+        />
       </div>
 
-      {/* Actions */}
+      {/* ───── DIVIDER ───── */}
+      <div className="my-4 h-px bg-white/10" />
+
+      {/* ───── ORDER DETAILS ───── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-slate-400">
+        <Detail label="User ID" value={order.userId} />
+        <Detail label="Email" value={order.email || "—"} />
+        <Detail label="Size" value={order.size || "—"} />
+        <Detail
+          label="Print Name"
+          value={
+            order.printName
+              ? `Yes (${order.printedName})`
+              : "No"
+          }
+        />
+        <Detail
+          label="Outside Campus"
+          value={order.isOutsideCampus ? "Yes" : "No"}
+        />
+        <Detail
+          label="Delivery Charge"
+          value={`₹${order.deliveryCharge || 0}`}
+        />
+        <Detail
+          label="Print Charge"
+          value={`₹${order.printNameCharge || 0}`}
+        />
+        <Detail
+          label="Txn ID"
+          value={order.txnId || "—"}
+        />
+      </div>
+
+      {/* ───── ADDRESS ───── */}
+      {order.isOutsideCampus && order.deliveryAddress && (
+        <div className="mt-4 rounded-xl border border-white/10 bg-black/30 p-3">
+          <p className="text-xs text-slate-400 mb-1">
+            Delivery Address
+          </p>
+          <p className="text-sm text-slate-200 leading-relaxed">
+            {order.deliveryAddress.fullName}
+            <br />
+            {order.deliveryAddress.addressLine}
+            <br />
+            {order.deliveryAddress.city} –{" "}
+            {order.deliveryAddress.pincode}
+            <br />
+            📞 {order.deliveryAddress.phone}
+          </p>
+        </div>
+      )}
+
+      {/* ───── PAYMENT SCREENSHOT ───── */}
+      {order.paymentScreenshotUrl && (
+        <a
+          href={order.paymentScreenshotUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="
+            inline-flex items-center gap-2
+            mt-4
+            text-cyan-300
+            text-sm
+            hover:underline
+          "
+        >
+          View payment screenshot →
+        </a>
+      )}
+
+      {/* ───── ACTIONS ───── */}
       <div className="mt-5 flex flex-wrap gap-3">
         <button
           onClick={() => onApprove(order.orderId)}
@@ -75,7 +142,7 @@ export default function OrderCard({ order, onApprove, onReject }) {
             transition
           "
         >
-          Approve
+          Approve Payment
         </button>
 
         <button
@@ -90,9 +157,40 @@ export default function OrderCard({ order, onApprove, onReject }) {
             transition
           "
         >
-          Reject
+          Reject Payment
         </button>
       </div>
     </div>
+  );
+}
+
+/* ───────────────── HELPERS ───────────────── */
+
+function Detail({ label, value }) {
+  return (
+    <span>
+      {label}:{" "}
+      <span className="text-slate-200">{value}</span>
+    </span>
+  );
+}
+
+function StatusPill({ label, tone }) {
+  const tones = {
+    green: "bg-emerald-500/15 text-emerald-300 border-emerald-400/30",
+    red: "bg-red-500/15 text-red-400 border-red-500/30",
+    yellow: "bg-yellow-500/15 text-yellow-300 border-yellow-400/30",
+    blue: "bg-cyan-500/15 text-cyan-300 border-cyan-400/30",
+  };
+
+  return (
+    <span
+      className={`
+        px-3 py-1 rounded-full text-xs font-semibold
+        border ${tones[tone]}
+      `}
+    >
+      {label}
+    </span>
   );
 }

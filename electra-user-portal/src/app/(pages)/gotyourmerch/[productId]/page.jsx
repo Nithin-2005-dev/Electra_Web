@@ -1,7 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { db, auth } from "../../../lib/firebase";
 import { cloudinaryUrl } from "../../../lib/cloudinary";
 import { useParams, useRouter } from "next/navigation";
@@ -15,9 +24,8 @@ export default function ProductPage() {
   const [active, setActive] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showSizeChart, setShowSizeChart] = useState(false);
-
-  // 🔒 BUY LOCK
   const [buying, setBuying] = useState(false);
+  const [openFaq, setOpenFaq] = useState(null);
 
   /* ───────── LOAD PRODUCT ───────── */
   useEffect(() => {
@@ -25,21 +33,15 @@ export default function ProductPage() {
 
     const loadProduct = async () => {
       const snap = await getDoc(doc(db, "products", productId));
-
-      if (!snap.exists()) {
-        router.replace("/gotyourmerch");
-        return;
-      }
+      if (!snap.exists()) return router.replace("/gotyourmerch");
 
       const data = snap.data();
-
       setProduct({
         ...data,
         imageGallery: Array.isArray(data.imageGallery)
           ? data.imageGallery
           : [],
       });
-
       setActive(data.imageMain);
       setLoading(false);
     };
@@ -47,165 +49,221 @@ export default function ProductPage() {
     loadProduct();
   }, [productId, router]);
 
-  if (loading) {
-    return (
-      <main className="loading">
-        <div className="spinner" />
-        Loading product…
-        <style jsx>{`
-          .loading {
-            min-height: 100vh;
-            display: grid;
-            place-items: center;
-            background: #000;
-            color: #9ca3af;
-            gap: 1rem;
+if (loading) {
+  return (
+    <main className="loading">
+      <div className="spinner" />
+      Loading product…
+      <style jsx>{`
+        .loading {
+          min-height: 100vh;
+          display: grid;
+          place-items: center;
+          background: #000;
+          color: #9ca3af;
+          gap: 1rem;
+        }
+
+        .spinner {
+          width: 36px;
+          height: 36px;
+          border: 3px solid rgba(255, 255, 255, 0.2);
+          border-top-color: #22d3ee;
+          border-radius: 50%;
+          animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
           }
-          .spinner {
-            width: 36px;
-            height: 36px;
-            border: 3px solid rgba(255,255,255,0.2);
-            border-top-color: #22d3ee;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-          }
-          @keyframes spin {
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
-      </main>
-    );
-  }
+        }
+      `}</style>
+    </main>
+  );
+}
 
   if (!product || !active) return null;
 
-  /* ───────── SAFE IMAGE LIST ───────── */
   const images = Array.from(
     new Set([product.imageMain, ...product.imageGallery])
   ).filter(Boolean);
 
-  /* ───────── BUY NOW ───────── */
   const orderNow = async () => {
-    if (buying || !product.available) return;
+  if (buying || !product.available) return;
 
-    const user = auth.currentUser;
-    if (!user) {
-      router.push("/auth/sign-in");
-      return;
-    }
+  const user = auth.currentUser;
+  if (!user) return router.push("/auth/sign-in");
 
-    try {
-      setBuying(true);
+  setBuying(true);
 
-      const orderId = `ORD-${nanoid(6).toUpperCase()}`;
+  const q = query(
+    collection(db, "orders"),
+    where("userId", "==", user.uid)
+  );
 
-      await setDoc(doc(db, "orders", orderId), {
-        orderId,
-        userId: user.uid,
-        productId,
-        productName: product.name,
-        amount: product.price,
-        paymentStatus: "pending_payment",
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
+  const snap = await getDocs(q);
 
-      router.push(`/checkout/${orderId}`);
-    } catch (err) {
-      console.error(err);
-      setBuying(false);
-      alert("Failed to create order. Try again.");
-    }
-  };
+  const pendingOrder = snap.docs
+    .map(d => d.data())
+    .find(
+      o =>
+        o.productId === productId &&
+        o.paymentStatus === "pending_payment"
+    );
 
-  /* ───────── UI ───────── */
+  if (pendingOrder) {
+    router.push(`/checkout/${pendingOrder.orderId}`);
+    return;
+  }
+
+  const orderId = `ORD-${nanoid(6).toUpperCase()}`;
+
+  await setDoc(doc(db, "orders", orderId), {
+    orderId,
+    userId: user.uid,
+    productId,
+    productName: product.name,
+    amount: product.price,
+    paymentStatus: "pending_payment",
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+
+  router.push(`/checkout/${orderId}`);
+};
+
+
+
   return (
     <main className="wrap">
-      {/* LEFT — GALLERY */}
+      {/* PRODUCT */}
       <section className="gallery">
         <img
           className="main"
           src={cloudinaryUrl(active, "q_auto,f_auto,w_1400/")}
           alt={product.name}
         />
-
         <div className="thumbs">
-          {images.map((pid, index) => (
+          {images.map((pid, i) => (
             <img
-              key={`${pid}-${index}`}
+              key={i}
               src={cloudinaryUrl(pid, "q_auto,f_auto,w_200/")}
               onClick={() => setActive(pid)}
               className={pid === active ? "active" : ""}
-              alt=""
             />
           ))}
         </div>
       </section>
 
-      {/* RIGHT — INFO */}
       <section className="info">
         <h1>{product.name}</h1>
-
         <div className="price">₹{product.price}</div>
 
-        <button
-          className="size-chart"
-          onClick={() => setShowSizeChart(true)}
-        >
+        <button className="size-chart" onClick={() => setShowSizeChart(true)}>
           Size Chart
         </button>
 
-        <button
-          className="buy"
-          disabled={!product.available || buying}
-          onClick={orderNow}
-        >
+        <button className="buy" disabled={!product.available || buying} onClick={orderNow}>
           {buying ? "Processing…" : "Buy It Now"}
         </button>
 
-        {!product.available && (
-          <span className="out">Out of stock</span>
-        )}
+        {!product.available && <span className="out">Out of stock</span>}
 
-        {/* PRODUCT DETAILS */}
         <div className="details">
           <h3>Product Details</h3>
           <ul>
-            <li><strong>Fabric:</strong> 100% French Terry Loopknit Cotton</li>
-            <li><strong>Fit:</strong> Oversized Fit</li>
-            <li><strong>GSM:</strong> 240 GSM</li>
-            <li><strong>Colour:</strong> Navy Blue</li>
-            <li><strong>Neck:</strong> Ribbed Crew Neck</li>
-            <li><strong>Care:</strong> Machine wash cold, inside-out</li>
+            <li><strong>Fabric:</strong> French Terry Loopknit Cotton</li>
+            <li><strong>Fit:</strong> Oversized</li>
+            <li><strong>GSM:</strong> 240</li>
+            <li><strong>Care:</strong> Cold wash, inside-out</li>
           </ul>
         </div>
       </section>
 
-      {/* SIZE CHART MODAL */}
+      {/* FAQ SECTION */}
+      <section className="faq">
+        <h2>Frequently Asked Questions</h2>
+
+        {FAQS.map((f, i) => (
+          <div
+            key={i}
+            className={`faq-item ${openFaq === i ? "open" : ""}`}
+            onClick={() => setOpenFaq(openFaq === i ? null : i)}
+          >
+            <div className="question">
+              <span>{f.q}</span>
+              <span className="icon">{openFaq === i ? "−" : "+"}</span>
+            </div>
+            <div className="answer">{f.a}</div>
+          </div>
+        ))}
+      </section>
+
+      {/* SIZE CHART */}
       {showSizeChart && (
         <div className="modal" onClick={() => setShowSizeChart(false)}>
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-            <button
-              className="close"
-              onClick={() => setShowSizeChart(false)}
-            >
-              ✕
-            </button>
-            <img src={product.sizeChartUrl} alt="Size chart" />
+            <button className="close">✕</button>
+            <img src={product.sizeChartUrl} />
           </div>
         </div>
       )}
 
-      {/* CHECKOUT LOCK */}
       {buying && (
         <div className="checkout-loading">
           <div className="spinner" />
-          <p>Redirecting to checkout…</p>
+          Redirecting to checkout…
         </div>
       )}
 
       <style jsx>{`
-        .wrap {
+        /* FAQ */
+        .faq {
+          grid-column: 1 / -1;
+          margin-top: 4rem;
+          width: 100%;
+          margin-inline: auto;
+        }
+
+        .faq h2 {
+          font-size: 1.6rem;
+          margin-bottom: 1.5rem;
+          text-align: center;
+        }
+
+        .faq-item {
+          border-bottom: 1px solid rgba(255,255,255,0.1);
+          padding: 1rem 0;
+          cursor: pointer;
+        }
+
+        .question {
+          display: flex;
+          justify-content: space-between;
+          font-weight: 600;
+          letter-spacing: 0.03em;
+        }
+
+        .answer {
+          max-height: 0;
+          overflow: hidden;
+          color: #9ca3af;
+          font-size: 0.9rem;
+          transition: max-height 0.35s ease, opacity 0.3s ease;
+          opacity: 0;
+        }
+
+        .faq-item.open .answer {
+          max-height: 200px;
+          opacity: 1;
+          margin-top: 0.6rem;
+        }
+
+        .icon {
+          color: #22d3ee;
+        }
+         .wrap {
           min-height: 100vh;
           background: #000;
           color: #fff;
@@ -362,4 +420,24 @@ export default function ProductPage() {
       `}</style>
     </main>
   );
-}
+} 
+
+/* FAQ DATA */
+const FAQS = [
+  {
+    q: "How long does delivery take?",
+    a: "Orders are shipped in bulk. Delivery usually takes 5–10 working days after shipping.",
+  },
+  {
+    q: "Can I cancel or change my order?",
+    a: "Orders cannot be changed once payment is confirmed.",
+  },
+  {
+    q: "How do I choose the right size?",
+    a: "Please refer to the size chart above. Our fits are oversized by default.",
+  },
+  {
+    q: "Is this official Electra merchandise?",
+    a: "Yes. All merch is officially designed and distributed by Electra Society.",
+  },
+];
