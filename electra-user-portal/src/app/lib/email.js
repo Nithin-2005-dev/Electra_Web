@@ -42,7 +42,7 @@ export async function sendAdminPaymentEmail(order) {
 /* -------------------------------------------------
    USER EMAIL — order status updates
 -------------------------------------------------- */
-export async function sendUserOrderEmail(user, subject, message) {
+export async function sendUserOrderEmail(user, subject, html) {
   if (!user?.email) {
     throw new Error("User email missing — cannot send email");
   }
@@ -51,20 +51,7 @@ export async function sendUserOrderEmail(user, subject, message) {
     from: "Electra Society <no-reply@electrasocietynits.com>",
     to: [user.email],
     subject,
-    html: `
-      <p>Hi ${user.name || ""},</p>
-      <p>${message}</p>
-
-      <br />
-      <p>
-        <a href="${process.env.APP_BASE_URL}/dashboard">
-          View your dashboard
-        </a>
-      </p>
-
-      <br />
-      <p>— Electra Society</p>
-    `,
+    html,
   });
 }
 

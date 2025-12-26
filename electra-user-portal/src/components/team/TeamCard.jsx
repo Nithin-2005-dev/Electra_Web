@@ -40,7 +40,7 @@ export default function TeamCard({ ele }) {
 
       {/* IMAGE */}
       <div className="relative z-10 px-4">
-        <div className="rounded-xl overflow-hidden bg-[#0b1220]">
+        <div className="rounded-xl overflow-hidden">
           {ele.publicId ? (
             <CldImage
               src={ele.publicId}

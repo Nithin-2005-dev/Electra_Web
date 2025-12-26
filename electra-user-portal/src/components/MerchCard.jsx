@@ -3,16 +3,11 @@
 import Link from "next/link";
 import { cloudinaryUrl } from "../app/lib/cloudinary";
 import { auth, db } from "../app/lib/firebase";
-import {
-  doc,
-  updateDoc,
-  arrayUnion,
-  arrayRemove,
-} from "firebase/firestore";
+import { doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
 export default function MerchCard({ product }) {
-  const disabled = !product.available;
+  const soldOut = !product.available;
 
   const [user, setUser] = useState(null);
   const [subscribed, setSubscribed] = useState(false);
@@ -37,11 +32,7 @@ export default function MerchCard({ product }) {
   };
 
   /* ───────── NOTIFY LOGIC ───────── */
-  const toggleNotify = async (e) => {
-    // 🔥 ABSOLUTELY REQUIRED
-    e.preventDefault();
-    e.stopPropagation();
-
+  const toggleNotify = async () => {
     if (loading) return;
 
     if (!user) {
@@ -68,7 +59,7 @@ export default function MerchCard({ product }) {
       }
     } catch (err) {
       console.error(err);
-      showToast("Something went wrong. Try again.");
+      showToast("Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -76,20 +67,14 @@ export default function MerchCard({ product }) {
 
   return (
     <>
-      <Link
-        href={`/gotyourmerch/${product.id}`}
-        className="link"
-        onClick={(e) => {
-          if (disabled) {
-            e.preventDefault(); // 🚫 stop navigation
-            e.stopPropagation();
-          }
-        }}
-      >
-        <div className={`card ${disabled ? "disabled" : ""}`}>
-          {/* IMAGE */}
+      <div className="card">
+        {/* IMAGE — ONLY CLICKABLE AREA */}
+        <Link
+          href={`/gotyourmerch/${product.id}`}
+          className="imageLink"
+        >
           <div className="imageWrap">
-            {disabled && <span className="sold">SOLD OUT</span>}
+            {soldOut && <span className="sold">SOLD OUT</span>}
 
             <img
               src={cloudinaryUrl(product.imageMain, "q_auto,f_auto,w_900/")}
@@ -99,41 +84,35 @@ export default function MerchCard({ product }) {
 
             <div className="imageGlow" />
           </div>
+        </Link>
 
-          {/* INFO */}
-          <div className="info">
-            <p className="name">{product.name}</p>
-            <p className="price">₹{product.price}</p>
+        {/* INFO */}
+        <div className="info">
+          <p className="name">{product.name}</p>
+          <p className="price">₹{product.price}</p>
 
-            {/* 🔔 NOTIFY BUTTON */}
-            {disabled && (
-              <button
-                type="button" // 🔥 IMPORTANT
-                onClick={toggleNotify}
-                disabled={loading}
-                className="notifyBtn"
-              >
-                {loading
-                  ? "PLEASE WAIT…"
-                  : subscribed
-                  ? "SUBSCRIBED ✓"
-                  : "NOTIFY ME"}
-              </button>
-            )}
-          </div>
+          {/* NOTIFY BUTTON */}
+          {soldOut && (
+            <button
+              type="button"
+              onClick={toggleNotify}
+              disabled={loading}
+              className="notifyBtn"
+            >
+              {loading
+                ? "PLEASE WAIT…"
+                : subscribed
+                ? "SUBSCRIBED ✓"
+                : "NOTIFY ME"}
+            </button>
+          )}
         </div>
-      </Link>
+      </div>
 
       {/* TOAST */}
       {toast && <div className="toast">{toast}</div>}
 
-      {/* STYLES — UNCHANGED */}
       <style jsx>{`
-        .link {
-          text-decoration: none;
-          display: block;
-        }
-
         .card {
           border-radius: 26px;
           padding: 1rem;
@@ -142,13 +121,14 @@ export default function MerchCard({ product }) {
             0 10px 20px rgba(0, 0, 0, 0.6),
             0 30px 70px rgba(0, 0, 0, 0.85),
             inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
           transform: translateY(18px) scale(0.97);
           opacity: 0;
           animation: cardEnter 0.65s ease-out forwards;
           transition: transform 0.35s ease, box-shadow 0.35s ease;
         }
 
-        .card:not(.disabled):hover {
+        .card:hover {
           transform: translateY(-6px) scale(1.03);
           box-shadow:
             0 18px 40px rgba(0, 0, 0, 0.75),
@@ -156,9 +136,10 @@ export default function MerchCard({ product }) {
             inset 0 1px 0 rgba(255, 255, 255, 0.08);
         }
 
-        .card.disabled {
-          opacity: 0.45;
-          filter: grayscale(0.25);
+        /* IMAGE LINK */
+        .imageLink {
+          display: block;
+          text-decoration: none;
         }
 
         .imageWrap {
@@ -166,7 +147,11 @@ export default function MerchCard({ product }) {
           width: 100%;
           aspect-ratio: 1 / 1.25;
           border-radius: 20px;
-          background: radial-gradient(120% 90% at 50% 0%, #1a1f1f, #060707);
+          background: radial-gradient(
+            120% 90% at 50% 0%,
+            #1a1f1f,
+            #060707
+          );
           overflow: hidden;
           display: flex;
           align-items: center;
@@ -183,7 +168,7 @@ export default function MerchCard({ product }) {
           transition: transform 0.45s ease;
         }
 
-        .card:not(.disabled):hover img {
+        .imageWrap:hover img {
           transform: scale(1.06);
         }
 

@@ -173,9 +173,9 @@ if (loading) {
         <div className="details">
           <h3>Product Details</h3>
           <ul>
-            <li><strong>Fabric:</strong> French Terry Loopknit Cotton</li>
-            <li><strong>Fit:</strong> Oversized</li>
-            <li><strong>GSM:</strong> 240</li>
+            <li><strong>Fabric:</strong> {product.material || "French Terry Loopknit Cotton"}</li>
+            <li><strong>Fit:</strong> {product.fit || "Oversized"}</li>
+            <li><strong>GSM:</strong> {product.gsm ||  240}</li>
             <li><strong>Care:</strong> Cold wash, inside-out</li>
           </ul>
         </div>
@@ -425,19 +425,31 @@ if (loading) {
 /* FAQ DATA */
 const FAQS = [
   {
-    q: "How long does delivery take?",
-    a: "Orders are shipped in bulk. Delivery usually takes 5–10 working days after shipping.",
+    q: "Do you deliver all over India?",
+    a: "Yes. We provide all-India delivery. Orders are shipped to most serviceable pin codes across the country.",
   },
   {
-    q: "Can I cancel or change my order?",
-    a: "Orders cannot be changed once payment is confirmed.",
+    q: "Are shipping charges included?",
+    a: "No. Shipping charges are calculated separately and will be added at checkout.",
+  },
+  {
+    q: "How long does delivery take?",
+    a: "Orders are taken in bulk. Once all orders are finalized, production and shipping take approximately 15–25 days, depending on the vendor and location. This is not instant delivery.",
+  },
+  {
+    q: "How can I track my order?",
+    a: "Once your order is shipped, tracking details will be shared with you via email.",
+  },
+  {
+    q: "Can I cancel or modify my order?",
+    a: "No. Orders cannot be cancelled or modified once payment is confirmed, as production starts in bulk.",
   },
   {
     q: "How do I choose the right size?",
-    a: "Please refer to the size chart above. Our fits are oversized by default.",
+    a: "Please refer to the size chart provided.",
   },
   {
     q: "Is this official Electra merchandise?",
-    a: "Yes. All merch is officially designed and distributed by Electra Society.",
+    a: "Yes. All merchandise is officially designed and distributed by Electra Society.",
   },
 ];

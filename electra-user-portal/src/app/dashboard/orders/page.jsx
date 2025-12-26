@@ -42,7 +42,7 @@ export default function OrdersPage() {
   const router = useRouter();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState("active"); // active | completed | rejected
+  const [tab, setTab] = useState("active");
 
   /* ───────── AUTH + FETCH ───────── */
   useEffect(() => {
@@ -101,10 +101,64 @@ export default function OrdersPage() {
       ? completedOrders
       : rejectedOrders;
 
-  /* ───────── LOADING ───────── */
+  /* ───────── LOADING UI ───────── */
   if (loading) {
     return (
-      <main className="center">Loading your orders…</main>
+      <main className="wrap">
+        <h1>Your Orders</h1>
+
+        <div className="tabs">
+          <button className="active">Active</button>
+          <button>Completed</button>
+          <button>Rejected</button>
+        </div>
+
+        <div className="list">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <OrderSkeleton key={i} />
+          ))}
+        </div>
+
+        <style jsx>{`
+          .wrap {
+            min-height: 100vh;
+            background: #000;
+            color: #fff;
+            padding: 2rem;
+          }
+
+          h1 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+          }
+
+          .tabs {
+            display: flex;
+            gap: 0.6rem;
+            margin-bottom: 1.6rem;
+          }
+
+          .tabs button {
+            padding: 0.45rem 1rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: transparent;
+            color: #6b7280;
+            font-size: 0.8rem;
+          }
+
+          .tabs .active {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+          }
+
+          .list {
+            display: grid;
+            gap: 1rem;
+          }
+        `}</style>
+      </main>
     );
   }
 
@@ -112,7 +166,6 @@ export default function OrdersPage() {
     <main className="wrap">
       <h1>Your Orders</h1>
 
-      {/* ───── TABS ───── */}
       <div className="tabs">
         {[
           ["active", `Active (${activeOrders.length})`],
@@ -129,7 +182,6 @@ export default function OrdersPage() {
         ))}
       </div>
 
-      {/* ───── CONTENT ───── */}
       {visible.length === 0 ? (
         <p className="empty">No orders here.</p>
       ) : (
@@ -151,13 +203,6 @@ export default function OrdersPage() {
         h1 {
           font-size: 1.8rem;
           margin-bottom: 1rem;
-        }
-
-        .center {
-          min-height: 100vh;
-          display: grid;
-          place-items: center;
-          color: #9ca3af;
         }
 
         .tabs {
@@ -199,13 +244,12 @@ export default function OrdersPage() {
 
 /* ───────────────── ORDER CARD ───────────────── */
 
-
 function OrderCard({ order }) {
   const router = useRouter();
   const state = getOrderState(order);
 
   const continuePayment = (e) => {
-    e.stopPropagation(); // ⛔ prevent card click
+    e.stopPropagation();
     router.push(`/checkout/${order.orderId}`);
   };
 
@@ -216,15 +260,18 @@ function OrderCard({ order }) {
         router.push(`/dashboard/orders/${order.orderId}`)
       }
     >
+      {/* HEADER */}
       <div className="top">
-        <strong>{order.productName}</strong>
-        <span>₹{order.amount}</span>
+        <strong className="title">{order.productName}</strong>
+        <span className="amount">₹{order.amount}</span>
       </div>
 
+      {/* STATUS BADGE */}
       <div className={`status ${state.tone}`}>
         {state.label}
       </div>
 
+      {/* TIMELINE */}
       <div className="timeline">
         <Timeline label="Placed" date={formatDate(order.createdAt)} />
         <Timeline label="Verified" date={formatDate(order.approvedAt)} />
@@ -232,7 +279,7 @@ function OrderCard({ order }) {
         <Timeline label="Delivered" date={formatDate(order.deliveredAt)} />
       </div>
 
-      {/* ✅ CONTINUE PAYMENT BUTTON */}
+      {/* ACTION */}
       {order.paymentStatus === "pending_payment" && (
         <button
           className="payBtn"
@@ -242,17 +289,25 @@ function OrderCard({ order }) {
         </button>
       )}
 
+      {/* FOOTER */}
       <div className="meta">
-        Order ID: {order.orderId}
+        Order ID · <span>{order.orderId}</span>
       </div>
 
       <style jsx>{`
         .card {
-          background: #0b0b0b;
+          background:
+            linear-gradient(180deg, #0d0f12, #07080a);
           border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 16px;
-          padding: 1rem;
-          transition: transform 0.15s ease, border-color 0.15s ease;
+          border-radius: 18px;
+          padding: 1.25rem 1.2rem;
+          box-shadow:
+            0 8px 20px rgba(0,0,0,0.6),
+            inset 0 1px 0 rgba(255,255,255,0.04);
+          transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease,
+            border-color 0.25s ease;
         }
 
         .clickable {
@@ -260,44 +315,99 @@ function OrderCard({ order }) {
         }
 
         .clickable:hover {
-          transform: translateY(-2px);
-          border-color: rgba(255,255,255,0.2);
+          transform: translateY(-4px);
+          box-shadow:
+            0 14px 36px rgba(0,0,0,0.75),
+            inset 0 1px 0 rgba(255,255,255,0.08);
+          border-color: rgba(255,255,255,0.16);
         }
 
+        /* HEADER */
         .top {
           display: flex;
           justify-content: space-between;
-          margin-bottom: 0.4rem;
-        }
-
-        .status {
-          font-size: 0.75rem;
+          align-items: flex-start;
+          gap: 1rem;
           margin-bottom: 0.6rem;
         }
 
-        .green { color: #22c55e; }
-        .blue { color: #38bdf8; }
-        .yellow { color: #facc15; }
-        .red { color: #ef4444; }
-        .gray { color: #9ca3af; }
+        .title {
+          font-size: 0.95rem;
+          font-weight: 600;
+          letter-spacing: 0.04em;
+          color: #e5e7eb;
+        }
 
+        .amount {
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: #22d3ee;
+          white-space: nowrap;
+        }
+
+        /* STATUS */
+        .status {
+          display: inline-block;
+          margin-bottom: 0.8rem;
+          padding: 0.28rem 0.7rem;
+          border-radius: 999px;
+          font-size: 0.65rem;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          border: 1px solid transparent;
+          width: fit-content;
+        }
+
+        .green {
+          color: #22c55e;
+          border-color: rgba(34,197,94,0.35);
+          background: rgba(34,197,94,0.08);
+        }
+
+        .blue {
+          color: #38bdf8;
+          border-color: rgba(56,189,248,0.35);
+          background: rgba(56,189,248,0.08);
+        }
+
+        .yellow {
+          color: #facc15;
+          border-color: rgba(250,204,21,0.35);
+          background: rgba(250,204,21,0.08);
+        }
+
+        .red {
+          color: #ef4444;
+          border-color: rgba(239,68,68,0.35);
+          background: rgba(239,68,68,0.08);
+        }
+
+        .gray {
+          color: #9ca3af;
+          border-color: rgba(156,163,175,0.25);
+          background: rgba(156,163,175,0.06);
+        }
+
+        /* TIMELINE */
         .timeline {
           font-size: 0.78rem;
           color: #9ca3af;
           display: grid;
-          gap: 0.25rem;
-          margin-bottom: 0.6rem;
+          gap: 0.3rem;
+          padding-left: 0.2rem;
         }
 
+        /* PAY BUTTON */
         .payBtn {
-          margin-top: 0.6rem;
-          background: #fff;
+          margin-top: 0.9rem;
+          background: linear-gradient(180deg,#ffffff,#e5e7eb);
           color: #000;
           border: none;
           border-radius: 999px;
-          padding: 0.45rem 1rem;
-          font-size: 0.7rem;
-          letter-spacing: 0.12em;
+          padding: 0.45rem 1.2rem;
+          font-size: 0.65rem;
+          letter-spacing: 0.18em;
+          font-weight: 600;
           cursor: pointer;
         }
 
@@ -305,10 +415,16 @@ function OrderCard({ order }) {
           opacity: 0.9;
         }
 
+        /* FOOTER */
         .meta {
-          margin-top: 0.6rem;
-          font-size: 0.7rem;
+          margin-top: 0.9rem;
+          font-size: 0.65rem;
+          letter-spacing: 0.08em;
           color: #6b7280;
+        }
+
+        .meta span {
+          color: #9ca3af;
         }
       `}</style>
     </div>
@@ -319,6 +435,58 @@ function Timeline({ label, date }) {
   return (
     <div>
       {label}: <strong>{date}</strong>
+    </div>
+  );
+}
+
+/* ───────────────── SKELETON ───────────────── */
+
+function OrderSkeleton() {
+  return (
+    <div className="skeleton">
+      <div className="row" />
+      <div className="bar short" />
+      <div className="bar" />
+      <div className="bar tiny" />
+
+      <style jsx>{`
+        .skeleton {
+          background: #0b0b0b;
+          border-radius: 16px;
+          padding: 1rem;
+          border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .row {
+          height: 16px;
+          width: 60%;
+          margin-bottom: 0.6rem;
+          background: linear-gradient(
+            90deg,
+            #111 25%,
+            #1a1a1a 37%,
+            #111 63%
+          );
+          background-size: 400% 100%;
+          animation: shimmer 1.4s infinite;
+          border-radius: 6px;
+        }
+
+        .bar {
+          height: 10px;
+          background: #1a1a1a;
+          border-radius: 6px;
+          margin-top: 0.4rem;
+        }
+
+        .short { width: 40%; }
+        .tiny { width: 30%; }
+
+        @keyframes shimmer {
+          0% { background-position: 100% 0; }
+          100% { background-position: 0 0; }
+        }
+      `}</style>
     </div>
   );
 }
