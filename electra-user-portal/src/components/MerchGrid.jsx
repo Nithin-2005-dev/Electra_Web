@@ -18,26 +18,34 @@ export default function MerchPage() {
     });
   }, []);
 
+  /* ───────── FILTER + SORT (SAFE) ───────── */
   const filtered = useMemo(() => {
     let list = [...products];
 
-    if (filter === "available") list = list.filter((p) => p.available);
-    if (filter === "sold") list = list.filter((p) => !p.available);
+    if (filter === "available") {
+      list = list.filter((p) => p.available !== false);
+    }
 
+    if (filter === "sold") {
+      list = list.filter((p) => p.available === false);
+    }
+
+    // available first
     list.sort((a, b) =>
-      a.available === b.available ? 0 : a.available ? -1 : 1
+      a.available === b.available ? 0 : a.available === false ? 1 : -1
     );
 
     return list;
   }, [products, filter]);
 
-  const inStock = products.filter((p) => p.available).length;
-  const outStock = products.filter((p) => !p.available).length;
+  const inStock = products.filter((p) => p.available !== false).length;
+  const outStock = products.filter((p) => p.available === false).length;
 
   return (
     <main className="page">
-      {/* HEADER */}
+      {/* ───────── HEADER ───────── */}
       <header className="header">
+        <div />
         <h1>PRODUCTS</h1>
         <button className="filterBtn" onClick={() => setOpenFilter(true)}>
           FILTER
@@ -47,9 +55,21 @@ export default function MerchPage() {
       <div className="layout">
         {/* DESKTOP FILTER */}
         <aside className="filters">
-          <Filter label={`All (${products.length})`} active={filter==="all"} onClick={()=>setFilter("all")} />
-          <Filter label={`In stock (${inStock})`} active={filter==="available"} onClick={()=>setFilter("available")} />
-          <Filter label={`Out of stock (${outStock})`} active={filter==="sold"} onClick={()=>setFilter("sold")} />
+          <Filter
+            label={`All (${products.length})`}
+            active={filter === "all"}
+            onClick={() => setFilter("all")}
+          />
+          <Filter
+            label={`In stock (${inStock})`}
+            active={filter === "available"}
+            onClick={() => setFilter("available")}
+          />
+          <Filter
+            label={`Out of stock (${outStock})`}
+            active={filter === "sold"}
+            onClick={() => setFilter("sold")}
+          />
         </aside>
 
         {/* GRID */}
@@ -64,13 +84,13 @@ export default function MerchPage() {
         </section>
       </div>
 
-      {/* MOBILE OVERLAY */}
+      {/* OVERLAY */}
       <div
         className={`overlay ${openFilter ? "show" : ""}`}
         onClick={() => setOpenFilter(false)}
       />
 
-      {/* MOBILE HALF SIDEBAR */}
+      {/* MOBILE FILTER */}
       <aside className={`mobileFilter ${openFilter ? "open" : ""}`}>
         <div className="mobileHeader">
           <span>FILTER</span>
@@ -78,45 +98,74 @@ export default function MerchPage() {
         </div>
 
         <div className="mobileOptions">
-          <Filter big label={`All (${products.length})`} active={filter==="all"} onClick={()=>{setFilter("all");setOpenFilter(false);}} />
-          <Filter big label={`In stock (${inStock})`} active={filter==="available"} onClick={()=>{setFilter("available");setOpenFilter(false);}} />
-          <Filter big label={`Out of stock (${outStock})`} active={filter==="sold"} onClick={()=>{setFilter("sold");setOpenFilter(false);}} />
+          <Filter
+            big
+            label={`All (${products.length})`}
+            active={filter === "all"}
+            onClick={() => {
+              setFilter("all");
+              setOpenFilter(false);
+            }}
+          />
+          <Filter
+            big
+            label={`In stock (${inStock})`}
+            active={filter === "available"}
+            onClick={() => {
+              setFilter("available");
+              setOpenFilter(false);
+            }}
+          />
+          <Filter
+            big
+            label={`Out of stock (${outStock})`}
+            active={filter === "sold"}
+            onClick={() => {
+              setFilter("sold");
+              setOpenFilter(false);
+            }}
+          />
         </div>
       </aside>
 
       <style jsx>{`
+      .mobileOptions{
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
         .page {
           min-height: 100vh;
           background: radial-gradient(120% 80% at 50% 0%, #0b0b0b, #000);
           color: #e5e7eb;
         }
 
+        /* HEADER FIXED */
         .header {
-          text-align: center;
-          padding: 3.5rem 2rem 2.5rem;
-          border-bottom: 1px solid rgba(255,255,255,0.08);
-          position: relative;
+          display: grid;
+          grid-template-columns: 1fr auto 1fr;
+          align-items: center;
+          padding: 3rem 2rem 2.2rem;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .header h1 {
+          text-align: center;
           font-size: 1.7rem;
           letter-spacing: 0.45em;
           font-weight: 600;
         }
 
         .filterBtn {
-          position: absolute;
-          right: 2rem;
-          top: 50%;
-          transform: translateY(-50%);
-          display: none;
+          justify-self: end;
           background: none;
-          border: 1px solid rgba(255,255,255,0.25);
+          border: 1px solid rgba(255, 255, 255, 0.25);
           color: #fff;
           padding: 0.45rem 1rem;
           border-radius: 999px;
           font-size: 0.7rem;
           letter-spacing: 0.18em;
+          display: none;
         }
 
         .layout {
@@ -136,26 +185,30 @@ export default function MerchPage() {
 
         .grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-          gap: 2.6rem;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 2.4rem;
         }
 
+        /* MOBILE */
         @media (max-width: 900px) {
           .layout {
             grid-template-columns: 1fr;
           }
+
           .filters {
             display: none;
           }
+
           .filterBtn {
             display: block;
           }
         }
 
+        /* OVERLAY */
         .overlay {
           position: fixed;
           inset: 0;
-          background: rgba(0,0,0,0.45);
+          background: rgba(0, 0, 0, 0.45);
           opacity: 0;
           pointer-events: none;
           transition: opacity 0.3s ease;
@@ -167,6 +220,7 @@ export default function MerchPage() {
           pointer-events: auto;
         }
 
+        /* MOBILE SIDEBAR */
         .mobileFilter {
           position: fixed;
           top: 0;
@@ -174,14 +228,12 @@ export default function MerchPage() {
           width: 80%;
           max-width: 360px;
           height: 100%;
-          background: linear-gradient(180deg,#0b0b0b,#000);
-          border-left: 1px solid rgba(255,255,255,0.08);
+          background: linear-gradient(180deg, #0b0b0b, #000);
+          border-left: 1px solid rgba(255, 255, 255, 0.08);
           transform: translateX(100%);
-          transition: transform 0.35s cubic-bezier(.22,.61,.36,1);
+          transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
           z-index: 90;
           padding: 2rem;
-          display: flex;
-          flex-direction: column;
         }
 
         .mobileFilter.open {
@@ -191,7 +243,6 @@ export default function MerchPage() {
         .mobileHeader {
           display: flex;
           justify-content: space-between;
-          align-items: center;
           margin-bottom: 2rem;
         }
 
@@ -199,18 +250,12 @@ export default function MerchPage() {
           font-size: 0.8rem;
           letter-spacing: 0.35em;
         }
-
-        .mobileOptions {
-          display: flex;
-          flex-direction: column;
-          gap: 1.6rem;
-        }
       `}</style>
     </main>
   );
 }
 
-/* ───────── FILTER BUTTON ───────── */
+/* FILTER */
 function Filter({ label, active, onClick, big }) {
   return (
     <button className={`filter ${active ? "active" : ""} ${big ? "big" : ""}`} onClick={onClick}>
@@ -236,54 +281,39 @@ function Filter({ label, active, onClick, big }) {
   );
 }
 
-/* ───────── SKELETON CARD ───────── */
+/* SKELETON */
 function SkeletonCard() {
   return (
     <div className="skeleton">
       <div className="image" />
       <div className="text short" />
       <div className="text tiny" />
-
       <style jsx>{`
         .skeleton {
           border-radius: 26px;
           padding: 1rem;
           background: linear-gradient(180deg, #0e1111, #070808);
-          box-shadow:
-            0 10px 20px rgba(0,0,0,0.6),
-            0 30px 70px rgba(0,0,0,0.85),
-            inset 0 1px 0 rgba(255,255,255,0.05);
         }
-
         .image {
           aspect-ratio: 1 / 1.25;
           border-radius: 20px;
-          background: linear-gradient(
-            90deg,
-            #111 25%,
-            #1a1a1a 37%,
-            #111 63%
-          );
+          background: linear-gradient(90deg, #111 25%, #1a1a1a 37%, #111 63%);
           background-size: 400% 100%;
           animation: shimmer 1.4s infinite;
           margin-bottom: 1rem;
         }
-
         .text {
           height: 10px;
           background: #1a1a1a;
           border-radius: 6px;
           margin: 0.4rem auto;
         }
-
         .short {
           width: 70%;
         }
-
         .tiny {
           width: 40%;
         }
-
         @keyframes shimmer {
           0% { background-position: 100% 0; }
           100% { background-position: 0 0; }
