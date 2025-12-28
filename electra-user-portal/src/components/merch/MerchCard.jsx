@@ -15,8 +15,9 @@ export default function MerchCard({ product }) {
   const [toast, setToast] = useState(null);
   const [playing, setPlaying] = useState(false);
   const [direction, setDirection] = useState("forward");
-  const [linkDisabled, setLinkDisabled] = useState(false);
+  const [inView, setInView] = useState(false);
 
+  const cardRef = useRef(null);
   const forwardRef = useRef(null);
   const backwardRef = useRef(null);
 
@@ -37,10 +38,9 @@ export default function MerchCard({ product }) {
 
   /* ───────── VIDEO CONTROL ───────── */
   const startPreview = () => {
-    if (!product.video) return;
+    if (!product.video || playing) return;
 
     setPlaying(true);
-    setLinkDisabled(true);
     setDirection("forward");
 
     backwardRef.current?.pause();
@@ -52,7 +52,6 @@ export default function MerchCard({ product }) {
 
   const stopPreview = () => {
     setPlaying(false);
-    setLinkDisabled(false);
 
     forwardRef.current?.pause();
     backwardRef.current?.pause();
@@ -61,26 +60,43 @@ export default function MerchCard({ product }) {
     if (backwardRef.current) backwardRef.current.currentTime = 0;
   };
 
+  // 🔧 FIX: loop only if still in view
   const onForwardEnd = () => {
+    if (!inView) return;
     setDirection("backward");
     backwardRef.current.currentTime = 0;
     backwardRef.current.play();
   };
 
   const onBackwardEnd = () => {
+    if (!inView) return;
     setDirection("forward");
     forwardRef.current.currentTime = 0;
     forwardRef.current.play();
   };
 
-  /* ───────── MOBILE TOUCH (REAL FIX) ───────── */
-  const handleMobileTouch = () => {
-    if (!isTouch || !product.video) return;
+  /* ───────── MOBILE: VIEWPORT CONTROL ───────── */
+  useEffect(() => {
+    if (!isTouch || !product.video || !cardRef.current) return;
 
-    if (!playing) {
-      startPreview();
-    }
-  };
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const visible = entry.intersectionRatio >= 0.85; // 🔧 FIX
+
+        setInView(visible);
+
+        if (visible) {
+          startPreview();
+        } else {
+          stopPreview();
+        }
+      },
+      { threshold: [0, 0.85, 1] } // 🔧 FIX
+    );
+
+    observer.observe(cardRef.current);
+    return () => observer.disconnect();
+  }, [isTouch, product.video]);
 
   /* ───────── TOAST ───────── */
   const showToast = (msg) => {
@@ -122,16 +138,12 @@ export default function MerchCard({ product }) {
   return (
     <>
       <div
+        ref={cardRef}
         className="card"
         onMouseEnter={!isTouch ? startPreview : undefined}
         onMouseLeave={!isTouch ? stopPreview : undefined}
-        onTouchStart={handleMobileTouch}
       >
-        <Link
-          href={`/gotyourmerch/${product.id}`}
-          className="imageLink"
-          style={{ pointerEvents: linkDisabled ? "none" : "auto" }}
-        >
+        <Link href={`/gotyourmerch/${product.id}`} className="imageLink">
           <div className="imageWrap">
             {soldOut && <span className="sold">SOLD OUT</span>}
 
@@ -312,7 +324,6 @@ export default function MerchCard({ product }) {
         }
       `}</style>
     </>
-
   );
 }
 
