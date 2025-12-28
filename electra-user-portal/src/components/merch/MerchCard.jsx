@@ -123,6 +123,8 @@ export default function MerchCard({ product }) {
         className="card"
         onMouseEnter={!isTouch ? startPreview : undefined}
         onMouseLeave={!isTouch ? stopPreview : undefined}
+        onTouchStart={!isTouch ? startPreview : undefined}
+        onTouchEnd={!isTouch ? stopPreview : undefined}
       >
         <Link
           href={`/gotyourmerch/${product.id}`}
