@@ -14,7 +14,7 @@ export default function MerchCard({ product }) {
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
   const [playing, setPlaying] = useState(false);
-  const [direction, setDirection] = useState("forward"); // forward | backward
+  const [direction, setDirection] = useState("forward");
 
   const forwardRef = useRef(null);
   const backwardRef = useRef(null);
@@ -42,7 +42,7 @@ export default function MerchCard({ product }) {
     setDirection("forward");
 
     backwardRef.current?.pause();
-    backwardRef.current && (backwardRef.current.currentTime = 0);
+    if (backwardRef.current) backwardRef.current.currentTime = 0;
 
     forwardRef.current.currentTime = 0;
     forwardRef.current.play();
@@ -58,7 +58,6 @@ export default function MerchCard({ product }) {
     if (backwardRef.current) backwardRef.current.currentTime = 0;
   };
 
-  /* 🔁 Seamless direction switching */
   const onForwardEnd = () => {
     setDirection("backward");
     backwardRef.current.currentTime = 0;
@@ -71,13 +70,19 @@ export default function MerchCard({ product }) {
     forwardRef.current.play();
   };
 
-  /* ───────── MOBILE TAP ───────── */
-  const handleTap = (e) => {
+  /* ───────── MOBILE TOUCH (FIX) ───────── */
+  const handleMobileTouch = (e) => {
     if (!isTouch || !product.video) return;
-    e.preventDefault();
 
-    if (!playing) startPreview();
-    else window.location.href = `/gotyourmerch/${product.id}`;
+    // First tap → play video
+    if (!playing) {
+      e.preventDefault();
+      startPreview();
+      return;
+    }
+
+    // Second tap → navigate
+    window.location.href = `/gotyourmerch/${product.id}`;
   };
 
   /* ───────── TOAST ───────── */
@@ -123,18 +128,12 @@ export default function MerchCard({ product }) {
         className="card"
         onMouseEnter={!isTouch ? startPreview : undefined}
         onMouseLeave={!isTouch ? stopPreview : undefined}
-        onTouchStart={!isTouch ? startPreview : undefined}
-        onTouchEnd={!isTouch ? stopPreview : undefined}
+        onTouchStart={handleMobileTouch}
       >
-        <Link
-          href={`/gotyourmerch/${product.id}`}
-          className="imageLink"
-          onClick={handleTap}
-        >
+        <Link href={`/gotyourmerch/${product.id}`} className="imageLink">
           <div className="imageWrap">
             {soldOut && <span className="sold">SOLD OUT</span>}
 
-            {/* IMAGE */}
             <img
               src={cloudinaryImage(
                 product.imageMain,
@@ -144,7 +143,6 @@ export default function MerchCard({ product }) {
               className={playing ? "hide" : ""}
             />
 
-            {/* FORWARD VIDEO */}
             {product.video && (
               <video
                 ref={forwardRef}
@@ -159,7 +157,6 @@ export default function MerchCard({ product }) {
               />
             )}
 
-            {/* BACKWARD VIDEO (REVERSED TRANSFORM) */}
             {product.video && (
               <video
                 ref={backwardRef}
@@ -269,16 +266,50 @@ export default function MerchCard({ product }) {
           color: #9ca3af;
         }
 
+        .notifyBtn {
+          margin-top: 0.6rem;
+          background: none;
+          border: 1px solid rgba(255,255,255,0.25);
+          color: #fff;
+          padding: 0.4rem 0.9rem;
+          border-radius: 999px;
+          font-size: 0.65rem;
+          letter-spacing: 0.18em;
+          cursor: pointer;
+        }
+
+        .notifyBtn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
         .toast {
           position: fixed;
           bottom: 28px;
           left: 50%;
           transform: translateX(-50%);
           background: rgba(10,10,10,0.9);
+          border: 1px solid rgba(255,255,255,0.15);
           padding: 0.6rem 1rem;
           border-radius: 999px;
+          font-size: 0.7rem;
+          letter-spacing: 0.12em;
+          color: #f9fafb;
+          z-index: 999;
+          backdrop-filter: blur(8px);
+          animation: toastIn 0.3s ease;
         }
-        .notifyBtn { margin-top: 0.6rem; background: none; border: 1px solid rgba(255,255,255,0.25); color: #fff; padding: 0.4rem 0.9rem; border-radius: 999px; font-size: 0.65rem; letter-spacing: 0.18em; cursor: pointer; } .notifyBtn:disabled { opacity: 0.6; cursor: not-allowed; } .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: rgba(10,10,10,0.9); border: 1px solid rgba(255,255,255,0.15); padding: 0.6rem 1rem; border-radius: 999px; font-size: 0.7rem; letter-spacing: 0.12em; color: #f9fafb; z-index: 999; backdrop-filter: blur(8px); animation: toastIn 0.3s ease; } @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } } @keyframes cardEnter { to { transform: translateY(0) scale(1); opacity: 1; } }
+
+        @keyframes toastIn {
+          from {
+            opacity: 0;
+            transform: translate(-50%, 10px);
+          }
+          to {
+            opacity: 1;
+            transform: translate(-50%, 0);
+          }
+        }
       `}</style>
     </>
   );
