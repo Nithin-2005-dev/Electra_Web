@@ -14,7 +14,7 @@ import {
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 
-import Toasts from "../../../../components/Toast";
+import Toasts from "../../../../components/merch/Toast";
 import OrderCard from "../../../../components/admin-orders/OrderCard";
 import OrderRow from "../../../../components/admin-orders/OrderRow";
 import BatchCard from "../../../../components/admin-orders/BatchCard";

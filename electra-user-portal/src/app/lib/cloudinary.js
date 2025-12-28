@@ -1,4 +1,5 @@
-export const cloudinaryUrl = (publicId, transform = "") => {
-  if (!publicId) return "";
-  return `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${transform}${publicId}`;
-};
+export const cloudinaryImage = (id, transform = "") =>
+  `https://res.cloudinary.com/dqa3ov76r/image/upload/${transform}${id}`;
+
+export const cloudinaryVideo = (id, transform = "") =>
+  `https://res.cloudinary.com/dqa3ov76r/video/upload/${transform}${id}`;

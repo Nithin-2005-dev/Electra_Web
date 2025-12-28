@@ -1,6 +1,5 @@
-import MerchHeroVideo from "../../../components/MerchHeroVideo";
-import MerchGrid from "../../../components/MerchGrid";
-import PreviousMerch from "../../../components/PreviousMerch";
+import MerchHeroVideo from "../../../components/merch/MerchHeroVideo";
+import MerchGrid from "../../../components/merch/MerchGrid";
 
 export default function MerchPage() {
   return (
