@@ -13,6 +13,7 @@ export default function MerchCard({ product }) {
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
+
   const [playing, setPlaying] = useState(false);
   const [direction, setDirection] = useState("forward");
   const [inView, setInView] = useState(false);
@@ -25,73 +26,94 @@ export default function MerchCard({ product }) {
     typeof window !== "undefined" &&
     window.matchMedia("(hover: none)").matches;
 
+  const shouldLoop = isTouch ? inView : playing;
+
+  /* ───────── SAFE VIDEO HELPERS ───────── */
+  const safePlay = async (video) => {
+    if (!video || !video.paused) return;
+    try {
+      await video.play();
+    } catch {
+      // AbortError is expected during fast hover/scroll
+    }
+  };
+
+  const safePause = (video) => {
+    if (!video || video.paused) return;
+    video.pause();
+  };
+
   /* ───────── AUTH ───────── */
   useEffect(() => {
     const unsub = auth.onAuthStateChanged((u) => {
       setUser(u || null);
-      setSubscribed(
-        !!u && product.interestedUsers?.includes(u.uid)
-      );
+      setSubscribed(!!u && product.interestedUsers?.includes(u.uid));
     });
     return () => unsub();
   }, [product.interestedUsers]);
 
   /* ───────── VIDEO CONTROL ───────── */
   const startPreview = () => {
-    if (!product.video || playing) return;
+    if (!product.video) return;
 
     setPlaying(true);
     setDirection("forward");
 
-    backwardRef.current?.pause();
+    safePause(backwardRef.current);
     if (backwardRef.current) backwardRef.current.currentTime = 0;
 
-    forwardRef.current.currentTime = 0;
-    forwardRef.current.play();
+    if (forwardRef.current) forwardRef.current.currentTime = 0;
+    safePlay(forwardRef.current);
   };
 
   const stopPreview = () => {
     setPlaying(false);
 
-    forwardRef.current?.pause();
-    backwardRef.current?.pause();
+    safePause(forwardRef.current);
+    safePause(backwardRef.current);
 
     if (forwardRef.current) forwardRef.current.currentTime = 0;
     if (backwardRef.current) backwardRef.current.currentTime = 0;
   };
 
-  // 🔧 FIX: loop only if still in view
+  /* ───────── INFINITE PING-PONG LOOP (NO FLICKER) ───────── */
   const onForwardEnd = () => {
-    if (!inView) return;
+    if (!shouldLoop) return;
+
     setDirection("backward");
-    backwardRef.current.currentTime = 0;
-    backwardRef.current.play();
+
+    requestAnimationFrame(() => {
+      if (!backwardRef.current) return;
+      backwardRef.current.currentTime = 0;
+      safePlay(backwardRef.current);
+    });
   };
 
   const onBackwardEnd = () => {
-    if (!inView) return;
+    if (!shouldLoop) return;
+
     setDirection("forward");
-    forwardRef.current.currentTime = 0;
-    forwardRef.current.play();
+
+    requestAnimationFrame(() => {
+      if (!forwardRef.current) return;
+      forwardRef.current.currentTime = 0;
+      safePlay(forwardRef.current);
+    });
   };
 
-  /* ───────── MOBILE: VIEWPORT CONTROL ───────── */
+  /* ───────── MOBILE VIEWPORT ───────── */
   useEffect(() => {
     if (!isTouch || !product.video || !cardRef.current) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        const visible = entry.intersectionRatio >= 0.85; // 🔧 FIX
-
+        const visible = entry.intersectionRatio >= 0.85;
         setInView(visible);
 
-        if (visible) {
-          startPreview();
-        } else {
-          stopPreview();
-        }
+        if (visible) startPreview();
+        else stopPreview();
       },
-      { threshold: [0, 0.85, 1] } // 🔧 FIX
+      { threshold: [0, 0.85, 1] }
     );
 
     observer.observe(cardRef.current);
@@ -135,6 +157,10 @@ export default function MerchCard({ product }) {
     }
   };
 
+  /* 🔑 FIX: image visibility depends on actual video visibility */
+  const showVideo =
+    playing && (direction === "forward" || direction === "backward");
+
   return (
     <>
       <div
@@ -148,19 +174,16 @@ export default function MerchCard({ product }) {
             {soldOut && <span className="sold">SOLD OUT</span>}
 
             <img
-              src={cloudinaryImage(
-                product.imageMain,
-                "q_auto,f_auto,w_900/"
-              )}
+              src={cloudinaryImage(product.imageMain, "q_auto,f_auto,w_900/")}
               alt={product.name}
-              className={playing ? "hide" : ""}
+              className={showVideo ? "hide" : ""}
             />
 
             {product.video && (
               <video
                 ref={forwardRef}
                 className={`video ${
-                  playing && direction === "forward" ? "show" : ""
+                  showVideo && direction === "forward" ? "show" : ""
                 }`}
                 src={cloudinaryVideo(product.video, "q_auto,f_auto/")}
                 muted
@@ -174,7 +197,7 @@ export default function MerchCard({ product }) {
               <video
                 ref={backwardRef}
                 className={`video reverse ${
-                  playing && direction === "backward" ? "show" : ""
+                  showVideo && direction === "backward" ? "show" : ""
                 }`}
                 src={cloudinaryVideo(product.video, "q_auto,f_auto/")}
                 muted
@@ -203,6 +226,7 @@ export default function MerchCard({ product }) {
       </div>
 
       {toast && <div className="toast">{toast}</div>}
+
       <style jsx>{`
         .card {
           border-radius: 26px;
@@ -239,9 +263,10 @@ export default function MerchCard({ product }) {
           inset: 0;
           width: 100%;
           height: 100%;
-          object-fit: cover;
+          object-fit: contain; /* 🔧 FIX: match image */
           opacity: 0;
           transition: opacity 0.3s ease;
+          scale: 1.5;
         }
 
         .video.show {
@@ -281,7 +306,7 @@ export default function MerchCard({ product }) {
         .notifyBtn {
           margin-top: 0.6rem;
           background: none;
-          border: 1px solid rgba(255,255,255,0.25);
+          border: 1px solid rgba(255, 255, 255, 0.25);
           color: #fff;
           padding: 0.4rem 0.9rem;
           border-radius: 999px;
@@ -300,8 +325,8 @@ export default function MerchCard({ product }) {
           bottom: 28px;
           left: 50%;
           transform: translateX(-50%);
-          background: rgba(10,10,10,0.9);
-          border: 1px solid rgba(255,255,255,0.15);
+          background: rgba(10, 10, 10, 0.9);
+          border: 1px solid rgba(255, 255, 255, 0.15);
           padding: 0.6rem 1rem;
           border-radius: 999px;
           font-size: 0.7rem;
@@ -326,4 +351,3 @@ export default function MerchCard({ product }) {
     </>
   );
 }
-
