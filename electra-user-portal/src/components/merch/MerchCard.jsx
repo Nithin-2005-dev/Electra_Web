@@ -15,6 +15,7 @@ export default function MerchCard({ product }) {
   const [toast, setToast] = useState(null);
   const [playing, setPlaying] = useState(false);
   const [direction, setDirection] = useState("forward");
+  const [linkDisabled, setLinkDisabled] = useState(false);
 
   const forwardRef = useRef(null);
   const backwardRef = useRef(null);
@@ -39,6 +40,7 @@ export default function MerchCard({ product }) {
     if (!product.video) return;
 
     setPlaying(true);
+    setLinkDisabled(true);
     setDirection("forward");
 
     backwardRef.current?.pause();
@@ -50,6 +52,7 @@ export default function MerchCard({ product }) {
 
   const stopPreview = () => {
     setPlaying(false);
+    setLinkDisabled(false);
 
     forwardRef.current?.pause();
     backwardRef.current?.pause();
@@ -70,19 +73,13 @@ export default function MerchCard({ product }) {
     forwardRef.current.play();
   };
 
-  /* ───────── MOBILE TOUCH (FIX) ───────── */
-  const handleMobileTouch = (e) => {
+  /* ───────── MOBILE TOUCH (REAL FIX) ───────── */
+  const handleMobileTouch = () => {
     if (!isTouch || !product.video) return;
 
-    // First tap → play video
     if (!playing) {
-      e.preventDefault();
       startPreview();
-      return;
     }
-
-    // Second tap → navigate
-    window.location.href = `/gotyourmerch/${product.id}`;
   };
 
   /* ───────── TOAST ───────── */
@@ -130,7 +127,11 @@ export default function MerchCard({ product }) {
         onMouseLeave={!isTouch ? stopPreview : undefined}
         onTouchStart={handleMobileTouch}
       >
-        <Link href={`/gotyourmerch/${product.id}`} className="imageLink">
+        <Link
+          href={`/gotyourmerch/${product.id}`}
+          className="imageLink"
+          style={{ pointerEvents: linkDisabled ? "none" : "auto" }}
+        >
           <div className="imageWrap">
             {soldOut && <span className="sold">SOLD OUT</span>}
 
@@ -190,7 +191,6 @@ export default function MerchCard({ product }) {
       </div>
 
       {toast && <div className="toast">{toast}</div>}
-
       <style jsx>{`
         .card {
           border-radius: 26px;
@@ -312,5 +312,7 @@ export default function MerchCard({ product }) {
         }
       `}</style>
     </>
+
   );
 }
+
