@@ -25,7 +25,7 @@
   height: 620px;
   object-fit: contain;
   border-radius: 14px;
-  background: #0b0f15;
+  /* background: #0b0f15; */
 }
 
 .thumbs {
@@ -257,4 +257,75 @@
 .add-cart:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+.size-block,
+.print-block {
+  margin-top: 1.2rem;
+}
+
+.size-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  margin-bottom: 0.6rem;
+}
+
+.size-grid {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.size-pill {
+  min-width: 44px;
+  padding: 0.45rem 0;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: transparent;
+  color: #e5e7eb;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.size-pill.active {
+  background: #22d3ee;
+  color: #000;
+  border-color: #22d3ee;
+}
+
+.print-toggle {
+  display: flex;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  color: #e5e7eb;
+  align-items: center;
+}
+
+.print-input {
+  margin-top: 0.6rem;
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: #000;
+  color: #fff;
+}
+
+.hint {
+  margin-top: 0.4rem;
+  font-size: 0.7rem;
+  color: #facc15;
+}
+
+.add-cart {
+  margin-top: 0.8rem;
+  padding: 0.9rem;
+  border-radius: 12px;
+  background: #111;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.add-cart:disabled {
+  opacity: 0.5;
 }

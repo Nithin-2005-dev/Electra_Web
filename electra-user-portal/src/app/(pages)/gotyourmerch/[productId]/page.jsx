@@ -24,14 +24,16 @@ import LoadingScreen from "../../../../components/product/LoadingScreen";
 export default function ProductPage() {
   const { productId } = useParams();
   const router = useRouter();
-
+  const [selectedSize, setSelectedSize] = useState("");
+  const [printName, setPrintName] = useState(false);
+  const [printedName, setPrintedName] = useState("");
   const [product, setProduct] = useState(null);
   const [active, setActive] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showSizeChart, setShowSizeChart] = useState(false);
   const [buying, setBuying] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
-
+  
   /* ───────── LOAD PRODUCT ───────── */
   useEffect(() => {
     if (!productId) return;
@@ -43,6 +45,7 @@ export default function ProductPage() {
       const data = snap.data();
       setProduct({
         ...data,
+        productId,
         imageGallery: Array.isArray(data.imageGallery)
           ? data.imageGallery
           : [],
@@ -56,48 +59,69 @@ export default function ProductPage() {
 
   /* ───────── ORDER NOW ───────── */
   const orderNow = async () => {
-    if (buying || !product.available) return;
+  if (buying || !product.available) return;
 
-    const user = auth.currentUser;
-    if (!user) return router.push("/auth/sign-in");
+  if (!selectedSize) {
+    alert("Please select a size");
+    return;
+  }
 
-    setBuying(true);
+  if (printName && !printedName.trim()) {
+    alert("Please enter the name to be printed");
+    return;
+  }
 
-    const q = query(
-      collection(db, "orders"),
-      where("userId", "==", user.uid)
+  const user = auth.currentUser;
+  if (!user) return router.push("/auth/sign-in");
+
+  setBuying(true);
+
+  // prevent duplicate pending order for same product + size
+  const q = query(
+    collection(db, "orders"),
+    where("userId", "==", user.uid),
+    where("paymentStatus", "==", "pending_payment")
+  );
+
+  const snap = await getDocs(q);
+
+  const existing = snap.docs
+    .map(d => d.data())
+    .find(o =>
+      o.items?.some(
+        i => i.productId === productId && i.size === selectedSize
+      )
     );
 
-    const snap = await getDocs(q);
+  if (existing) {
+    router.push(`/checkout/${existing.orderId}`);
+    return;
+  }
 
-    const pendingOrder = snap.docs
-      .map((d) => d.data())
-      .find(
-        (o) =>
-          o.productId === productId &&
-          o.paymentStatus === "pending_payment"
-      );
+  const orderId = `ORD-${nanoid(6).toUpperCase()}`;
 
-    if (pendingOrder) {
-      router.push(`/checkout/${pendingOrder.orderId}`);
-      return;
-    }
-
-    const orderId = `ORD-${nanoid(6).toUpperCase()}`;
-
-    await setDoc(doc(db, "orders", orderId), {
-      orderId,
-      userId: user.uid,
-      productId,
-      productName: product.name,
-      amount: product.price,
-      paymentStatus: "pending_payment",
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    });
-
-    router.push(`/checkout/${orderId}`);
+  const item = {
+    productId,
+    productName: product.name,
+    price: product.price,
+    size: selectedSize,
+    printName,
+    printedName: printName ? printedName.trim() : null,
   };
+
+  await setDoc(doc(db, "orders", orderId), {
+    orderId,
+    userId: user.uid,
+    items: [item],
+    amount: product.price,
+    paymentStatus: "pending_payment",
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+
+  router.push(`/checkout/${orderId}`);
+};
+
 
   if (loading) return <LoadingScreen />;
 
@@ -115,6 +139,12 @@ export default function ProductPage() {
         product={product}
         buying={buying}
         onBuy={orderNow}
+        size={selectedSize}
+        setSize={setSelectedSize}
+        printName={printName}
+        setPrintName={setPrintName}
+        printedName={printedName}
+        setPrintedName={setPrintedName}
         onOpenSizeChart={() => setShowSizeChart(true)}
       />
 
