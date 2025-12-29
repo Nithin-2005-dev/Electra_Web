@@ -89,7 +89,7 @@ export async function POST(req) {
     /* ───────── SEND PREMIUM EMAIL ───────── */
     await sendUserOrderEmail(
       user,
-      "Your Electra order is confirmed ✅",
+      "Your Electra order is confirmed ",
       approvedEmailHtml(order, items, user)
     );
 
