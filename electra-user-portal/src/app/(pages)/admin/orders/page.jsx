@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -10,6 +9,7 @@ import {
   getDocs,
   doc,
   getDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
@@ -54,7 +54,14 @@ export default function AdminOrdersDashboard() {
 
       const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
       const res = await getDocs(q);
-      setOrders(res.docs.map((d) => d.data()));
+
+      setOrders(
+        res.docs.map((d) => ({
+          ...d.data(),
+          items: d.data().items || [],
+        }))
+      );
+
       setLoading(false);
     });
 
@@ -65,15 +72,33 @@ export default function AdminOrdersDashboard() {
   const filtered = useMemo(() => {
     if (!search) return orders;
     const q = search.toLowerCase();
+
     return orders.filter((o) =>
-      [o.orderId, o.txnId, o.productName]
+      [
+        o.orderId,
+        o.txnId,
+        ...o.items.map((i) => i.productName),
+      ]
         .filter(Boolean)
         .some((v) => v.toLowerCase().includes(q))
     );
   }, [orders, search]);
 
-  /* ───────── BUCKETS ───────── */
+  /* ───────── FLATTEN ITEMS FOR BULK OPS ───────── */
+  const flattenedItems = useMemo(() => {
+    return filtered.flatMap((order) =>
+      order.items.map((item) => ({
+        ...item,
+        orderId: order.orderId,
+        userId: order.userId,
+        deliveryAddress: order.deliveryAddress,
+        paymentStatus: order.paymentStatus,
+        fulfillmentStatus: order.fulfillmentStatus || "placed",
+      }))
+    );
+  }, [filtered]);
 
+  /* ───────── BUCKETS ───────── */
   const pendingPayments = filtered.filter(
     (o) => o.paymentStatus === "pending_verification"
   );
@@ -83,15 +108,15 @@ export default function AdminOrdersDashboard() {
   );
 
   const readyToShipBulk = groupBulkByProduct(
-    filtered.filter(
-      (o) =>
-        o.paymentStatus === "confirmed" &&
-        (!o.fulfillmentStatus || o.fulfillmentStatus === "placed")
+    flattenedItems.filter(
+      (i) =>
+        i.paymentStatus === "confirmed" &&
+        i.fulfillmentStatus === "placed"
     )
   );
 
   const shippedBulk = groupBulkByProduct(
-    filtered.filter((o) => o.fulfillmentStatus === "shipped")
+    flattenedItems.filter((i) => i.fulfillmentStatus === "shipped")
   );
 
   const deliveredOrders = filtered.filter(
@@ -124,28 +149,12 @@ export default function AdminOrdersDashboard() {
 
   const shipProduct = async (productId) => {
     await adminApi("/api/admin/ship-product", { productId });
-    setOrders((o) =>
-      o.map((x) =>
-        x.productId === productId &&
-        x.paymentStatus === "confirmed"
-          ? { ...x, fulfillmentStatus: "shipped" }
-          : x
-      )
-    );
-    addToast("Product shipped", "success");
+    addToast("Product marked as shipped", "success");
   };
 
   const deliverProduct = async (productId) => {
     await adminApi("/api/admin/deliver-product", { productId });
-    setOrders((o) =>
-      o.map((x) =>
-        x.productId === productId &&
-        x.fulfillmentStatus === "shipped"
-          ? { ...x, fulfillmentStatus: "delivered" }
-          : x
-      )
-    );
-    addToast("Product delivered", "success");
+    addToast("Product marked as delivered", "success");
   };
 
   if (loading) {
@@ -153,7 +162,7 @@ export default function AdminOrdersDashboard() {
   }
 
   return (
-    <main className="wrap">
+    <main className="wrap_admin_orders">
       <header className="header">
         <h1>Admin · Orders</h1>
         <input
@@ -225,7 +234,7 @@ export default function AdminOrdersDashboard() {
           <OrderRow key={o.orderId} order={o} />
         ))}
         <style jsx>{`
-        .wrap {
+        .wrap_admin_orders {
           min-height: 100vh;
           background: #000;
           color: #fff;
@@ -274,3 +283,5 @@ export default function AdminOrdersDashboard() {
     </main>
   );
 }
+
+

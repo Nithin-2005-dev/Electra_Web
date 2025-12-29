@@ -1,8 +1,46 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 
 export default function OrderCard({ order, onApprove, onReject }) {
+  /* ───────── NORMALIZE ITEMS ───────── */
+  const items = useMemo(() => {
+    if (Array.isArray(order.items) && order.items.length) {
+      return order.items.map((i) => ({
+        ...i,
+        quantity: Number(i.quantity ?? 1),
+      }));
+    }
+
+    // Legacy / Buy-now fallback
+    return [
+      {
+        productId: order.productId,
+        productName: order.productName,
+        size: order.size,
+        quantity: 1,
+        printName: order.printName,
+        printedName: order.printedName,
+        price: order.amount,
+      },
+    ];
+  }, [order]);
+
+  /* ───────── TOTALS ───────── */
+  const baseTotal = items.reduce(
+    (s, i) => s + (i.price || 0) * i.quantity,
+    0
+  );
+
+  const printTotal = items.reduce(
+    (s, i) => s + (i.printName ? 50 * i.quantity : 0),
+    0
+  );
+
+  const finalAmount =
+    order.totalAmountPaid ??
+    baseTotal + printTotal + (order.deliveryCharge || 0);
+
   return (
     <div
       className="
@@ -20,7 +58,9 @@ export default function OrderCard({ order, onApprove, onReject }) {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className="text-white font-semibold text-lg leading-tight">
-            {order.productName}
+            {items.length === 1
+              ? items[0].productName
+              : `${items.length} items`}
           </h3>
           <p className="text-slate-400 text-sm mt-0.5">
             Order ID:{" "}
@@ -30,10 +70,10 @@ export default function OrderCard({ order, onApprove, onReject }) {
 
         <div className="text-right shrink-0">
           <div className="text-cyan-300 font-bold text-lg">
-            ₹{order.totalAmountPaid ?? order.amount}
+            ₹{finalAmount}
           </div>
           <div className="text-xs text-slate-400">
-            Base ₹{order.amount}
+            Base ₹{baseTotal}
           </div>
         </div>
       </div>
@@ -57,37 +97,42 @@ export default function OrderCard({ order, onApprove, onReject }) {
         />
       </div>
 
-      {/* ───── DIVIDER ───── */}
-      <div className="my-4 h-px bg-white/10" />
+      {/* ───── ITEMS LIST ───── */}
+      <div className="my-4 space-y-2">
+        {items.map((i, idx) => (
+          <div
+            key={idx}
+            className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm"
+          >
+            <div className="flex justify-between">
+              <span className="text-slate-200 font-medium">
+                {i.productName}
+              </span>
+              <span className="text-slate-400">
+                × {i.quantity}
+              </span>
+            </div>
+            <div className="text-slate-400 text-xs mt-0.5">
+              Size: {i.size || "—"}
+              {i.printName && (
+                <> · Print: {i.printedName}</>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
 
       {/* ───── ORDER DETAILS ───── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-slate-400">
         <Detail label="User ID" value={order.userId} />
-        <Detail label="Email" value={order.email || "—"} />
-        <Detail label="Size" value={order.size || "—"} />
+        <Detail label="Txn ID" value={order.txnId || "—"} />
         <Detail
-          label="Print Name"
-          value={
-            order.printName
-              ? `Yes (${order.printedName})`
-              : "No"
-          }
-        />
-        <Detail
-          label="Outside Campus"
-          value={order.isOutsideCampus ? "Yes" : "No"}
+          label="Print Charge"
+          value={`₹${printTotal}`}
         />
         <Detail
           label="Delivery Charge"
           value={`₹${order.deliveryCharge || 0}`}
-        />
-        <Detail
-          label="Print Charge"
-          value={`₹${order.printNameCharge || 0}`}
-        />
-        <Detail
-          label="Txn ID"
-          value={order.txnId || "—"}
         />
       </div>
 

@@ -63,7 +63,7 @@ export default function SignInPage() {
   };
 
   return (
-    <main className="wrap">
+    <main className="wrap_signin">
       <div className="card">
         <h1>Sign in</h1>
         <p className="sub">Access your Electra account</p>
@@ -102,7 +102,7 @@ export default function SignInPage() {
       </div>
 
       <style jsx>{`
-        .wrap {
+        .wrap_signin {
           min-height: 100vh;
           display: grid;
           place-items: center;

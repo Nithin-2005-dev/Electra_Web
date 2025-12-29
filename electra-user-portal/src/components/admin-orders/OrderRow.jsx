@@ -1,14 +1,47 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 
 export default function OrderRow({ order }) {
+  /* ───────── NORMALIZE ITEMS ───────── */
+  const items = useMemo(() => {
+    if (Array.isArray(order.items) && order.items.length) {
+      return order.items.map((i) => ({
+        ...i,
+        quantity: Number(i.quantity ?? 1),
+      }));
+    }
+
+    // Buy-now / legacy fallback
+    return [
+      {
+        productName: order.productName,
+        price: order.amount,
+        quantity: 1,
+      },
+    ];
+  }, [order]);
+
+  /* ───────── LABELS ───────── */
+  const productLabel =
+    items.length === 1
+      ? items[0].productName
+      : `${items.length} items`;
+
+  const baseTotal = items.reduce(
+    (s, i) => s + (i.price || 0) * i.quantity,
+    0
+  );
+
+  const finalAmount =
+    order.totalAmountPaid ?? baseTotal;
+
   return (
     <div className="order-row">
       {/* PRODUCT */}
       <div className="cell product">
         <span className="label">Product</span>
-        <span className="value">{order.productName}</span>
+        <span className="value">{productLabel}</span>
       </div>
 
       {/* ORDER ID */}
@@ -20,7 +53,7 @@ export default function OrderRow({ order }) {
       {/* AMOUNT */}
       <div className="cell amount">
         <span className="label">Amount</span>
-        <span className="value price">₹{order.amount}</span>
+        <span className="value price">₹{finalAmount}</span>
       </div>
 
       <style jsx>{`

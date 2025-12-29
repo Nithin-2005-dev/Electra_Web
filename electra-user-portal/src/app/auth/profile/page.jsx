@@ -84,10 +84,10 @@ export default function ProfilePage() {
   /* ---------- LOADING ---------- */
   if (checking) {
     return (
-      <main className="wrap">
+      <main className="wrap_profile">
         <p className="loading">Checking account…</p>
         <style jsx>{`
-          .wrap {
+          .wrap_profile {
             min-height: 100vh;
             display: grid;
             place-items: center;
@@ -100,7 +100,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="wrap">
+    <main className="wrap_profile">
       <div className="card">
         <h1>Complete your profile</h1>
         <p className="sub">
@@ -160,7 +160,7 @@ export default function ProfilePage() {
       </div>
 
       <style jsx>{`
-        .wrap {
+        .wrap_profile {
           min-height: 100vh;
           display: grid;
           place-items: center;

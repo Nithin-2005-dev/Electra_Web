@@ -12,7 +12,7 @@ export default function AboutFramer() {
       <div className="grain" />
 
       <motion.div
-        className="wrap"
+        className="wrap_about"
         initial={{ opacity: 0, y: 80 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-140px" }}
@@ -79,7 +79,7 @@ export default function AboutFramer() {
           pointer-events: none;
         }
 
-        .wrap {
+        .wrap_about {
           position: relative;
           max-width: 1000px;
           margin: 0 auto;

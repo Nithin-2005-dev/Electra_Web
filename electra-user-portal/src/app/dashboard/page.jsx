@@ -43,7 +43,7 @@ export default function DashboardPage() {
   /* ───────── PREMIUM LOADING ───────── */
   if (authLoading || loading) {
     return (
-      <main className="wrap">
+      <main className="wrap_signout">
         {/* HEADER SKELETON */}
         <div className="skel header">
           <div className="line w40" />
@@ -67,7 +67,7 @@ export default function DashboardPage() {
         </div>
 
         <style jsx>{`
-          .wrap {
+          .wrap_signout {
             min-height: 100vh;
             background: radial-gradient(circle at top, #0b0f0f, #050505);
             padding: clamp(1.2rem, 4vw, 2.5rem);
@@ -144,7 +144,7 @@ export default function DashboardPage() {
 
   /* ───────── DASHBOARD ───────── */
   return (
-    <main className="wrap">
+    <main className="wrap_signout">
       {/* HEADER */}
       <header className="top fade-in">
         <div>
@@ -181,7 +181,7 @@ export default function DashboardPage() {
       </section>
 
       <style jsx>{`
-        .wrap {
+        .wrap_signout {
           min-height: 100vh;
           background: radial-gradient(circle at top, #0b0f0f, #050505);
           color: #fff;

@@ -104,7 +104,7 @@ export default function OrdersPage() {
   /* ───────── LOADING UI ───────── */
   if (loading) {
     return (
-      <main className="wrap">
+      <main className="wrap_dashboard_orders">
         <h1>Your Orders</h1>
 
         <div className="tabs">
@@ -120,7 +120,7 @@ export default function OrdersPage() {
         </div>
 
         <style jsx>{`
-          .wrap {
+          .wrap_dashboard_orders {
             min-height: 100vh;
             background: #000;
             color: #fff;
@@ -163,7 +163,7 @@ export default function OrdersPage() {
   }
 
   return (
-    <main className="wrap">
+    <main className="wrap_dashboard_orders">
       <h1>Your Orders</h1>
 
       <div className="tabs">
@@ -193,7 +193,7 @@ export default function OrdersPage() {
       )}
 
       <style jsx>{`
-        .wrap {
+        .wrap_dashboard_orders {
           min-height: 100vh;
           background: #000;
           color: #fff;
@@ -248,6 +248,23 @@ function OrderCard({ order }) {
   const router = useRouter();
   const state = getOrderState(order);
 
+  const totalPaid =
+    order.totalAmountPaid ??
+    order.amount +
+      (order.printNameCharge || 0) +
+      (order.deliveryCharge || 0);
+
+  const items = order.items || [
+    {
+      productName: order.productName,
+      size: order.size,
+      printName: order.printName,
+      printedName: order.printedName,
+      quantity: 1,
+      price: order.price,
+    },
+  ];
+
   const continuePayment = (e) => {
     e.stopPropagation();
     router.push(`/checkout/${order.orderId}`);
@@ -262,21 +279,57 @@ function OrderCard({ order }) {
     >
       {/* HEADER */}
       <div className="top">
-        <strong className="title">{order.productName}</strong>
-        <span className="amount">₹{order.amount}</span>
+        <div>
+          <strong className="title">Order #{order.orderId}</strong>
+          <div className={`status ${state.tone}`}>
+            {state.label}
+          </div>
+        </div>
+
+        <div className="amount">
+          ₹{totalPaid}
+          <span>Total</span>
+        </div>
       </div>
 
-      {/* STATUS BADGE */}
-      <div className={`status ${state.tone}`}>
-        {state.label}
+      {/* ITEMS */}
+      <div className="items">
+        {items.slice(0, 2).map((item, i) => (
+          <div key={i} className="itemRow">
+            <div className="left">
+              <p className="name">{item.productName}</p>
+              <p className="meta">
+                Size: {item.size}
+                {item.printName && (
+                  <> · Printed: {item.printedName}</>
+                )}
+              </p>
+            </div>
+            <div className="right">
+              {item.quantity || 1} × ₹{item.price}
+            </div>
+          </div>
+        ))}
+
+        {items.length > 2 && (
+          <div className="more">
+            +{items.length - 2} more item(s)
+          </div>
+        )}
       </div>
 
-      {/* TIMELINE */}
+      {/* TIMELINE (COMPACT) */}
       <div className="timeline">
-        <Timeline label="Placed" date={formatDate(order.createdAt)} />
-        <Timeline label="Verified" date={formatDate(order.approvedAt)} />
-        <Timeline label="Shipped" date={formatDate(order.shippedAt)} />
-        <Timeline label="Delivered" date={formatDate(order.deliveredAt)} />
+        <span>Placed · {formatDate(order.createdAt)}</span>
+        {order.approvedAt && (
+          <span>Verified · {formatDate(order.approvedAt)}</span>
+        )}
+        {order.shippedAt && (
+          <span>Shipped · {formatDate(order.shippedAt)}</span>
+        )}
+        {order.deliveredAt && (
+          <span>Delivered · {formatDate(order.deliveredAt)}</span>
+        )}
       </div>
 
       {/* ACTION */}
@@ -291,140 +344,124 @@ function OrderCard({ order }) {
 
       {/* FOOTER */}
       <div className="meta">
-        Order ID · <span>{order.orderId}</span>
+        Placed on <strong>{formatDate(order.createdAt)}</strong>
       </div>
 
       <style jsx>{`
         .card {
-          background:
-            linear-gradient(180deg, #0d0f12, #07080a);
+          background: linear-gradient(180deg, #0d0f12, #07080a);
           border: 1px solid rgba(255,255,255,0.08);
           border-radius: 18px;
-          padding: 1.25rem 1.2rem;
-          box-shadow:
-            0 8px 20px rgba(0,0,0,0.6),
-            inset 0 1px 0 rgba(255,255,255,0.04);
-          transition:
-            transform 0.25s ease,
-            box-shadow 0.25s ease,
-            border-color 0.25s ease;
-        }
-
-        .clickable {
-          cursor: pointer;
+          padding: 1.3rem;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+          transition: transform .25s ease, box-shadow .25s ease;
         }
 
         .clickable:hover {
           transform: translateY(-4px);
-          box-shadow:
-            0 14px 36px rgba(0,0,0,0.75),
-            inset 0 1px 0 rgba(255,255,255,0.08);
-          border-color: rgba(255,255,255,0.16);
+          box-shadow: 0 16px 44px rgba(0,0,0,0.8);
         }
 
         /* HEADER */
         .top {
           display: flex;
           justify-content: space-between;
-          align-items: flex-start;
           gap: 1rem;
-          margin-bottom: 0.6rem;
+          margin-bottom: 1rem;
         }
 
         .title {
-          font-size: 0.95rem;
+          font-size: 0.9rem;
           font-weight: 600;
-          letter-spacing: 0.04em;
           color: #e5e7eb;
         }
 
         .amount {
-          font-size: 0.9rem;
-          font-weight: 600;
+          text-align: right;
+          font-size: 1rem;
+          font-weight: 700;
           color: #22d3ee;
-          white-space: nowrap;
+        }
+
+        .amount span {
+          display: block;
+          font-size: 0.65rem;
+          color: #9ca3af;
+          font-weight: 400;
         }
 
         /* STATUS */
         .status {
-          display: inline-block;
-          margin-bottom: 0.8rem;
+          margin-top: 0.35rem;
           padding: 0.28rem 0.7rem;
           border-radius: 999px;
-          font-size: 0.65rem;
+          font-size: 0.6rem;
           letter-spacing: 0.14em;
           text-transform: uppercase;
-          border: 1px solid transparent;
           width: fit-content;
         }
 
-        .green {
-          color: #22c55e;
-          border-color: rgba(34,197,94,0.35);
-          background: rgba(34,197,94,0.08);
+        /* ITEMS */
+        .items {
+          display: grid;
+          gap: 0.7rem;
+          margin-bottom: 0.9rem;
         }
 
-        .blue {
-          color: #38bdf8;
-          border-color: rgba(56,189,248,0.35);
-          background: rgba(56,189,248,0.08);
+        .itemRow {
+          display: flex;
+          justify-content: space-between;
+          gap: 1rem;
         }
 
-        .yellow {
-          color: #facc15;
-          border-color: rgba(250,204,21,0.35);
-          background: rgba(250,204,21,0.08);
+        .name {
+          font-size: 0.82rem;
+          font-weight: 600;
+          color: #fff;
         }
 
-        .red {
-          color: #ef4444;
-          border-color: rgba(239,68,68,0.35);
-          background: rgba(239,68,68,0.08);
-        }
-
-        .gray {
+        .meta {
+          font-size: 0.72rem;
           color: #9ca3af;
-          border-color: rgba(156,163,175,0.25);
-          background: rgba(156,163,175,0.06);
+        }
+
+        .right {
+          font-size: 0.78rem;
+          white-space: nowrap;
+          color: #e5e7eb;
+        }
+
+        .more {
+          font-size: 0.7rem;
+          color: #22d3ee;
         }
 
         /* TIMELINE */
         .timeline {
-          font-size: 0.78rem;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.8rem;
+          font-size: 0.7rem;
           color: #9ca3af;
-          display: grid;
-          gap: 0.3rem;
-          padding-left: 0.2rem;
+          margin-bottom: 0.9rem;
         }
 
         /* PAY BUTTON */
         .payBtn {
-          margin-top: 0.9rem;
           background: linear-gradient(180deg,#ffffff,#e5e7eb);
           color: #000;
-          border: none;
           border-radius: 999px;
-          padding: 0.45rem 1.2rem;
+          padding: 0.45rem 1.4rem;
           font-size: 0.65rem;
           letter-spacing: 0.18em;
           font-weight: 600;
+          border: none;
           cursor: pointer;
         }
 
-        .payBtn:hover {
-          opacity: 0.9;
-        }
-
         /* FOOTER */
-        .meta {
-          margin-top: 0.9rem;
-          font-size: 0.65rem;
-          letter-spacing: 0.08em;
-          color: #6b7280;
-        }
-
-        .meta span {
-          color: #9ca3af;
+        .meta strong {
+          color: #e5e7eb;
         }
       `}</style>
     </div>

@@ -30,53 +30,113 @@ export async function adminApi(url, payload) {
   return res.json();
 }
 
-/* ───────────────── BULK GROUPING ───────────────── */
+/* ───────────────── BULK GROUPING (FIXED) ───────────────── */
 /**
- * Groups orders by productId for bulk operations
- * Keeps full order list for export / inspection
+ * Groups orders by productId (ITEM-AWARE)
+ * - Supports cart + buy-now orders
+ * - Preserves full order reference
+ * - Quantity-safe
  */
 export function groupBulkByProduct(orders) {
   const map = new Map();
 
-  for (const o of orders) {
-    if (!map.has(o.productId)) {
-      map.set(o.productId, {
-        productId: o.productId,
-        productName: o.productName,
-        count: 0,
-        orders: [], // 🔑 individual orders preserved
-      });
+  for (const order of orders) {
+    // Case 1: cart-based order
+    if (Array.isArray(order.items)) {
+      for (const item of order.items) {
+        const pid = item.productId;
+        if (!pid) continue;
+
+        if (!map.has(pid)) {
+          map.set(pid, {
+            productId: pid,
+            productName: item.productName,
+            orders: [],
+          });
+        }
+
+        map.get(pid).orders.push(order);
+      }
+      continue;
     }
 
-    const bucket = map.get(o.productId);
-    bucket.count += 1;
-    bucket.orders.push(o);
+    // Case 2: buy-now / legacy
+    if (order.productId) {
+      if (!map.has(order.productId)) {
+        map.set(order.productId, {
+          productId: order.productId,
+          productName: order.productName,
+          orders: [],
+        });
+      }
+
+      map.get(order.productId).orders.push(order);
+    }
   }
 
   return Array.from(map.values());
 }
 
-/* ───────────────── EXCEL EXPORT ───────────────── */
+/* ───────────────── EXCEL EXPORT (ITEM-LEVEL) ───────────────── */
 /**
- * Exports all orders of ONE product batch
- * Each row = one customer/order
+ * Exports ONE product batch
+ * Each row = ONE T-SHIRT (quantity exploded)
  */
 export function exportProductOrdersToExcel(batch) {
   if (!batch?.orders?.length) return;
 
-  const rows = batch.orders.map((o) => ({
-    OrderID: o.orderId,
-    Product: o.productName,
-    Amount: o.amount,
-    Size: o.size || "",
-    PrintName: o.printName ? o.printedName || "" : "",
-    TransactionID: o.txnId || "",
-    PaymentStatus: o.paymentStatus,
-    FulfillmentStatus: o.fulfillmentStatus || "placed",
-    CreatedAt: o.createdAt?.toDate
-      ? o.createdAt.toDate().toLocaleString("en-IN")
-      : "",
-  }));
+  const rows = [];
+
+  batch.orders.forEach((order) => {
+    const base = {
+      Order_ID: order.orderId,
+      Payment_Status: order.paymentStatus,
+      Fulfillment_Status: order.fulfillmentStatus || "placed",
+      Transaction_ID: order.txnId || "",
+      Outside_Campus: order.isOutsideCampus ? "Yes" : "No",
+      Delivery_Charge: order.deliveryCharge || 0,
+      Total_Amount_Paid: order.totalAmountPaid || order.amount || 0,
+      Created_At: order.createdAt?.toDate
+        ? order.createdAt.toDate().toLocaleString("en-IN")
+        : "",
+    };
+
+    // CART ORDER
+    if (Array.isArray(order.items)) {
+      order.items
+        .filter((i) => i.productId === batch.productId)
+        .forEach((item) => {
+          const qty = Number(item.quantity || 1);
+
+          for (let i = 0; i < qty; i++) {
+            rows.push({
+              ...base,
+              Product_ID: batch.productId,
+              Product_Name: item.productName,
+              Size: item.size || "",
+              Print_Name: item.printName ? "Yes" : "No",
+              Printed_Name: item.printedName || "",
+              Unit_Price: item.price || 0,
+            });
+          }
+        });
+
+      return;
+    }
+
+    // BUY-NOW ORDER
+    if (order.productId === batch.productId) {
+      rows.push({
+        ...base,
+        Product_ID: batch.productId,
+        Product_Name: order.productName,
+        Size: order.size || "",
+        Print_Name: order.printName ? "Yes" : "No",
+        Printed_Name: order.printedName || "",
+        Unit_Price: order.amount || 0,
+      });
+    }
+  });
 
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
@@ -89,6 +149,6 @@ export function exportProductOrdersToExcel(batch) {
 
   XLSX.writeFile(
     wb,
-    `${safeName}_${batch.count}_orders.xlsx`
+    `${safeName}_${rows.length}_tshirts.xlsx`
   );
 }

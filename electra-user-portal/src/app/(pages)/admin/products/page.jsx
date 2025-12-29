@@ -123,7 +123,7 @@ export default function AdminProductsPage() {
 
   /* ================= UI ================= */
   return (
-    <main className="wrap">
+    <main className="wrap_admin_products">
       <h1>Admin · Products</h1>
 
       {/* ADD PRODUCT */}
@@ -185,7 +185,7 @@ export default function AdminProductsPage() {
       </section>
 
       <style jsx>{`
-        .wrap {
+        .wrap_admin_products {
           min-height: 100vh;
           background: #000;
           color: #fff;

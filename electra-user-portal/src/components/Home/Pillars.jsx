@@ -100,7 +100,7 @@ export default function PillarsElectraPremium() {
           padding: 9rem 6vw;
         }
 
-        .wrap {
+        .wrap_pillars {
           max-width: 1200px;
           margin: 0 auto;
         }

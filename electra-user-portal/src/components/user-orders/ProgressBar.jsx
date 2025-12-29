@@ -54,7 +54,7 @@ export default function ProgressBar({ order }) {
   const progressPct = (currentIndex / (STEPS.length - 1)) * 100;
 
   return (
-    <div className="wrap">
+    <div className="wrap_progress">
       <div className="track">
         <div className="fill" style={{ width: `${progressPct}%` }} />
       </div>
@@ -82,7 +82,7 @@ export default function ProgressBar({ order }) {
       </div>
 
       <style jsx>{`
-        .wrap {
+        .wrap_progress {
           position: relative;
           padding: 1.8rem 1rem 2rem;
           background: #0b0f15;

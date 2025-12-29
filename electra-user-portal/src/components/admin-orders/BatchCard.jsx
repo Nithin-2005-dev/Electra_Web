@@ -1,115 +1,80 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import * as XLSX from "xlsx";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-} from "firebase/firestore";
-import { db } from "../../app/lib/firebase";
 
 export default function BatchCard({
+  productId,
   productName,
-  orders = [],
+  orders = [], // 🔥 actually ITEMS
   action,
   onAction,
 }) {
-  /* ───────── EXPORT TO EXCEL ───────── */
-  const exportToExcel = async () => {
-    if (!orders.length) return;
+  /* ───────── NORMALIZE ITEMS ───────── */
+  const items = useMemo(() => {
+    return orders
+      .filter((i) => i.productId === productId)
+      .map((i) => ({
+        ...i,
+        quantity: Number(i.quantity ?? 1),
+      }));
+  }, [orders, productId]);
 
-    /* 1️⃣ Collect unique userIds from orders */
-    const userIds = [
-      ...new Set(
-        orders.map((o) => o.userId).filter(Boolean)
-      ),
-    ];
+  /* ───────── COUNTS ───────── */
+  const totalProducts = useMemo(
+    () => items.reduce((s, i) => s + i.quantity, 0),
+    [items]
+  );
 
-    /* 2️⃣ Fetch users */
-    const userMap = {};
+  const totalOrders = useMemo(
+    () => new Set(items.map((i) => i.orderId)).size,
+    [items]
+  );
 
-    // Firestore "in" query supports max 10 values
-    for (let i = 0; i < userIds.length; i += 10) {
-      const batch = userIds.slice(i, i + 10);
+  /* ───────── EXPORT TO EXCEL (ITEM LEVEL) ───────── */
+  const exportToExcel = () => {
+    if (!items.length) return;
 
-      const q = query(
-        collection(db, "users"),
-        where("uid", "in", batch)
-      );
+    const rows = items.map((i) => ({
+      Order_ID: i.orderId,
+      Product_Name: productName,
+      Product_ID: productId,
 
-      const snap = await getDocs(q);
-      snap.forEach((doc) => {
-        userMap[doc.data().uid] = doc.data();
-      });
-    }
+      Size: i.size || "",
+      Quantity: i.quantity,
+      Unit_Price: i.price || 0,
+      Subtotal: (i.price || 0) * i.quantity,
 
-    /* 3️⃣ Build Excel rows */
-    const rows = orders.map((o) => {
-      const user = userMap[o.userId] || {};
-      const addr = o.deliveryAddress || {};
+      Print_Name: i.printName ? "Yes" : "No",
+      Printed_Name: i.printedName || "",
+      Print_Name_Charge: i.printName ? 50 : 0,
 
-      return {
-        // ORDER
-        Order_ID: o.orderId,
-        Product_Name: o.productName,
-        Product_ID: o.productId,
-        Size: o.size || "",
-        Base_Amount: o.amount || 0,
+      Outside_Campus: i.isOutsideCampus ? "Yes" : "No",
+      Delivery_Charge: i.deliveryCharge || 0,
 
-        // DELIVERY
-        Outside_Campus: o.isOutsideCampus ? "Yes" : "No",
-        Delivery_Charge: o.deliveryCharge || 0,
+      Payment_Status: i.paymentStatus,
+      Transaction_ID: i.txnId || "",
+      Total_Amount_Paid: i.totalAmountPaid || 0,
 
-        // PRINT NAME
-        Print_Name: o.printName ? "Yes" : "No",
-        Print_Name_Charge: o.printNameCharge || 0,
-        Printed_Name: o.printedName || "",
+      Customer_Name: i.deliveryAddress?.fullName || "",
+      Customer_Phone: i.deliveryAddress?.phone || "",
+      Address: i.deliveryAddress?.addressLine || "",
+      City: i.deliveryAddress?.city || "",
+      Pincode: i.deliveryAddress?.pincode || "",
+    }));
 
-        // PAYMENT
-        Total_Amount_Paid: o.totalAmountPaid || 0,
-        Payment_Status: o.paymentStatus,
-        Transaction_ID: o.txnId || "",
-        Payment_Screenshot: o.paymentScreenshotUrl || "",
-        Approved_At: o.approvedAt
-          ? new Date(
-              o.approvedAt.seconds * 1000
-            ).toLocaleString("en-IN")
-          : "",
-        Approved_By: o.approvedBy || "",
-
-        // DELIVERY ADDRESS
-        Customer_Name: addr.fullName || "",
-        Customer_Phone: addr.phone || "",
-        Address: addr.addressLine || "",
-        City: addr.city || "",
-        Pincode: addr.pincode || "",
-
-        // USER DETAILS (🔥 FIXED)
-        User_Name: user.name || "",
-        User_Email: user.email || "",
-        User_Phone: user.phone || "",
-        College: user.college || "",
-        Stream: user.stream || "",
-        Year: user.year || "",
-        User_Role: user.role || "",
-      };
-    });
-
-    /* 4️⃣ Export Excel */
-    const worksheet = XLSX.utils.json_to_sheet(rows);
-    const workbook = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
 
     XLSX.utils.book_append_sheet(
-      workbook,
-      worksheet,
+      wb,
+      ws,
       productName.slice(0, 31)
     );
 
     XLSX.writeFile(
-      workbook,
-      `${productName.replace(/\s+/g, "_")}_ALL_ORDERS.xlsx`
+      wb,
+      `${productName.replace(/\s+/g, "_")}_BATCH.xlsx`
     );
   };
 
@@ -119,27 +84,23 @@ export default function BatchCard({
       <div className="info">
         <h3 className="product">{productName}</h3>
         <p className="count">
-          <strong>{orders.length}</strong> orders
+          <strong>{totalOrders}</strong> orders ·{" "}
+          <strong>{totalProducts}</strong> T-shirts
         </p>
       </div>
 
-      {/* RIGHT ACTIONS */}
+      {/* ACTIONS */}
       <div className="actions">
         <button
           className="export-btn"
           onClick={exportToExcel}
-          disabled={!orders.length}
+          disabled={!items.length}
         >
           Export Excel
         </button>
 
         {action && (
-          <button
-            className={`action-btn ${
-              action === "Reject" ? "danger" : ""
-            }`}
-            onClick={onAction}
-          >
+          <button className="action-btn" onClick={onAction}>
             {action}
           </button>
         )}
@@ -161,12 +122,6 @@ export default function BatchCard({
           border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .info {
-          display: flex;
-          flex-direction: column;
-          gap: 0.25rem;
-        }
-
         .product {
           margin: 0;
           font-size: 1rem;
@@ -175,7 +130,6 @@ export default function BatchCard({
         }
 
         .count {
-          margin: 0;
           font-size: 0.8rem;
           color: #9ca3af;
         }
@@ -189,11 +143,12 @@ export default function BatchCard({
           gap: 0.6rem;
         }
 
-        .export-btn {
+        .export-btn,
+        .action-btn {
           padding: 0.55rem 1rem;
           border-radius: 999px;
-          border: 1px solid rgba(255, 255, 255, 0.25);
-          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255,255,255,0.25);
+          background: rgba(255,255,255,0.08);
           color: #e5e7eb;
           font-size: 0.75rem;
           cursor: pointer;
@@ -202,22 +157,6 @@ export default function BatchCard({
         .export-btn:disabled {
           opacity: 0.4;
           cursor: not-allowed;
-        }
-
-        .action-btn {
-          padding: 0.55rem 1rem;
-          border-radius: 999px;
-          border: 1px solid rgba(34, 211, 238, 0.4);
-          background: rgba(34, 211, 238, 0.12);
-          color: #22d3ee;
-          font-size: 0.75rem;
-          cursor: pointer;
-        }
-
-        .action-btn.danger {
-          border-color: rgba(248, 113, 113, 0.45);
-          background: rgba(248, 113, 113, 0.12);
-          color: #f87171;
         }
       `}</style>
     </div>

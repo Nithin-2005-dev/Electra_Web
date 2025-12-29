@@ -107,6 +107,7 @@ export default function ProductPage() {
     size: selectedSize,
     printName,
     printedName: printName ? printedName.trim() : null,
+    quantity:1
   };
 
   await setDoc(doc(db, "orders", orderId), {
@@ -128,7 +129,7 @@ export default function ProductPage() {
   if (!product || !active) return null;
 
   return (
-    <main className="wrap">
+    <main className="wrap_product">
       <ProductGallery
         active={active}
         setActive={setActive}

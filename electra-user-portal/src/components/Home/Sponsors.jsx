@@ -64,7 +64,7 @@ export default function SponsorsSection() {
           padding: 8rem 6vw;
         }
 
-        .wrap {
+        .wrap_sponsers {
           max-width: 1150px;
           margin: 0 auto;
         }

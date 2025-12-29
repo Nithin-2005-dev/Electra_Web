@@ -1,7 +1,7 @@
 /* ===============================
-   PAGE WRAPPER
+   PAGE wrap_productPER
 ================================ */
-.wrap {
+.wrap_product {
   min-height: 100vh;
   background: #000;
   color: #fff;
@@ -230,7 +230,7 @@
    MOBILE
 ================================ */
 @media (max-width: 900px) {
-  .wrap {
+  .wrap_product {
     grid-template-columns: 1fr;
   }
 

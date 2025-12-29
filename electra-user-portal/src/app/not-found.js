@@ -64,7 +64,7 @@ export default function NotFound() {
           margin-bottom: 22px;
         }
 
-        .wrap {
+        .wrap_not_found {
           display: grid;
           gap: clamp(18px, 4vw, 32px);
           grid-template-columns: 1fr;
@@ -72,7 +72,7 @@ export default function NotFound() {
         }
 
         @media (min-width: 900px) {
-          .wrap {
+          .wrap_not_found {
             grid-template-columns: 1.1fr 0.9fr;
           }
         }
@@ -209,7 +209,7 @@ export default function NotFound() {
           This route isn’t connected. Continuity test failed — open loop detected.
         </p>
 
-        <div className="wrap">
+        <div className="wrap_not_found">
           {/* SVG + DMM kept exactly from your version */}
           {/* You already nailed the concept — don’t overthink it */}
         </div>
