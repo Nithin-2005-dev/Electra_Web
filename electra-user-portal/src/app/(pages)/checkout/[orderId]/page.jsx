@@ -3,7 +3,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { auth, db } from "../../../lib/firebase";
-import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
 export default function CheckoutPage() {
@@ -42,6 +47,7 @@ export default function CheckoutPage() {
       }
 
       const data = snap.data();
+
       if (data.userId !== user.uid) {
         setError("Unauthorized access");
         setLoading(false);
@@ -53,6 +59,7 @@ export default function CheckoutPage() {
         return;
       }
 
+      // normalize legacy buy-now orders
       if (!data.items) {
         data.items = [
           {
@@ -73,7 +80,7 @@ export default function CheckoutPage() {
     return () => unsub();
   }, [orderId, router]);
 
-  /* ───────── PRICE CALC (FIXED) ───────── */
+  /* ───────── PRICE CALC ───────── */
   const printTotal =
     order?.items.reduce(
       (s, i) =>
@@ -86,6 +93,25 @@ export default function CheckoutPage() {
 
   const deliveryFee = outside ? DELIVERY_CHARGE : 0;
   const finalAmount = order?.amount + printTotal + deliveryFee;
+
+  /* ───────── CLOUDINARY UPLOAD ───────── */
+  const uploadScreenshot = async (file) => {
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append(
+      "upload_preset",
+      process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
+    );
+
+    const res = await fetch(
+      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+      { method: "POST", body: fd }
+    );
+
+    if (!res.ok) throw new Error("Upload failed");
+    const data = await res.json();
+    return data.secure_url;
+  };
 
   /* ───────── SUBMIT ───────── */
   const submitProof = async () => {
@@ -106,14 +132,23 @@ export default function CheckoutPage() {
       setSubmitting(true);
       setError("");
 
+      const screenshotUrl = await uploadScreenshot(file);
+
       await updateDoc(doc(db, "orders", orderId), {
         txnId: txnId.trim(),
+        paymentScreenshotUrl: screenshotUrl,
+
         isOutsideCampus: outside,
         deliveryCharge: deliveryFee,
         printNameCharge: printTotal,
         deliveryAddress: outside ? address : null,
+
         totalAmountPaid: finalAmount,
         paymentStatus: "pending_verification",
+
+        // 🔥 REQUIRED FOR ADMIN FLOW
+        fulfillmentStatus: "placed",
+
         updatedAt: serverTimestamp(),
       });
 
@@ -124,15 +159,15 @@ export default function CheckoutPage() {
       }).catch(() => {});
 
       router.push(`/dashboard/orders/${orderId}`);
-    } catch {
+    } catch (err) {
+      console.error(err);
       setError("Payment submission failed");
-    } finally {
       setSubmitting(false);
     }
   };
 
   /* ───────── LOADING UI ───────── */
-  if (loading) {
+ if (loading) {
     return (
       <main className="loading">
         <div className="skeleton" />
@@ -171,6 +206,7 @@ export default function CheckoutPage() {
   }
 
   if (!order) return <main>{error}</main>;
+
 
   /* ───────── UI ───────── */
   return (
@@ -480,5 +516,3 @@ export default function CheckoutPage() {
     </main>
   );
 }
-
-
