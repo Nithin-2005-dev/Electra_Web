@@ -1,11 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import GalleryCard from "./GalleryCard";
-
-/* ───────── CONFIG ───────── */
-const PX_PER_SECOND_DESKTOP = 26; // premium pace
-const PX_PER_SECOND_MOBILE = 18;  // slower for touch comfort
 
 export default function GalleryGrid({ images = [], filter = "all", onOpen }) {
   const safeImages = Array.isArray(images) ? images : [];
@@ -13,7 +9,8 @@ export default function GalleryGrid({ images = [], filter = "all", onOpen }) {
   const filtered = useMemo(() => {
     if (filter === "all") return safeImages;
     return safeImages.filter(
-      (img) => img?.category?.toLowerCase() === filter.toLowerCase()
+      (img) =>
+        img?.category?.toLowerCase() === filter.toLowerCase()
     );
   }, [safeImages, filter]);
 
@@ -40,8 +37,8 @@ export default function GalleryGrid({ images = [], filter = "all", onOpen }) {
       {columns.map((col, i) => (
         <GalleryColumn
           key={i}
-          images={col}
           direction={i % 2 ? "down" : "up"}
+          images={col}
           onOpen={onOpen}
         />
       ))}
@@ -79,40 +76,28 @@ export default function GalleryGrid({ images = [], filter = "all", onOpen }) {
 function GalleryColumn({ images, direction, onOpen }) {
   const ref = useRef(null);
 
-  /* ───────── DYNAMIC SPEED ───────── */
-  useEffect(() => {
-    if (!ref.current) return;
-
-    const isMobile = window.matchMedia("(max-width: 640px)").matches;
-    const speed = isMobile
-      ? PX_PER_SECOND_MOBILE
-      : PX_PER_SECOND_DESKTOP;
-
-    // total height of ONE loop (because we duplicate images)
-    const totalHeight = ref.current.scrollHeight / 2;
-
-    const duration = totalHeight / speed;
-
-    ref.current.style.animationDuration = `${duration}s`;
-  }, [images]);
-
-  /* ───────── PAUSE CONTROL ───────── */
-  const pause = () => {
-    ref.current?.style.setProperty("--play-state", "paused");
+  const handleEnter = () => {
+    ref.current?.style.setProperty(
+      "--play-state",
+      "paused"
+    );
   };
 
-  const resume = () => {
-    ref.current?.style.setProperty("--play-state", "running");
+  const handleLeave = () => {
+    ref.current?.style.setProperty(
+      "--play-state",
+      "running"
+    );
   };
 
   return (
     <div
-      ref={ref}
       className={`gallery-col ${direction}`}
-      onMouseEnter={pause}
-      onMouseLeave={resume}
-      onTouchStart={pause}
-      onTouchEnd={resume}
+      ref={ref}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+      onTouchStart={handleEnter}
+      onTouchEnd={handleLeave}
     >
       {[...images, ...images].map((img, idx) => (
         <GalleryCard
@@ -127,7 +112,7 @@ function GalleryColumn({ images, direction, onOpen }) {
           display: flex;
           flex-direction: column;
           gap: 1.5rem;
-
+          animation-duration: 120s;
           animation-timing-function: linear;
           animation-iteration-count: infinite;
           animation-play-state: var(--play-state, running);
@@ -163,6 +148,7 @@ function GalleryColumn({ images, direction, onOpen }) {
         @media (max-width: 640px) {
           .gallery-col {
             gap: 1rem;
+            animation-duration: 160s;
           }
         }
       `}</style>

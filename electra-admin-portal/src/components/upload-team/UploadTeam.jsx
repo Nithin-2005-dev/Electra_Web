@@ -15,7 +15,7 @@ const UploadTeam = ({preset,team}) => {
   const positionRef=useRef();
   const handleUpload=async(res)=>{
     try{
-      console.log(imageRef)
+
      await axios.post('/api/uploadTeam',{
         name:nameRef.current.value,year:yearRef.current.value,position:positionRef.current.value,publicId:res.info.public_id,insta:instaRef.current.value,fb:fbRef.current.value,linkdin:linkdinRef.current.value,category:team
       })
