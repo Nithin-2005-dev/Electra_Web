@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useEffect } from "react";
 import GalleryCard from "./GalleryCard";
 
 export default function GalleryGrid({ images = [], filter = "all", onOpen }) {
@@ -76,6 +76,26 @@ export default function GalleryGrid({ images = [], filter = "all", onOpen }) {
 function GalleryColumn({ images, direction, onOpen }) {
   const ref = useRef(null);
 
+  /* ✅ CONSTANT SPEED LOGIC */
+  useEffect(() => {
+    if (!ref.current) return;
+
+    const isMobile = window.matchMedia("(max-width: 640px)").matches;
+    const SPEED = isMobile ? 18 : 26; // px per second
+
+    const totalHeight = ref.current.scrollHeight / 2; // because duplicated
+    const duration = totalHeight / SPEED;
+
+    ref.current.style.animationDuration = `${duration}s`;
+
+    // Respect reduced motion
+    if (
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      ref.current.style.animation = "none";
+    }
+  }, [images]);
+
   const handleEnter = () => {
     ref.current?.style.setProperty(
       "--play-state",
@@ -92,8 +112,8 @@ function GalleryColumn({ images, direction, onOpen }) {
 
   return (
     <div
-      className={`gallery-col ${direction}`}
       ref={ref}
+      className={`gallery-col ${direction}`}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
       onTouchStart={handleEnter}
@@ -112,7 +132,6 @@ function GalleryColumn({ images, direction, onOpen }) {
           display: flex;
           flex-direction: column;
           gap: 1.5rem;
-          animation-duration: 120s;
           animation-timing-function: linear;
           animation-iteration-count: infinite;
           animation-play-state: var(--play-state, running);
@@ -148,7 +167,6 @@ function GalleryColumn({ images, direction, onOpen }) {
         @media (max-width: 640px) {
           .gallery-col {
             gap: 1rem;
-            animation-duration: 160s;
           }
         }
       `}</style>
