@@ -5,53 +5,103 @@ import { ResourceStore } from "../../app/store/ResourceStore";
 import ResourceCard from "./ResourceCard";
 
 export default function ResourceGrid({
-  category,
   semester,
+  category,
   subject,
-  onOpenPdf,
 }) {
-  const { getResources, data = [], resLoad } = useContext(ResourceStore);
+  const { getResources, data = [], resLoad } =
+    useContext(ResourceStore);
 
-  /* 🔥 FETCH LOGIC — THIS WAS MISSING */
+  /* ───────── FETCH ───────── */
   useEffect(() => {
     if (!semester || !subject) return;
+    getResources(semester, subject, category);
+  }, [semester, subject, category, getResources]);
 
-    // category === "all" → backend should handle
-    getResources(semester, category);
-  }, [semester, category, subject, getResources]);
-
-  /* Loading state */
+  /* ───────── LOADING (SKELETON) ───────── */
   if (resLoad) {
     return (
-      <div className="py-20 text-center text-slate-400">
-        Loading resources…
-      </div>
+      <section className="relative">
+        <div
+          className="
+            grid
+            gap-6
+            sm:grid-cols-2
+            lg:grid-cols-3
+            xl:grid-cols-4
+          "
+        >
+          {Array.from({ length: 8 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      </section>
     );
   }
 
-  /* Empty state (professional message) */
+  /* ───────── EMPTY ───────── */
   if (!data.length) {
     return (
-      <div className="py-20 text-center">
-        <p className="text-slate-300 font-medium">
-          No resources available yet
-        </p>
-        <p className="text-slate-500 text-sm mt-1">
-          Materials for this subject will be added soon.
-        </p>
-      </div>
+      <section className="py-28 text-center">
+        <div className="max-w-md mx-auto">
+          <p className="text-lg font-medium text-slate-200">
+            No resources available
+          </p>
+          <p className="mt-2 text-sm text-slate-500 leading-relaxed">
+            Notes, books, assignments or PYQs for this subject
+            will appear here once uploaded by the team.
+          </p>
+        </div>
+      </section>
     );
   }
 
+  /* ───────── GRID ───────── */
   return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {data.map((item) => (
-        <ResourceCard
-          key={item._id || item.name}
-          item={item}
-          onOpen={() => onOpenPdf(item)}
-        />
-      ))}
+    <section className="relative">
+      <div className="absolute inset-x-0 -top-6 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+      <div
+        className="
+          grid
+          gap-6
+          sm:grid-cols-2
+          lg:grid-cols-3
+          xl:grid-cols-4
+        "
+      >
+        {data.map((item) => (
+          <ResourceCard key={item._id} item={item} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ───────────────── SKELETON CARD ───────────────── */
+
+function SkeletonCard() {
+  return (
+    <div
+      className="
+        rounded-xl
+        border border-white/10
+        bg-[#0b0f15]
+        p-4
+        animate-pulse
+      "
+    >
+      {/* Title */}
+      <div className="h-4 w-3/4 rounded bg-white/10 mb-3" />
+
+      {/* Category */}
+      <div className="h-3 w-1/3 rounded bg-white/10 mb-6" />
+
+      {/* Footer row */}
+      <div className="flex justify-between items-center">
+        <div className="h-3 w-16 rounded bg-white/10" />
+        <div className="h-3 w-12 rounded bg-white/10" />
+      </div>
     </div>
   );
 }

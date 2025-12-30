@@ -1,17 +1,10 @@
 "use client";
 
 export default function CategoryTabs({ active, onChange, onBack }) {
-  const tabs = ["all", "notes", "books", "assignments"];
+  const tabs = ["all", "notes", "books", "assignments","pyqs"];
 
   return (
     <>
-      <button
-        onClick={onBack}
-        className="mb-4 text-cyan-300 text-sm hover:underline"
-      >
-        ← Back
-      </button>
-
       <div className="flex gap-2 mb-6 overflow-x-auto">
         {tabs.map((t) => (
           <button
