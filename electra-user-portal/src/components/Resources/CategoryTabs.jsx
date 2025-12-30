@@ -1,6 +1,6 @@
 "use client";
 
-export default function CategoryTabs({ active, onChange, onBack }) {
+export default function CategoryTabs({ active, onChange }) {
   const tabs = ["all", "notes", "books", "assignments","pyqs"];
 
   return (
