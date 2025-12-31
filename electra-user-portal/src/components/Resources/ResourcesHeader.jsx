@@ -84,7 +84,7 @@ export default function ResourcesHeader() {
         .res-ambient {
           position: absolute;
           inset: 0;
-          background:
+          {/* background:
             radial-gradient(
               600px circle at 50% -120px,
               rgba(34, 211, 238, 0.12),
@@ -94,7 +94,7 @@ export default function ResourcesHeader() {
               800px circle at 50% 100%,
               rgba(99, 102, 241, 0.08),
               transparent 70%
-            );
+            ); */}
           pointer-events: none;
         }
 
