@@ -6,8 +6,8 @@ export default function SemesterGrid() {
   const router = useRouter();
 
   return (
-    <section className="max-w-6xl mx-auto px-2">
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+    <section className="semester-wrap">
+      <div className="semester-grid">
         {Array.from({ length: 8 }).map((_, i) => {
           const semester = i + 1;
 
@@ -15,75 +15,148 @@ export default function SemesterGrid() {
             <button
               key={semester}
               onClick={() => router.push(`/Resources/${semester}`)}
-              className="
-                group relative overflow-hidden
-                rounded-2xl
-                border border-white/10
-                bg-[#0b0f15]
-                px-5 py-8
-                text-left
-                transition-all duration-300 ease-[cubic-bezier(.22,1,.36,1)]
-                hover:border-cyan-400/40
-                hover:translate-y-[-2px]
-                hover:shadow-[0_12px_40px_rgba(0,0,0,0.65)]
-                active:translate-y-[0px]
-                focus:outline-none
-                focus-visible:ring-2
-                focus-visible:ring-cyan-400/60
-              "
+              className="semester-card"
             >
-              {/* subtle top accent */}
-              <div
-                className="
-                  absolute inset-x-0 top-0 h-px
-                  bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent
-                  opacity-0 group-hover:opacity-100 transition
-                "
-              />
+              {/* TOP LABEL */}
+              <span className="semester-eyebrow">Semester</span>
 
-              {/* background depth */}
-              <div
-                className="
-                  absolute inset-0
-                  bg-gradient-to-b from-white/[0.03] to-transparent
-                  opacity-0 group-hover:opacity-100 transition
-                "
-              />
+              {/* NUMBER */}
+              <span className="semester-number">{semester}</span>
 
-              {/* content */}
-              <div className="relative z-10 flex flex-col gap-3">
-                <span className="text-[11px] tracking-[0.3em] uppercase text-slate-500">
-                  Semester
-                </span>
+              {/* META */}
+              <span className="semester-meta">
+                Notes · Books · PYQs · Assignments
+              </span>
 
-                <span className="text-3xl font-semibold text-white leading-none">
-                  {semester}
-                </span>
-
-                <span className="text-xs text-slate-400">
-                  Notes · Books · Assignments · pyqs
-                </span>
-
-                <span
-                  className="
-                    mt-3 inline-flex items-center gap-1
-                    text-xs font-medium
-                    text-cyan-400
-                    opacity-0
-                    translate-y-1
-                    transition-all duration-300
-                    group-hover:opacity-100
-                    group-hover:translate-y-0
-                  "
-                >
-                  Explore resources
-                  <span className="text-cyan-400/70">→</span>
-                </span>
-              </div>
+              {/* CTA (desktop only) */}
+              <span className="semester-cta">
+                Explore resources →
+              </span>
             </button>
           );
         })}
       </div>
+
+      <style jsx>{`
+        /* ===== WRAPPER ===== */
+        .semester-wrap {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 1rem;
+        }
+
+        /* ===== GRID ===== */
+        .semester-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 0.9rem;
+        }
+
+        /* ===== CARD ===== */
+        .semester-card {
+          position: relative;
+          overflow: hidden;
+          background: linear-gradient(
+            180deg,
+            #0c1017 0%,
+            #070a10 100%
+          );
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 16px;
+          padding: 1.1rem 1.1rem 1.2rem;
+          text-align: left;
+          transition: all 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+          cursor: pointer;
+        }
+
+        /* tap feedback (mobile) */
+        .semester-card:active {
+          transform: scale(0.985);
+          border-color: rgba(103, 232, 249, 0.4);
+        }
+
+        /* ===== CONTENT ===== */
+        .semester-eyebrow {
+          font-size: 0.62rem;
+          letter-spacing: 0.28em;
+          text-transform: uppercase;
+          color: #6b7280;
+        }
+
+        .semester-number {
+          display: block;
+          margin-top: 0.3rem;
+          font-size: 2.1rem;
+          font-weight: 700;
+          color: #ffffff;
+          line-height: 1;
+        }
+
+        .semester-meta {
+          display: block;
+          margin-top: 0.4rem;
+          font-size: 0.7rem;
+          color: #9ca3af;
+          line-height: 1.4;
+        }
+
+        .semester-cta {
+          display: none;
+          margin-top: 0.8rem;
+          font-size: 0.7rem;
+          font-weight: 500;
+          color: #67e8f9;
+        }
+
+        /* ===== HOVER (DESKTOP ONLY) ===== */
+        @media (hover: hover) {
+          .semester-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(103, 232, 249, 0.45);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+          }
+
+          .semester-card:hover .semester-cta {
+            display: inline-block;
+          }
+        }
+
+        /* ===== TABLET ===== */
+        @media (min-width: 640px) {
+          .semester-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.2rem;
+          }
+
+          .semester-card {
+            padding: 1.4rem 1.4rem 1.6rem;
+          }
+
+          .semester-number {
+            font-size: 2.4rem;
+          }
+
+          .semester-meta {
+            font-size: 0.75rem;
+          }
+        }
+
+        /* ===== DESKTOP ===== */
+        @media (min-width: 1024px) {
+          .semester-grid {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+          }
+
+          .semester-number {
+            font-size: 2.8rem;
+          }
+
+          .semester-meta {
+            font-size: 0.8rem;
+          }
+        }
+      `}</style>
     </section>
   );
 }

@@ -1,125 +1,185 @@
 "use client";
 
-import { useState } from "react";
 import { CldImage } from "next-cloudinary";
-import { FaInstagram, FaLinkedinIn, FaFacebookF } from "react-icons/fa";
+import {
+  FaLinkedinIn,
+  FaInstagram,
+  FaFacebookF,
+} from "react-icons/fa";
 
 export default function TeamCard({ ele }) {
-  const [hover, setHover] = useState(false);
-
   return (
-    <div
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      className="
-        relative w-full max-w-[360px]
-        rounded-2xl bg-black
-        border border-white/10
-        overflow-hidden
-        transition
-        hover:border-cyan-400/30
-      "
-    >
-      {/* subtle glow */}
-      <span
-        aria-hidden
-        className={`
-          pointer-events-none absolute inset-0
-          transition-opacity duration-300
-          ${hover ? "opacity-100" : "opacity-0"}
-          bg-[radial-gradient(60%_40%_at_50%_0%,rgba(20,247,255,.12),transparent_70%)]
-        `}
-      />
-
-      {/* ROLE */}
-      <div className="relative z-10 px-4 pt-4 pb-2 text-center">
-        <p className="text-xs tracking-[0.3em] uppercase text-cyan-400/80">
-          {ele.position}
-        </p>
-      </div>
-
+    <article className="team-card">
       {/* IMAGE */}
-      <div className="relative z-10 px-4">
-        <div className="rounded-xl overflow-hidden">
-          {ele.publicId ? (
-            <CldImage
-              src={ele.publicId}
-              width="600"
-              height="600"
-              crop="fit"
-              quality="auto"
-              format="auto"
-              alt={ele.name}
-              className="
-                w-full h-[320px]
-                object-contain
-                transition-transform duration-300
-                group-hover:scale-[1.02]
-              "
-            />
-          ) : (
-            <div className="h-[320px] grid place-items-center text-slate-500">
-              No image
-            </div>
-          )}
-        </div>
+      <div className="image-wrap">
+        {ele.publicId ? (
+          <CldImage
+            src={ele.publicId}
+            width="600"
+            height="800"
+            crop="fill"
+            gravity="face"
+            quality="auto"
+            format="auto"
+            alt={ele.name}
+            className="image"
+          />
+        ) : (
+          <div className="no-image">No Image</div>
+        )}
       </div>
 
-      {/* NAME */}
-      <div className="relative z-10 px-4 pt-4 pb-2 text-center">
-        <h3 className="text-white text-lg font-semibold tracking-tight">
-          {ele.name}
-        </h3>
+      {/* CONTENT */}
+      <div className="content">
+        <p className="role">{ele.position}</p>
+        <h3 className="name">{ele.name}</h3>
+
+        {(ele.linkedin || ele.linkdin || ele.insta || ele.fb) && (
+          <div className="socials">
+            {(ele.linkedin || ele.linkdin) && (
+              <a
+                href={ele.linkedin || ele.linkdin}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="LinkedIn"
+              >
+                <FaLinkedinIn />
+              </a>
+            )}
+            {ele.insta && (
+              <a
+                href={ele.insta}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Instagram"
+              >
+                <FaInstagram />
+              </a>
+            )}
+            {ele.fb && (
+              <a
+                href={ele.fb}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Facebook"
+              >
+                <FaFacebookF />
+              </a>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* SOCIALS */}
-      {(ele.insta || ele.linkedin || ele.linkdin || ele.fb) && (
-        <div
-          className={`
-            relative z-10
-            flex justify-center gap-5
-            pb-4
-            transition-all duration-300
-            ${hover ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}
-          `}
-        >
-          {ele.insta && (
-            <a
-              href={ele.insta}
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Instagram"
-              className="text-slate-400 hover:text-white transition"
-            >
-              <FaInstagram size={18} />
-            </a>
-          )}
+      {/* STYLES */}
+      <style jsx>{`
+        /* ───────── CARD ───────── */
+        .team-card {
+          width: 100%;
+          max-width: 260px;
+          background: linear-gradient(
+            180deg,
+            rgba(10, 15, 25, 0.9),
+            rgba(2, 4, 9, 1)
+          );
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          border-radius: 16px;
+          overflow: hidden;
+          transition: transform 0.35s ease, box-shadow 0.35s ease,
+            border-color 0.35s ease;
+        }
 
-          {(ele.linkedin || ele.linkdin) && (
-            <a
-              href={ele.linkedin || ele.linkdin}
-              target="_blank"
-              rel="noreferrer"
-              aria-label="LinkedIn"
-              className="text-slate-400 hover:text-white transition"
-            >
-              <FaLinkedinIn size={18} />
-            </a>
-          )}
+        .team-card:hover {
+          transform: translateY(-8px);
+          border-color: rgba(34, 211, 238, 0.35);
+          box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9);
+        }
 
-          {ele.fb && (
-            <a
-              href={ele.fb}
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Facebook"
-              className="text-slate-400 hover:text-white transition"
-            >
-              <FaFacebookF size={18} />
-            </a>
-          )}
-        </div>
-      )}
-    </div>
+        /* ───────── IMAGE ───────── */
+        .image-wrap {
+          width: 100%;
+          aspect-ratio: 3 / 4;
+          background: #020409;
+          overflow: hidden;
+        }
+
+        .image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.6s ease;
+        }
+
+        .team-card:hover .image {
+          transform: scale(1.07);
+        }
+
+        .no-image {
+          height: 100%;
+          display: grid;
+          place-items: center;
+          font-size: 0.8rem;
+          color: #64748b;
+        }
+
+        /* ───────── CONTENT ───────── */
+        .content {
+          padding: 14px 14px 16px;
+          text-align: center;
+        }
+
+        .role {
+          font-size: 0.62rem;
+          letter-spacing: 0.32em;
+          text-transform: uppercase;
+          color: #22d3ee;
+          opacity: 0.85;
+          margin-bottom: 6px;
+        }
+
+        .name {
+          font-size: 0.95rem;
+          font-weight: 600;
+          color: #ffffff;
+          line-height: 1.3;
+          margin-bottom: 12px;
+        }
+
+        /* ───────── SOCIALS ───────── */
+        .socials {
+          display: flex;
+          justify-content: center;
+          gap: 10px;
+        }
+
+        .socials a {
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          display: grid;
+          place-items: center;
+          font-size: 13px;
+          color: #94a3b8;
+          background: rgba(255, 255, 255, 0.04);
+          transition: all 0.25s ease;
+        }
+
+        .socials a:hover {
+          color: #ffffff;
+          background: rgba(34, 211, 238, 0.18);
+          transform: translateY(-2px);
+        }
+
+        /* ───────── RESPONSIVE ───────── */
+        @media (max-width: 640px) {
+          .team-card {
+            max-width: 100%;
+          }
+
+          .name {
+            font-size: 1rem;
+          }
+        }
+      `}</style>
+    </article>
   );
 }

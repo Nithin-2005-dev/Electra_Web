@@ -17,7 +17,7 @@ export default function PillarsElectraPremium() {
       key: "fic",
       badge: "Faculty In-Charge",
       name: "Dr. Sreejith S",
-      role: "Electra Society",
+      role: "Electrical Engineering Department",
       img: "https://res.cloudinary.com/dqa3ov76r/image/upload/v1766727426/yqeqx12pw2tmsetwsxpr.jpg",
       bio: `Dr. Sreejith S is an accomplished academician and researcher with expertise in Power Electronics, Renewable Energy Systems, Electric Drives, Smart Grids, Optimization Techniques, Electric Vehicles, and Fuel Cells. He earned his PhD from the National Institute of Technology Tiruchirappalli in 2013, following his M.E. from MEPCO Schlenk Engineering College, Sivakasi, and B.E. from Noorul Islam College of Engineering, Kumaracoil. Currently, he serves as Assistant Professor Grade-I at the National Institute of Technology, Silchar. Prior to this, he held faculty positions at NIT Silchar and Vellore Institute of Technology, Vellore, where he worked as an Associate Professor. With nearly two decades of teaching experience, his academic career reflects consistent growth, strong institutional commitment, and a focus on advancing education and research in modern power and energy systems.`,
     },
