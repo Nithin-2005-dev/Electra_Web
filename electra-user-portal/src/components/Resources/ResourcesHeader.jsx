@@ -9,7 +9,7 @@ export default function ResourcesHeader() {
   const semester = params?.semester;
   const subject = params?.subject;
 
-  const isRoot = pathname === "/resources";
+  const isRoot = pathname === "/Resources";
   const isSemester = semester && !subject;
   const isSubject = semester && subject;
 
@@ -38,8 +38,6 @@ export default function ResourcesHeader() {
           {isRoot && (
             <>
               <span>Select a semester</span>
-              <span className="dot">•</span>
-              <span>Notes · Books · Assignments · PYQs</span>
             </>
           )}
 
