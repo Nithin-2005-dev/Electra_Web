@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 
 export default function OrderCard({ order, onApprove, onReject }) {
+  const [loadingAction, setLoadingAction] = useState(null);
+
   /* ───────── NORMALIZE ITEMS ───────── */
   const items = useMemo(() => {
     if (Array.isArray(order.items) && order.items.length) {
@@ -12,7 +14,6 @@ export default function OrderCard({ order, onApprove, onReject }) {
       }));
     }
 
-    // Legacy / Buy-now fallback
     return [
       {
         productId: order.productId,
@@ -41,18 +42,22 @@ export default function OrderCard({ order, onApprove, onReject }) {
     order.totalAmountPaid ??
     baseTotal + printTotal + (order.deliveryCharge || 0);
 
+  /* ───────── ACTIONS ───────── */
+  const handleApprove = async () => {
+    if (loadingAction) return;
+    setLoadingAction("approve");
+    await onApprove(order.orderId);
+  };
+
+  const handleReject = async () => {
+    if (loadingAction) return;
+    setLoadingAction("reject");
+    await onReject(order.orderId);
+  };
+
   return (
     <div
-      className="
-        relative rounded-2xl
-        border border-white/10
-        bg-[#0b0f15]/90
-        backdrop-blur
-        p-5
-        shadow-[0_20px_60px_rgba(0,0,0,.6)]
-        transition
-        hover:border-cyan-400/30
-      "
+      className={`order-card relative rounded-2xl bg-[#0b0f15]/90 backdrop-blur p-5 transition`}
     >
       {/* ───── HEADER ───── */}
       <div className="flex items-start justify-between gap-4">
@@ -78,7 +83,7 @@ export default function OrderCard({ order, onApprove, onReject }) {
         </div>
       </div>
 
-      {/* ───── STATUS PILLS ───── */}
+      {/* ───── STATUS ───── */}
       <div className="mt-3 flex flex-wrap gap-2">
         <StatusPill
           label={`Payment: ${order.paymentStatus}`}
@@ -90,19 +95,18 @@ export default function OrderCard({ order, onApprove, onReject }) {
               : "yellow"
           }
         />
-
         <StatusPill
           label={`Fulfillment: ${order.fulfillmentStatus ?? "placed"}`}
           tone="blue"
         />
       </div>
 
-      {/* ───── ITEMS LIST ───── */}
+      {/* ───── ITEMS ───── */}
       <div className="my-4 space-y-2">
         {items.map((i, idx) => (
           <div
             key={idx}
-            className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm"
+            className="rounded-lg border border-white/20 bg-black/30 px-3 py-2 text-sm"
           >
             <div className="flex justify-between">
               <span className="text-slate-200 font-medium">
@@ -114,126 +118,129 @@ export default function OrderCard({ order, onApprove, onReject }) {
             </div>
             <div className="text-slate-400 text-xs mt-0.5">
               Size: {i.size || "—"}
-              {i.printName && (
-                <> · Print: {i.printedName}</>
-              )}
+              {i.printName && <> · Print: {i.printedName}</>}
             </div>
           </div>
         ))}
       </div>
 
-      {/* ───── ORDER DETAILS ───── */}
+      {/* ───── DETAILS ───── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-slate-400">
         <Detail label="User ID" value={order.userId} />
         <Detail label="Txn ID" value={order.txnId || "—"} />
-        <Detail
-          label="Print Charge"
-          value={`₹${printTotal}`}
-        />
+        <Detail label="Print Charge" value={`₹${printTotal}`} />
         <Detail
           label="Delivery Charge"
           value={`₹${order.deliveryCharge || 0}`}
         />
       </div>
 
-      {/* ───── ADDRESS ───── */}
-      {order.isOutsideCampus && order.deliveryAddress && (
-        <div className="mt-4 rounded-xl border border-white/10 bg-black/30 p-3">
-          <p className="text-xs text-slate-400 mb-1">
-            Delivery Address
-          </p>
-          <p className="text-sm text-slate-200 leading-relaxed">
-            {order.deliveryAddress.fullName}
-            <br />
-            {order.deliveryAddress.addressLine}
-            <br />
-            {order.deliveryAddress.city} –{" "}
-            {order.deliveryAddress.pincode}
-            <br />
-            📞 {order.deliveryAddress.phone}
-          </p>
-        </div>
-      )}
-
-      {/* ───── PAYMENT SCREENSHOT ───── */}
-      {order.paymentScreenshotUrl && (
-        <a
-          href={order.paymentScreenshotUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="
-            inline-flex items-center gap-2
-            mt-4
-            text-cyan-300
-            text-sm
-            hover:underline
-          "
-        >
-          View payment screenshot →
-        </a>
-      )}
-
       {/* ───── ACTIONS ───── */}
-      <div className="mt-5 flex flex-wrap gap-3">
+      <div className="mt-5 flex gap-3 flex-wrap">
         <button
-          onClick={() => onApprove(order.orderId)}
-          className="
-            px-4 py-2 rounded-lg
-            bg-cyan-500/15
-            text-cyan-300
-            font-semibold
-            border border-cyan-400/30
+          onClick={handleApprove}
+          disabled={loadingAction !== null}
+          aria-busy={loadingAction === "approve"}
+          className={`action-btn px-4 py-2 rounded-lg font-semibold transition
+            bg-cyan-500/15 text-cyan-300 border border-cyan-400/40
             hover:bg-cyan-500/25
-            transition
-          "
+            ${loadingAction === "approve" ? "loading" : ""}
+          `}
         >
           Approve Payment
         </button>
 
         <button
-          onClick={() => onReject(order.orderId)}
-          className="
-            px-4 py-2 rounded-lg
-            bg-red-500/10
-            text-red-400
-            font-semibold
-            border border-red-500/30
+          onClick={handleReject}
+          disabled={loadingAction !== null}
+          aria-busy={loadingAction === "reject"}
+          className={`action-btn px-4 py-2 rounded-lg font-semibold transition
+            bg-red-500/10 text-red-400 border border-red-500/40
             hover:bg-red-500/20
-            transition
-          "
+            ${loadingAction === "reject" ? "loading" : ""}
+          `}
         >
           Reject Payment
         </button>
       </div>
+
+      {/* ───── LOCAL STYLES ───── */}
+      <style jsx>{`
+        .order-card {
+          margin-bottom: 1.75rem;
+          border: 1px solid rgba(255, 255, 255, 0.22);
+          box-shadow:
+            0 0 0 1px rgba(255,255,255,0.04),
+            0 20px 60px rgba(0,0,0,0.65);
+        }
+
+        .order-card::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          pointer-events: none;
+          box-shadow: inset 0 0 0 1px rgba(34,211,238,0.08);
+        }
+
+        .action-btn {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .action-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .action-btn.loading::after {
+          content: "";
+          width: 14px;
+          height: 14px;
+          margin-left: 8px;
+          border-radius: 50%;
+          border: 2px solid currentColor;
+          border-top-color: transparent;
+          animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+      `}</style>
     </div>
   );
 }
 
-/* ───────────────── HELPERS ───────────────── */
+/* ───────── HELPERS ───────── */
 
 function Detail({ label, value }) {
   return (
     <span>
-      {label}:{" "}
-      <span className="text-slate-200">{value}</span>
+      {label}: <span className="text-slate-200">{value}</span>
     </span>
   );
 }
 
 function StatusPill({ label, tone }) {
   const tones = {
-    green: "bg-emerald-500/15 text-emerald-300 border-emerald-400/30",
-    red: "bg-red-500/15 text-red-400 border-red-500/30",
-    yellow: "bg-yellow-500/15 text-yellow-300 border-yellow-400/30",
-    blue: "bg-cyan-500/15 text-cyan-300 border-cyan-400/30",
+    green:
+      "bg-emerald-500/15 text-emerald-300 border border-emerald-400/30",
+    red:
+      "bg-red-500/15 text-red-400 border border-red-500/30",
+    yellow:
+      "bg-yellow-500/15 text-yellow-300 border border-yellow-400/30",
+    blue:
+      "bg-cyan-500/15 text-cyan-300 border border-cyan-400/30",
   };
 
   return (
     <span
-      className={`
-        px-3 py-1 rounded-full text-xs font-semibold
-        border ${tones[tone]}
-      `}
+      className={`px-3 py-1 rounded-full text-xs font-semibold ${tones[tone]}`}
     >
       {label}
     </span>

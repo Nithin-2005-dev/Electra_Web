@@ -82,60 +82,68 @@ export function groupBulkByProduct(orders) {
  * Exports ONE product batch
  * Each row = ONE T-SHIRT (quantity exploded)
  */
+
+
+
 export function exportProductOrdersToExcel(batch) {
   if (!batch?.orders?.length) return;
 
   const rows = [];
 
-  batch.orders.forEach((order) => {
-    const base = {
-      Order_ID: order.orderId,
-      Payment_Status: order.paymentStatus,
-      Fulfillment_Status: order.fulfillmentStatus || "placed",
-      Transaction_ID: order.txnId || "",
-      Outside_Campus: order.isOutsideCampus ? "Yes" : "No",
-      Delivery_Charge: order.deliveryCharge || 0,
-      Total_Amount_Paid: order.totalAmountPaid || order.amount || 0,
-      Created_At: order.createdAt?.toDate
-        ? order.createdAt.toDate().toLocaleString("en-IN")
+  batch.orders.forEach((i) => {
+    rows.push({
+      /* ───────── ORDER META ───────── */
+      Order_ID: i.orderId || "",
+      User_ID: i.userId || "",
+      Payment_Status: i.paymentStatus || "",
+      Transaction_ID: i.txnId || "",
+      Approved_At: i.approvedAt?.toDate
+        ? i.approvedAt.toDate().toLocaleString("en-IN")
         : "",
-    };
+      Created_At: i.createdAt?.toDate
+        ? i.createdAt.toDate().toLocaleString("en-IN")
+        : "",
+      Updated_At: i.updatedAt?.toDate
+        ? i.updatedAt.toDate().toLocaleString("en-IN")
+        : "",
 
-    // CART ORDER
-    if (Array.isArray(order.items)) {
-      order.items
-        .filter((i) => i.productId === batch.productId)
-        .forEach((item) => {
-          const qty = Number(item.quantity || 1);
+      /* ───────── CUSTOMER ───────── */
+      Customer_Name: i.deliveryAddress?.fullName || "",
+      Phone: i.deliveryAddress?.phone || "",
+      Address: i.deliveryAddress?.addressLine || "",
+      City: i.deliveryAddress?.city || "",
+      Pincode: i.deliveryAddress?.pincode || "",
+      Outside_Campus: i.isOutsideCampus ? "Yes" : "No",
 
-          for (let i = 0; i < qty; i++) {
-            rows.push({
-              ...base,
-              Product_ID: batch.productId,
-              Product_Name: item.productName,
-              Size: item.size || "",
-              Print_Name: item.printName ? "Yes" : "No",
-              Printed_Name: item.printedName || "",
-              Unit_Price: item.price || 0,
-            });
-          }
-        });
+      /* ───────── PRODUCT ───────── */
+      Product_ID: i.productId || "",
+      Product_Name: i.productName || "",
+      Size: i.size || "",
+      Quantity: Number(i.quantity || 1),
 
-      return;
-    }
+      /* ───────── PRINT LOGIC (IMPORTANT) ───────── */
+      Print_Name: i.printName ? "Yes" : "No",
+      Printed_Name: i.printName
+        ? i.printedName || ""
+        : "ALL",
 
-    // BUY-NOW ORDER
-    if (order.productId === batch.productId) {
-      rows.push({
-        ...base,
-        Product_ID: batch.productId,
-        Product_Name: order.productName,
-        Size: order.size || "",
-        Print_Name: order.printName ? "Yes" : "No",
-        Printed_Name: order.printedName || "",
-        Unit_Price: order.amount || 0,
-      });
-    }
+      /* ───────── PRICING ───────── */
+      Unit_Price: Number(i.price || 0),
+      Item_Total:
+        Number(i.price || 0) * Number(i.quantity || 1),
+      Print_Name_Charge: i.printName ? 50 : 0,
+      Delivery_Charge: Number(i.deliveryCharge || 0),
+      Total_Amount_Paid: Number(i.totalAmountPaid || 0),
+
+      /* ───────── FULFILLMENT ───────── */
+      Fulfillment_Status: i.fulfillmentStatus || "",
+      Shipped_At: i.shippedAt?.toDate
+        ? i.shippedAt.toDate().toLocaleString("en-IN")
+        : "",
+      Delivered_At: i.deliveredAt?.toDate
+        ? i.deliveredAt.toDate().toLocaleString("en-IN")
+        : "",
+    });
   });
 
   const ws = XLSX.utils.json_to_sheet(rows);
@@ -149,6 +157,6 @@ export function exportProductOrdersToExcel(batch) {
 
   XLSX.writeFile(
     wb,
-    `${safeName}_${rows.length}_tshirts.xlsx`
+    `${safeName}_FULL_EXPORT_${rows.length}.xlsx`
   );
 }

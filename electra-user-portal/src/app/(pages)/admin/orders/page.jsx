@@ -9,7 +9,6 @@ import {
   getDocs,
   doc,
   getDoc,
-  updateDoc,
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
@@ -18,6 +17,7 @@ import Toasts from "../../../../components/merch/Toast";
 import OrderCard from "../../../../components/admin-orders/OrderCard";
 import OrderRow from "../../../../components/admin-orders/OrderRow";
 import BatchCard from "../../../../components/admin-orders/BatchCard";
+import CompletedBatchCard from "../../../../components/admin-orders/CompletedBatchCard";
 
 import {
   adminApi,
@@ -34,6 +34,7 @@ export default function AdminOrdersDashboard() {
   const [search, setSearch] = useState("");
   const [toasts, setToasts] = useState([]);
 
+  /* ───────── TOAST ───────── */
   const addToast = (message, type = "info") => {
     const id = Date.now();
     setToasts((t) => [...t, { id, message, type }]);
@@ -42,7 +43,7 @@ export default function AdminOrdersDashboard() {
     }, 4000);
   };
 
-  /* ───────── ADMIN GUARD ───────── */
+  /* ───────── ADMIN GUARD + LOAD ───────── */
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) return router.replace("/");
@@ -52,13 +53,16 @@ export default function AdminOrdersDashboard() {
         return router.replace("/");
       }
 
-      const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
+      const q = query(
+        collection(db, "orders"),
+        orderBy("createdAt", "desc")
+      );
       const res = await getDocs(q);
 
       setOrders(
         res.docs.map((d) => ({
           ...d.data(),
-          items: d.data().items || [],
+          items: Array.isArray(d.data().items) ? d.data().items : [],
         }))
       );
 
@@ -70,7 +74,7 @@ export default function AdminOrdersDashboard() {
 
   /* ───────── SEARCH ───────── */
   const filtered = useMemo(() => {
-    if (!search) return orders;
+    if (!search.trim()) return orders;
     const q = search.toLowerCase();
 
     return orders.filter((o) =>
@@ -84,21 +88,32 @@ export default function AdminOrdersDashboard() {
     );
   }, [orders, search]);
 
-  /* ───────── FLATTEN ITEMS FOR BULK OPS ───────── */
+  /* ───────── FLATTEN ITEMS (FINAL FIX) ───────── */
   const flattenedItems = useMemo(() => {
-    return filtered.flatMap((order) =>
-      order.items.map((item) => ({
-        ...item,
-        orderId: order.orderId,
-        userId: order.userId,
-        deliveryAddress: order.deliveryAddress,
-        paymentStatus: order.paymentStatus,
-        fulfillmentStatus: order.fulfillmentStatus || "placed",
-      }))
-    );
-  }, [filtered]);
+  return filtered.flatMap((order) =>
+    order.items.map((item) => ({
+      ...item,
+      orderId: order.orderId,
+      userId: order.userId,
+      deliveryAddress: order.deliveryAddress,
+      paymentStatus: order.paymentStatus,
+      txnId: order.txnId,
+      isOutsideCampus: order.isOutsideCampus,
+      deliveryCharge: order.deliveryCharge,
+      totalAmountPaid: order.totalAmountPaid || order.amount,
+      createdAt: order.createdAt,
+
+      // ✅ FINAL SOURCE OF TRUTH
+      fulfillmentStatus:
+        item.fulfillmentStatus ||
+        (order.paymentStatus === "confirmed" ? "placed" : null),
+    }))
+  );
+}, [filtered]);
+
 
   /* ───────── BUCKETS ───────── */
+
   const pendingPayments = filtered.filter(
     (o) => o.paymentStatus === "pending_verification"
   );
@@ -116,22 +131,50 @@ export default function AdminOrdersDashboard() {
   );
 
   const shippedBulk = groupBulkByProduct(
-    flattenedItems.filter((i) => i.fulfillmentStatus === "shipped")
+    flattenedItems.filter(
+      (i) => i.fulfillmentStatus === "shipped"
+    )
   );
 
-  const deliveredOrders = filtered.filter(
-    (o) => o.fulfillmentStatus === "delivered"
+  const completedBulk = groupBulkByProduct(
+    flattenedItems.filter(
+      (i) => i.fulfillmentStatus === "delivered"
+    )
   );
+
+  /* ───────── TAB COUNTS (ITEM LEVEL) ───────── */
+
+  const pendingItemsCount = flattenedItems.filter(
+    (i) => i.paymentStatus === "pending_verification"
+  ).length;
+
+  const shippingItemsCount = flattenedItems.filter(
+    (i) =>
+      i.paymentStatus === "confirmed" &&
+      i.fulfillmentStatus === "placed"
+  ).length;
+
+  const deliveryItemsCount = flattenedItems.filter(
+    (i) => i.fulfillmentStatus === "shipped"
+  ).length;
+
+  const completedItemsCount = flattenedItems.filter(
+    (i) => i.fulfillmentStatus === "delivered"
+  ).length;
+
+  const rejectedItemsCount = flattenedItems.filter(
+    (i) => i.paymentStatus === "rejected"
+  ).length;
 
   /* ───────── ACTIONS ───────── */
 
   const approve = async (orderId) => {
     await adminApi("/api/admin/approve", { orderId });
-    setOrders((o) =>
-      o.map((x) =>
-        x.orderId === orderId
-          ? { ...x, paymentStatus: "confirmed" }
-          : x
+    setOrders((p) =>
+      p.map((o) =>
+        o.orderId === orderId
+          ? { ...o, paymentStatus: "confirmed" }
+          : o
       )
     );
     addToast("Payment approved", "success");
@@ -139,9 +182,11 @@ export default function AdminOrdersDashboard() {
 
   const reject = async (orderId) => {
     await adminApi("/api/admin/reject", { orderId });
-    setOrders((o) =>
-      o.map((x) =>
-        x.orderId === orderId ? { ...x, paymentStatus: "rejected" } : x
+    setOrders((p) =>
+      p.map((o) =>
+        o.orderId === orderId
+          ? { ...o, paymentStatus: "rejected" }
+          : o
       )
     );
     addToast("Payment rejected", "success");
@@ -149,11 +194,37 @@ export default function AdminOrdersDashboard() {
 
   const shipProduct = async (productId) => {
     await adminApi("/api/admin/ship-product", { productId });
+
+    setOrders((prev) =>
+      prev.map((o) => ({
+        ...o,
+        items: o.items.map((i) =>
+          i.productId === productId &&
+          i.fulfillmentStatus === "placed"
+            ? { ...i, fulfillmentStatus: "shipped" }
+            : i
+        ),
+      }))
+    );
+
     addToast("Product marked as shipped", "success");
   };
 
   const deliverProduct = async (productId) => {
     await adminApi("/api/admin/deliver-product", { productId });
+
+    setOrders((prev) =>
+      prev.map((o) => ({
+        ...o,
+        items: o.items.map((i) =>
+          i.productId === productId &&
+          i.fulfillmentStatus === "shipped"
+            ? { ...i, fulfillmentStatus: "delivered" }
+            : i
+        ),
+      }))
+    );
+
     addToast("Product marked as delivered", "success");
   };
 
@@ -174,11 +245,11 @@ export default function AdminOrdersDashboard() {
 
       <nav className="tabs">
         {[
-          ["payments", `Payments (${pendingPayments.length})`],
-          ["shipping", `Shipping (${readyToShipBulk.length})`],
-          ["delivery", `Delivery (${shippedBulk.length})`],
-          ["completed", `Completed (${deliveredOrders.length})`],
-          ["rejected", `Rejected (${rejectedOrders.length})`],
+          ["payments", `Payments (${pendingItemsCount})`],
+          ["shipping", `Shipping (${shippingItemsCount})`],
+          ["delivery", `Delivery (${deliveryItemsCount})`],
+          ["completed", `Completed (${completedItemsCount})`],
+          ["rejected", `Rejected (${rejectedItemsCount})`],
         ].map(([k, l]) => (
           <button
             key={k}
@@ -225,15 +296,21 @@ export default function AdminOrdersDashboard() {
         ))}
 
       {tab === "completed" &&
-        deliveredOrders.map((o) => (
-          <OrderRow key={o.orderId} order={o} />
+        completedBulk.map((p) => (
+          <CompletedBatchCard
+            key={p.productId}
+            productId={p.productId}
+            productName={p.productName}
+            orders={p.orders}
+          />
         ))}
 
       {tab === "rejected" &&
         rejectedOrders.map((o) => (
           <OrderRow key={o.orderId} order={o} />
         ))}
-        <style jsx>{`
+
+      <style jsx>{`
         .wrap_admin_orders {
           min-height: 100vh;
           background: #000;
@@ -275,13 +352,7 @@ export default function AdminOrdersDashboard() {
           background: #fff;
           color: #000;
         }
-        .empty {
-          color: #9ca3af;
-          margin-top: 1rem;
-        }
       `}</style>
     </main>
   );
 }
-
-
