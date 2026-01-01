@@ -322,7 +322,7 @@ export default function CartPage() {
 .item img {
   width: 110px;
   height: 140px;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 14px;
   background: #000;
 }
@@ -485,17 +485,6 @@ export default function CartPage() {
     grid-column: span 2;
     text-align: right;
     margin-top: 0.4rem;
-  }
-
-  .summary {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    top: auto;
-    border-radius: 22px 22px 0 0;
-    padding: 1.2rem 1.4rem;
-    backdrop-filter: blur(10px);
   }
 }
 /* ───────── BREADCRUMB ───────── */

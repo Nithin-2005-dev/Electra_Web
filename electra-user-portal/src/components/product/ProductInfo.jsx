@@ -55,7 +55,7 @@ export default function ProductInfo({
       const userRef = doc(db, "users", user.uid);
       const snap = await getDoc(userRef);
 
-      const cartKey = `${product.productId}_${size}`;
+      const cartKey = `${product.productId}_${size}_${printName ? printedName.trim() : "no-print"}`;
 
       const cartItem = {
         productId: product.productId,
@@ -304,6 +304,35 @@ export default function ProductInfo({
           color:#ef4444;
           font-size:0.85rem;
         }
+        /* ───────── MOBILE TOAST FIX ───────── */
+@media (max-width: 480px) {
+  .toast {
+    bottom: 16px;                 /* avoid home indicator */
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: calc(100% - 24px); /* prevent overflow */
+    padding: 0.65rem 0.9rem;
+    gap: 0.6rem;
+    font-size: 0.6rem;
+  }
+
+  .toast span,
+  .toast p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .toast button {
+    font-size: 0.7rem;
+    min-width: 44px;              /* thumb target */
+  }
+
+  .out {
+    font-size: 0.75rem;
+  }
+}
+
       `}</style>
     </>
   );

@@ -9,7 +9,9 @@ export default function MerchHeroVideo() {
   const audioRef = useRef(null);
 
   const isInView = useInView(sectionRef, { amount: 0.6 });
+
   const [audioUnlocked, setAudioUnlocked] = useState(false);
+  const [soundOn, setSoundOn] = useState(false);
 
   /* ---------- Unlock audio ONCE (browser rule) ---------- */
   useEffect(() => {
@@ -42,7 +44,7 @@ export default function MerchHeroVideo() {
 
     if (isInView) {
       video.play().catch(() => {});
-      if (audioUnlocked) {
+      if (audioUnlocked && soundOn) {
         audio.volume = 0.6;
         audio.play().catch(() => {});
       }
@@ -50,9 +52,9 @@ export default function MerchHeroVideo() {
       video.pause();
       audio.pause();
     }
-  }, [isInView, audioUnlocked]);
+  }, [isInView, audioUnlocked, soundOn]);
 
-  /* ---------- Stop audio & video when tab changes ---------- */
+  /* ---------- Stop when tab hidden ---------- */
   useEffect(() => {
     const handleVisibility = () => {
       const video = videoRef.current;
@@ -64,14 +66,29 @@ export default function MerchHeroVideo() {
         audio.pause();
       } else if (isInView) {
         video.play().catch(() => {});
-        if (audioUnlocked) audio.play().catch(() => {});
+        if (audioUnlocked && soundOn) {
+          audio.play().catch(() => {});
+        }
       }
     };
 
     document.addEventListener("visibilitychange", handleVisibility);
     return () =>
       document.removeEventListener("visibilitychange", handleVisibility);
-  }, [isInView, audioUnlocked]);
+  }, [isInView, audioUnlocked, soundOn]);
+
+  /* ---------- Toggle sound ---------- */
+  const toggleSound = () => {
+    const audio = audioRef.current;
+    if (!audioUnlocked || !audio) return;
+
+    setSoundOn((prev) => {
+      const next = !prev;
+      if (!next) audio.pause();
+      else if (isInView) audio.play().catch(() => {});
+      return next;
+    });
+  };
 
   /* ---------- Scroll button ---------- */
   const scrollToContent = () => {
@@ -93,6 +110,15 @@ export default function MerchHeroVideo() {
 
       {/* Audio */}
       <audio ref={audioRef} src="/merch-theme.mp3" loop />
+
+      {/* Sound toggle */}
+      <button
+        className="sound-toggle"
+        onClick={toggleSound}
+        aria-label="Toggle sound"
+      >
+        {soundOn ? "🔊" : "🔇"}
+      </button>
 
       {/* Overlay */}
       <div className="overlay">
@@ -116,7 +142,6 @@ export default function MerchHeroVideo() {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          object-position: center;
         }
 
         .overlay {
@@ -148,7 +173,7 @@ export default function MerchHeroVideo() {
           margin-bottom: 1.8rem;
         }
 
-        button {
+        .overlay button {
           padding: 0.75rem 2rem;
           border: 1px solid white;
           background: transparent;
@@ -158,9 +183,34 @@ export default function MerchHeroVideo() {
           transition: all 0.25s ease;
         }
 
-        button:hover {
+        .overlay button:hover {
           background: white;
           color: black;
+        }
+
+        /* 🔊 SOUND TOGGLE */
+        .sound-toggle {
+          position: absolute;
+          top: 1.2rem;
+          right: 1.2rem;
+          z-index: 3;
+          background: rgba(0, 0, 0, 0.45);
+          border: 1px solid rgba(255, 255, 255, 0.4);
+          color: white;
+          width: 42px;
+          height: 42px;
+          border-radius: 50%;
+          cursor: pointer;
+          font-size: 1.2rem;
+          display: grid;
+          place-items: center;
+          backdrop-filter: blur(6px);
+          transition: transform 0.15s ease, background 0.15s ease;
+        }
+
+        .sound-toggle:hover {
+          background: rgba(255, 255, 255, 0.15);
+          transform: scale(1.05);
         }
       `}</style>
     </section>

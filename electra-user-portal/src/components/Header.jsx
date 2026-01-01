@@ -60,7 +60,9 @@ export default function Header() {
               </button>
 
               {merchOpen && (
-                <div className="dropdown">
+                <div className="dropdown" 
+                onClick={() => setMerchOpen((v) => !v)}
+                >
                   <Link href="/gotyourmerch">Products</Link>
                   <Link href="/cart">Cart</Link>
                 </div>

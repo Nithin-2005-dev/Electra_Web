@@ -16,7 +16,6 @@ function cloudinaryUrl(
 
 export async function POST(req) {
   try {
-    /* ───────── ADMIN GUARD ───────── */
     await requireAdmin(req);
 
     const { productId } = await req.json();
@@ -33,95 +32,69 @@ export async function POST(req) {
       .where("paymentStatus", "==", "confirmed")
       .get();
 
-    const eligibleDocs = snap.docs.filter((d) => {
-      const o = d.data();
-      return (
-        (Array.isArray(o.items)
-          ? o.items.some((i) => i.productId === productId)
-          : o.productId === productId) &&
-        (!o.fulfillmentStatus || o.fulfillmentStatus === "pending")
-      );
-    });
-
-    if (!eligibleDocs.length) {
-      return NextResponse.json(
-        { error: "No orders to ship" },
-        { status: 400 }
-      );
-    }
-
-    /* ───────── FETCH PRODUCT DATA ───────── */
-    const productSnap = await adminDb
-      .collection("products")
-      .doc(productId)
-      .get();
-
-    const product = productSnap.exists ? productSnap.data() : {};
-
     const batch = adminDb.batch();
 
-    /* ───────── PROCESS ORDERS ───────── */
-    for (const docSnap of eligibleDocs) {
+    for (const docSnap of snap.docs) {
       const order = docSnap.data();
+      if (!Array.isArray(order.items)) continue;
 
-      /* UPDATE ORDER STATUS */
+      /* ───────── NORMALIZE ITEMS ───────── */
+      const normalizedItems = order.items.map((i) => ({
+        ...i,
+        fulfillmentStatus: i.fulfillmentStatus || "placed",
+      }));
+
+      /* ───────── CHECK SHIPPABLE ITEMS ───────── */
+      const shippableItems = normalizedItems.filter(
+        (i) =>
+          i.productId === productId &&
+          i.fulfillmentStatus === "placed"
+      );
+
+      if (!shippableItems.length) continue;
+
+      /* ───────── UPDATE ITEMS (NO TIMESTAMPS INSIDE ARRAY) ───────── */
       batch.update(docSnap.ref, {
-        fulfillmentStatus: "shipped",
+        items: normalizedItems.map((item) =>
+          item.productId === productId &&
+          item.fulfillmentStatus === "placed"
+            ? {
+                ...item,
+                fulfillmentStatus: "shipped",
+              }
+            : item
+        ),
         shippedAt: admin.firestore.FieldValue.serverTimestamp(),
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      /* FETCH USER */
+      /* ───────── FETCH USER ───────── */
       const userSnap = await adminDb
         .collection("users")
         .doc(order.userId)
         .get();
 
-      if (!userSnap.exists) continue;
+      if (!userSnap.exists || !userSnap.data().email) continue;
       const user = userSnap.data();
 
-      /* ───────── BUILD SHIPPED ITEMS (PRODUCT-SCOPED) ───────── */
-      let shippedItems = [];
+      /* ───────── BUILD EMAIL ITEMS ───────── */
+      const emailItems = shippableItems.map((i) => ({
+        productName: i.productName,
+        size: i.size,
+        quantity: i.quantity || 1,
+        printName: i.printName,
+        printedName: i.printedName,
+        price: i.price || 0,
+        imageUrl: cloudinaryUrl(i.image),
+      }));
 
-      // CART ORDER
-      if (Array.isArray(order.items)) {
-        shippedItems = order.items
-          .filter((i) => i.productId === productId)
-          .flatMap((i) =>
-            Array.from({ length: Number(i.quantity || 1) }).map(() => ({
-              productName: i.productName,
-              size: i.size,
-              printName: i.printName,
-              printedName: i.printedName,
-              price: i.price || product.price || 0,
-              imageUrl: cloudinaryUrl(product.imageMain),
-            }))
-          );
-      }
-
-      // BUY-NOW ORDER
-      if (!order.items && order.productId === productId) {
-        shippedItems.push({
-          productName: order.productName,
-          size: order.size,
-          printName: order.printName,
-          printedName: order.printedName,
-          price: order.amount || product.price || 0,
-          imageUrl: cloudinaryUrl(product.imageMain),
-        });
-      }
-
-      if (!shippedItems.length) continue;
-
-      /* ───────── SEND SHIPPED EMAIL ───────── */
-      if (user.email) {
-        await resend.emails.send({
-          from: "Electra Society <no-reply@electrasocietynits.com>",
-          to: [user.email],
-          subject: "Your Electra order has been shipped",
-          html: shippedEmailHtml(order, shippedItems, user),
-        });
-      }
+      /* ───────── SEND EMAIL ───────── */
+      await resend.emails.send({
+        from: "Electra Society <no-reply@electrasocietynits.com>",
+        to: [user.email],
+        subject: "Your Electra order item has been shipped",
+        html: shippedEmailHtml(order, emailItems, user),
+      });
     }
 
     await batch.commit();
@@ -134,7 +107,6 @@ export async function POST(req) {
     );
   }
 }
-
 
 /* ───────────────── EMAIL TEMPLATE ───────────────── */
 
@@ -168,32 +140,20 @@ function shippedEmailHtml(order, items, user) {
   padding:28px;
 ">
 
+<!-- HEADER -->
 <tr>
 <td align="center" style="padding-bottom:22px;">
-  <div style="
-    width:52px;
-    height:52px;
-    border-radius:50%;
-    background:#22c55e;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#fff;
-    font-size:26px;
-    font-weight:700;
-    margin-bottom:12px;
-  ">✓</div>
-
   <h1 style="margin:0;font-size:22px;font-weight:700;">
     Order Shipped
   </h1>
-
   <p style="margin-top:6px;font-size:13px;color:#6b7280;">
-    Hi ${user.name || "there"}, your order is on the way 🚚
+    Hi ${user.fullName || user.name || "there"},
+    your order has been shipped and is on the way
   </p>
 </td>
 </tr>
 
+<!-- ORDER ID -->
 <tr>
 <td align="center" style="padding-bottom:24px;">
   <div style="font-size:11px;letter-spacing:0.12em;color:#6b7280;">
@@ -213,55 +173,68 @@ function shippedEmailHtml(order, items, user) {
 </td>
 </tr>
 
+<!-- ITEMS -->
 <tr>
 <td style="padding-bottom:18px;">
   <h3 style="font-size:14px;letter-spacing:0.08em;color:#6b7280;">
     ORDER SUMMARY
   </h3>
 
-  <table width="100%">
-    ${items
-      .map(
-        (i) => `
+  <table width="100%" cellpadding="0" cellspacing="0">
+    ${items.map((i) => `
     <tr>
-      <td width="80">
+      <td width="80" style="padding-bottom:12px;">
         <img src="${i.imageUrl}" width="72" height="72"
           style="border-radius:12px;border:1px solid #e5e7eb;object-fit:cover"/>
       </td>
-      <td style="padding-left:12px;">
+      <td style="padding-left:12px;padding-bottom:12px;">
         <strong>${i.productName}</strong><br/>
         <span style="font-size:12px;color:#6b7280;">
           Size: ${i.size || "—"} · Qty: ${i.quantity}
           ${i.printName ? `<br/>Printed: ${i.printedName}` : ""}
         </span>
       </td>
-      <td align="right" style="font-weight:600;">
-        ₹${i.price}
+      <td align="right" style="font-weight:600;padding-bottom:12px;">
+        ₹${(i.price || 0) * (i.quantity || 1)}
       </td>
     </tr>
-    `
-      )
-      .join("")}
+    `).join("")}
   </table>
 </td>
 </tr>
 
+<!-- CHARGES -->
 <tr>
 <td style="border-top:1px solid #e5e7eb;padding-top:16px;">
   <table width="100%" style="font-size:14px;">
-    <tr><td>Base amount</td><td align="right">₹${order.amount}</td></tr>
-    ${order.printNameCharge ? `<tr><td>Name print</td><td align="right">₹${order.printNameCharge}</td></tr>` : ""}
-    ${order.deliveryCharge ? `<tr><td>Delivery</td><td align="right">₹${order.deliveryCharge}</td></tr>` : ""}
+    <tr>
+      <td>Base amount</td>
+      <td align="right">₹${order.amount || 0}</td>
+    </tr>
+
+    ${
+      order.printNameCharge
+        ? `<tr><td>Name print</td><td align="right">₹${order.printNameCharge}</td></tr>`
+        : ""
+    }
+
+    ${
+      order.deliveryCharge
+        ? `<tr><td>Delivery</td><td align="right">₹${order.deliveryCharge}</td></tr>`
+        : ""
+    }
+
     <tr style="font-weight:700;">
       <td style="padding-top:8px;">Total paid</td>
       <td align="right" style="padding-top:8px;color:#22c55e;">
-        ₹${order.totalAmountPaid}
+        ₹${order.totalAmountPaid || 0}
       </td>
     </tr>
   </table>
 </td>
 </tr>
 
+<!-- CTA -->
 <tr>
 <td align="center" style="padding-top:24px;">
   <a href="${process.env.APP_BASE_URL}/dashboard/orders/${order.orderId}"
@@ -280,9 +253,10 @@ function shippedEmailHtml(order, items, user) {
 </td>
 </tr>
 
+<!-- FOOTER -->
 <tr>
 <td style="padding-top:26px;font-size:12px;color:#6b7280;text-align:center;">
-  Automated message from Electra Society · Do not reply
+  This is an automated message from Electra Society · Do not reply
 </td>
 </tr>
 
