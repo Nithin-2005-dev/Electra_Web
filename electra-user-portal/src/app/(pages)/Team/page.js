@@ -1,12 +1,12 @@
-import { TeamStoreProvider } from "../../store/TeamStore"
-import CoreTeam from "../../../components/Team"
+import { TeamStoreProvider } from "../../store/TeamStore";
+import TeamPage from "../../../components/team/TeamPage";
 
-export default function Team(){
-    return (
-        <main className="min-h-screen">
-        <TeamStoreProvider>
-               <CoreTeam/>
-        </TeamStoreProvider>
-              </main>
-    )
+export default function Team() {
+  return (
+    <main className="min-h-screen bg-black">
+      <TeamStoreProvider>
+        <TeamPage />
+      </TeamStoreProvider>
+    </main>
+  );
 }

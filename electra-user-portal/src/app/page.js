@@ -1,22 +1,19 @@
-import Hero from "../components/Hero";
-import "./globals.css";
-import About from "../components/About";
-import ElectraPillars from "../components/Pillars";
-import ElectraEnergyTimeline from "../components/Events";
-import SponsorsSection from "../components/Sponsors";
-import AlumniSection from "../components/Alumni";
-export const dynamic = 'force-dynamic';
+import About from "../components/Home/About";
+import ElectraPillars from "../components/Home/Pillars";
+import Events from "../components/Home/Events";
+import SponsorsSection from "../components/Home/Sponsors";
+import AlumniSection from "../components/Home/Alumni";
+import Hero from "../components/Home/Hero";
 
-export default async function Page() {
-   await new Promise(r => setTimeout(r, 2000));
+export default function Page() {
   return (
     <main>
-      <Hero/>
-      <About/>
-      <ElectraPillars/>
-      <ElectraEnergyTimeline/>
-      <SponsorsSection/>
-      <AlumniSection/>
+      <Hero />
+      <About />
+      <Events />
+      <ElectraPillars />
+      <SponsorsSection />
+      <AlumniSection />
     </main>
   );
 }

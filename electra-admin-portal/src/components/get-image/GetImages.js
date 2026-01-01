@@ -13,7 +13,6 @@ const GetImages = () => {
     setLoading(true);
     const response = await axios.get("/api/getImg");
     getImgs(response.data);
-    console.log(imgs);
     setLoading(false);
   };
   useEffect(()=>{

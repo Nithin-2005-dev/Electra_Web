@@ -28,7 +28,7 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "src/app/auth/sign-up/page.jsx", "src/app/auth/verify/page.jsx"  ],
   "exclude": [
     "node_modules"
   ]

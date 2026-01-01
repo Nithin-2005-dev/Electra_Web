@@ -1,27 +1,31 @@
-// src/app/layout.tsx
-import BackgroundElectric from "../components/BackgroundElectric.jsx";
+// src/app/layout.js
 import "./globals.css";
 import Header from "../components/Header.jsx";
 import Footer from "../components/Footer.jsx";
-export const metadata = {
-  title: "Electra Society",
-  description: `Discover the Electra Society of NIT Silchar. Explore event galleries, academic resources, team details, and all about the Electrical Engineering Department.`,
-  keywords:`Electrical Engineering, NIT Silchar, academic resources, class notes, electrical engineering department, engineering seminars, technical workshops, research publications, student activities, Electra Society, NIT Silchar events, faculty directory, lab manuals, project reports, engineering syllabus, engineering assignments,Electra Society NIT Silchar,Electrical Engineering Site Nit Silchar`,
-  icons: {
-    icon: "https://res.cloudinary.com/dqa3ov76r/image/upload/v1729535834/favoritePhotos/ldlchr4ijcpgfq8nu2gx.jpg",
-  },
-};
+import AppSplash from "../components/AppSplash";
+import { Analytics } from "@vercel/analytics/next"
+import { Inter, Playfair_Display } from "next/font/google";
+export const metadata = { title: "Electra Society", description: "Discover the Electra Society of NIT Silchar. Explore events, resources, team details, and the Electrical Engineering Department.", keywords: "Electrical Engineering, NIT Silchar, Electra Society, engineering events, technical workshops, academic resources", icons: { icon: "https://res.cloudinary.com/dqa3ov76r/image/upload/v1766745932/dawnld1jgn6kzelqpg03.png", }, };
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "700", "900"],
+  variable: "--font-inter",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  style: ["italic"],
+  variable: "--font-playfair",
+});
+
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-    <head>
-      <meta name="google-site-verification" content="zyGXpXbSuU5mWmG2CFgo4znOeW12j5ReBttwdTqtzAc" />
-    </head>
-      <body className="bg-background text-textPrimary antialiased">
+    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
+      <body className="bg-black text-white antialiased">
+        <AppSplash />
         <Header />
-        <BackgroundElectric />
         <main className="pt-16">{children}</main>
-        <Footer/>
+        <Footer />
       </body>
     </html>
   );
