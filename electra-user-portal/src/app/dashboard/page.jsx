@@ -13,7 +13,6 @@ export default function DashboardPage() {
 
   const [userData, setUserData] = useState(null);
   const [formData, setFormData] = useState(null);
-
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -42,7 +41,7 @@ export default function DashboardPage() {
 
   /* ───────── EDIT HANDLERS ───────── */
   const onChange = (key, value) => {
-    setFormData((prev) => ({ ...prev, [key]: value }));
+    setFormData((p) => ({ ...p, [key]: value }));
   };
 
   const cancelEdit = () => {
@@ -56,7 +55,7 @@ export default function DashboardPage() {
       const user = auth.currentUser;
       if (!user) return;
 
-      const { email, ...updatable } = formData; // 🔒 email immutable
+      const { email, ...updatable } = formData;
       await updateDoc(doc(db, "users", user.uid), updatable);
 
       setUserData(formData);
@@ -66,100 +65,19 @@ export default function DashboardPage() {
     }
   };
 
-  /* ───────── SKELETON LOADING ───────── */
+  /* ───────── LOADING ───────── */
   if (authLoading || loading) {
     return (
-      <main className="wrap_signout">
-        <div className="skel header">
-          <div className="line w40" />
-          <div className="pill" />
-        </div>
-
-        <div className="skel card">
-          <div className="line w25" />
-          <div className="grid">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="box" />
-            ))}
-          </div>
-        </div>
-
-        <div className="grid actions">
-          <div className="box tall" />
-          <div className="box tall" />
-        </div>
-
-        <style jsx>{`
-          .wrap_signout {
-            min-height: 100vh;
-            background: radial-gradient(circle at top, #0b0f0f, #050505);
-            padding: 2.5rem;
-            max-width: 1100px;
-            margin: auto;
-          }
-
-          .skel {
-            background: linear-gradient(
-              90deg,
-              #111 25%,
-              #1a1a1a 37%,
-              #111 63%
-            );
-            background-size: 400% 100%;
-            animation: shimmer 1.4s infinite;
-            border-radius: 18px;
-            margin-bottom: 2rem;
-          }
-
-          .header {
-            display: flex;
-            justify-content: space-between;
-            padding: 1.6rem;
-          }
-
-          .line {
-            height: 18px;
-            border-radius: 8px;
-          }
-
-          .w40 { width: 40%; }
-          .w25 { width: 25%; }
-
-          .pill {
-            width: 90px;
-            height: 36px;
-            border-radius: 999px;
-          }
-
-          .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1rem;
-          }
-
-          .box {
-            height: 54px;
-            border-radius: 14px;
-          }
-
-          .box.tall {
-            height: 120px;
-          }
-
-          @keyframes shimmer {
-            0% { background-position: 100% 0; }
-            100% { background-position: 0 0; }
-          }
-        `}</style>
+      <main className="wrap">
+        <p style={{ color: "#9ca3af" }}>Loading…</p>
       </main>
     );
   }
 
-  /* ───────── DASHBOARD ───────── */
   return (
-    <main className="wrap_signout">
+    <main className="wrap">
       {/* HEADER */}
-      <header className="top fade-in">
+      <header className="top">
         <div>
           <p className="eyebrow">Welcome back</p>
           <h1>{userData.name}</h1>
@@ -174,7 +92,7 @@ export default function DashboardPage() {
       </header>
 
       {/* PROFILE */}
-      <section className="card slide-up">
+      <section className="card">
         <h2>Profile</h2>
 
         <div className="grid">
@@ -242,12 +160,13 @@ export default function DashboardPage() {
         />
       </section>
 
+      {/* STYLES */}
       <style jsx>{`
-        .wrap_signout {
+        .wrap {
           min-height: 100vh;
           background: radial-gradient(circle at top, #0b0f0f, #050505);
           color: #fff;
-          padding: 2.5rem;
+          padding: clamp(1rem, 4vw, 2.5rem);
           max-width: 1100px;
           margin: auto;
         }
@@ -256,7 +175,18 @@ export default function DashboardPage() {
           display: flex;
           justify-content: space-between;
           align-items: flex-end;
-          margin-bottom: 2.6rem;
+          margin-bottom: 2rem;
+        }
+
+        .eyebrow {
+          color: #9ca3af;
+          font-size: 0.7rem;
+          letter-spacing: 0.28em;
+          text-transform: uppercase;
+        }
+
+        h1 {
+          font-size: clamp(1.4rem, 4vw, 2.1rem);
         }
 
         .top-actions {
@@ -268,9 +198,10 @@ export default function DashboardPage() {
           background: transparent;
           border: 1px solid rgba(255,255,255,0.25);
           color: #fff;
-          padding: 0.55rem 1rem;
+          padding: 0.5rem 0.9rem;
           border-radius: 999px;
           cursor: pointer;
+          font-size: 0.8rem;
         }
 
         .ghost {
@@ -282,44 +213,49 @@ export default function DashboardPage() {
           background: linear-gradient(180deg, #0f1414, #070808);
           border: 1px solid rgba(255,255,255,0.08);
           border-radius: 20px;
-          padding: 1.6rem;
-          margin-bottom: 2.6rem;
+          padding: 1.4rem;
+          margin-bottom: 2rem;
         }
 
         .grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-          gap: 1rem;
+          gap: 0.9rem;
         }
 
         .actions {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 1.2rem;
+          grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+          gap: 1rem;
         }
 
         .edit-actions {
-          margin-top: 1.5rem;
+          margin-top: 1.2rem;
           display: flex;
-          gap: 0.8rem;
+          gap: 0.6rem;
         }
 
-        .fade-in {
-          animation: fadeIn 0.45s ease-out forwards;
-        }
+        /* MOBILE FIXES */
+        @media (max-width: 640px) {
+          .top {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+          }
 
-        .slide-up {
-          animation: slideUp 0.55s ease-out forwards;
-        }
+          .top-actions {
+            width: 100%;
+          }
 
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
+          .top-actions button {
+            flex: 1;
+            font-size: 0.75rem;
+            padding: 0.45rem;
+          }
 
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(16px); }
-          to { opacity: 1; transform: translateY(0); }
+          .card {
+            padding: 1.1rem;
+          }
         }
       `}</style>
     </main>
@@ -327,7 +263,6 @@ export default function DashboardPage() {
 }
 
 /* ───────── PROFILE FIELD ───────── */
-
 function ProfileField({ label, value, editing = false, disabled = false, onChange }) {
   return (
     <div className={`field ${editing ? "editing" : ""}`}>
@@ -343,43 +278,36 @@ function ProfileField({ label, value, editing = false, disabled = false, onChang
         .field {
           background: linear-gradient(180deg, #0b0f0f, #060707);
           border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 16px;
-          padding: 1rem 1.1rem;
+          border-radius: 14px;
+          padding: 0.8rem 0.9rem;
           display: flex;
           flex-direction: column;
-          gap: 0.35rem;
+          gap: 0.25rem;
         }
 
         .label {
-          font-size: 0.65rem;
-          letter-spacing: 0.22em;
+          font-size: 0.6rem;
+          letter-spacing: 0.2em;
           text-transform: uppercase;
           color: #9ca3af;
         }
 
         .value {
-          font-size: 0.95rem;
-          font-weight: 500;
-          color: #fff;
+          font-size: 0.9rem;
         }
 
         input {
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.15);
-          border-radius: 10px;
-          padding: 0.55rem 0.65rem;
+          background: rgba(255,255,255,0.05);
+          border: 1px solid rgba(255,255,255,0.2);
+          border-radius: 8px;
+          padding: 0.45rem 0.55rem;
           color: #fff;
-          font-size: 0.95rem;
+          font-size: 0.9rem;
           outline: none;
         }
 
         input:focus {
           border-color: #22d3ee;
-          box-shadow: 0 0 0 2px rgba(34,211,238,0.15);
-        }
-
-        .editing {
-          border-color: rgba(34,211,238,0.35);
         }
       `}</style>
     </div>
@@ -387,7 +315,6 @@ function ProfileField({ label, value, editing = false, disabled = false, onChang
 }
 
 /* ───────── ACTION CARD ───────── */
-
 function Action({ title, desc, onClick }) {
   return (
     <div className="action" onClick={onClick}>
@@ -399,13 +326,13 @@ function Action({ title, desc, onClick }) {
           cursor: pointer;
           background: linear-gradient(180deg, #0f1414, #070808);
           border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 20px;
-          padding: 1.6rem;
+          border-radius: 18px;
+          padding: 1.4rem;
           transition: transform 0.25s ease;
         }
 
         .action:hover {
-          transform: translateY(-4px);
+          transform: translateY(-3px);
         }
 
         p {
