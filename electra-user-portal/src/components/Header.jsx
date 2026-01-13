@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { auth } from "../app/lib/firebase";
+import { auth, db } from "../app/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 
 const NAV = [
   { href: "/", label: "Home" },
@@ -15,12 +16,40 @@ const NAV = [
 
 export default function Header() {
   const pathname = usePathname();
+
   const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null);
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [merchOpen, setMerchOpen] = useState(false);
 
+  /* 🔐 AUTH + ROLE FETCH */
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, setUser);
+    const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (!firebaseUser) {
+        setUser(null);
+        setRole(null);
+        return;
+      }
+
+      setUser(firebaseUser);
+
+      try {
+        const snap = await getDoc(
+          doc(db, "users", firebaseUser.uid)
+        );
+
+        if (snap.exists()) {
+          setRole(snap.data().role);
+        } else {
+          setRole(null);
+        }
+      } catch (err) {
+        console.error("Role fetch failed", err);
+        setRole(null);
+      }
+    });
+
     return () => unsub();
   }, []);
 
@@ -60,8 +89,9 @@ export default function Header() {
               </button>
 
               {merchOpen && (
-                <div className="dropdown" 
-                onClick={() => setMerchOpen((v) => !v)}
+                <div
+                  className="dropdown"
+                  onClick={() => setMerchOpen(false)}
                 >
                   <Link href="/gotyourmerch">Products</Link>
                   <Link href="/cart">Cart</Link>
@@ -77,6 +107,12 @@ export default function Header() {
                 }`}
               >
                 Dashboard
+              </Link>
+            )}
+
+            {role === "admin" && (
+              <Link href="/admin" className="nav-link">
+                Admin
               </Link>
             )}
           </nav>
@@ -118,7 +154,7 @@ export default function Header() {
                 </Link>
               ))}
 
-              {/* MERCH (MOBILE DROPDOWN) */}
+              {/* MERCH */}
               <div className="mobile-merch">
                 <button
                   className="mobile-item merch-toggle"
@@ -164,12 +200,23 @@ export default function Header() {
                 </Link>
               </div>
             )}
+
+            {role === "admin" && (
+              <div className="mobile-cta">
+                <Link
+                  href="/admin"
+                  className="cta-btn"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Admin
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* STYLES */}
-      <style jsx>{`
+       <style jsx>{`
         * {
           box-sizing: border-box;
         }
@@ -411,4 +458,3 @@ export default function Header() {
 
 
 
-      
