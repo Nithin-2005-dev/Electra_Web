@@ -169,7 +169,7 @@ export default function DashboardPage() {
       <style jsx>{`
         .wrap {
           min-height: 100vh;
-          background: radial-gradient(circle at top, #0b0f0f, #050505);
+          {/* background: radial-gradient(circle at top, #0b0f0f, #050505); */}
           color: #fff;
           padding: clamp(1rem, 4vw, 2.5rem);
           max-width: 1100px;
