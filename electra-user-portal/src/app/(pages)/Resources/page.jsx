@@ -1,11 +1,13 @@
 import { ResourceStoreProvider } from "../../store/ResourceStore";
 import SemesterGrid from "../../../components/Resources/SemesterGrid";
 import ResourcesHeader from "../../../components/Resources/ResourcesHeader";
+import ResourceHint from "../../../components/Resources/ResourceHint";
 
 export default function ResourcesPage() {
   return (
     <main className="min-h-screen bg-black text-white px-6 py-16">
     <ResourcesHeader/>
+    <ResourceHint/>
       <ResourceStoreProvider>
         <header className="max-w-6xl mx-auto mb-12">
           <h1 className="text-3xl font-bold tracking-tight">

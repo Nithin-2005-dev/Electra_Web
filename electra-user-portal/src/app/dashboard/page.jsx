@@ -148,6 +148,11 @@ export default function DashboardPage() {
 
       {/* ACTIONS */}
       <section className="actions">
+      <Action
+    title="My Resources"
+    desc="Manage, upload and track your academic resources"
+    onClick={() => router.push("/MyResources")}
+  />
         <Action
           title="Merch Store"
           desc="Browse and order exclusive Electra merchandise"
