@@ -66,13 +66,134 @@ export default function DashboardPage() {
   };
 
   /* ───────── LOADING ───────── */
-  if (authLoading || loading) {
-    return (
-      <main className="wrap">
-        <p style={{ color: "#9ca3af" }}>Loading…</p>
-      </main>
-    );
-  }
+ if (authLoading || loading) {
+  return (
+    <main className="wrap">
+      <div className="loader">
+        <div className="header">
+          <div className="sk sk-eyebrow" />
+          <div className="sk sk-title" />
+        </div>
+
+        <div className="card">
+          <div className="grid">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div className="field" key={i}>
+                <div className="sk sk-label" />
+                <div className="sk sk-value" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="actions">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div className="action" key={i}>
+              <div className="sk sk-action-title" />
+              <div className="sk sk-action-desc" />
+            </div>
+          ))}
+        </div>
+
+        <style jsx>{`
+          .loader {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+          }
+
+          .header {
+            max-width: 300px;
+          }
+
+          .sk {
+            background: linear-gradient(
+              100deg,
+              rgba(255,255,255,0.04) 40%,
+              rgba(255,255,255,0.08) 50%,
+              rgba(255,255,255,0.04) 60%
+            );
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+            border-radius: 8px;
+          }
+
+          @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+          }
+
+          .sk-eyebrow {
+            width: 120px;
+            height: 10px;
+            margin-bottom: 0.6rem;
+          }
+
+          .sk-title {
+            width: 200px;
+            height: 26px;
+          }
+
+          .card {
+            background: linear-gradient(180deg, #0f1414, #070808);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 1.4rem;
+          }
+
+          .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+          }
+
+          .field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+          }
+
+          .sk-label {
+            width: 70px;
+            height: 8px;
+          }
+
+          .sk-value {
+            width: 100%;
+            height: 16px;
+          }
+
+          .actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1rem;
+          }
+
+          .action {
+            background: linear-gradient(180deg, #0f1414, #070808);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+            padding: 1.4rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+          }
+
+          .sk-action-title {
+            width: 140px;
+            height: 18px;
+          }
+
+          .sk-action-desc {
+            width: 90%;
+            height: 12px;
+          }
+        `}</style>
+      </div>
+    </main>
+  );
+}
+
 
   return (
     <main className="wrap">
@@ -148,6 +269,11 @@ export default function DashboardPage() {
 
       {/* ACTIONS */}
       <section className="actions">
+      <Action
+    title="My Resources"
+    desc="Manage, upload and track your academic resources"
+    onClick={() => router.push("/MyResources")}
+  />
         <Action
           title="Merch Store"
           desc="Browse and order exclusive Electra merchandise"
@@ -164,7 +290,7 @@ export default function DashboardPage() {
       <style jsx>{`
         .wrap {
           min-height: 100vh;
-          background: radial-gradient(circle at top, #0b0f0f, #050505);
+          {/* background: radial-gradient(circle at top, #0b0f0f, #050505); */}
           color: #fff;
           padding: clamp(1rem, 4vw, 2.5rem);
           max-width: 1100px;

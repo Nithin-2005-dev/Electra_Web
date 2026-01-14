@@ -4,10 +4,16 @@ import { useState } from "react";
 import PdfViewer from "./PdfViewer";
 
 export default function ResourceCard({ item }) {
-  const hasFile = Boolean(item?.driveUrl || item?.link);
+  const hasFile = Boolean(item.driveUrl || item.link);
   const [openPdf, setOpenPdf] = useState(false);
 
-  const fileUrl = item?.driveUrl || item?.link;
+  const fileUrl = item.driveUrl || item.link;
+
+  // uploader label (new system)
+  const uploadedBy =
+    item.visibility === "private" && item.createdBy === "user"
+      ? `Uploaded by ${item.ownerName || "User"}`
+      : "Uploaded by Electra";
 
   return (
     <>
@@ -43,11 +49,16 @@ export default function ResourceCard({ item }) {
           {/* HEADER */}
           <div className="mb-4">
             <h3 className="text-white font-semibold text-sm leading-snug line-clamp-2">
-              {item?.name || "Untitled Resource"}
+              {item.name}
             </h3>
 
             <p className="mt-1 text-xs uppercase tracking-wider text-slate-400">
-              {item?.category || "Resource"}
+              {item.category}
+            </p>
+
+            {/* uploader info */}
+            <p className="mt-1 text-[11px] text-slate-500">
+              {uploadedBy}
             </p>
           </div>
 
@@ -59,12 +70,7 @@ export default function ResourceCard({ item }) {
             {/* OPEN BUTTON */}
             <button
               onClick={() => {
-                if (!hasFile) {
-                  alert(
-                    "This resource is currently unavailable.\n\nOur team is working to upload it soon."
-                  );
-                  return;
-                }
+                if (!hasFile) return;
                 setOpenPdf(true);
               }}
               className={`
@@ -77,7 +83,7 @@ export default function ResourceCard({ item }) {
                 transition
               `}
             >
-              Open →
+              {hasFile ? "Open →" : "Unavailable"}
             </button>
 
             {/* SECONDARY ACTION */}
