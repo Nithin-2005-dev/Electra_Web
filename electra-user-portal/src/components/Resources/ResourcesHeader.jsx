@@ -16,7 +16,6 @@ export default function ResourcesHeader() {
 
   return (
     <header className="res-wrap">
-      {/* Ambient background */}
       <div className="res-ambient" aria-hidden />
 
       <div className="res-container">
@@ -60,17 +59,22 @@ export default function ResourcesHeader() {
             )}
           </div>
 
-          {/* MY RESOURCES CTA */}
-          <button
-            className="my-res-btn"
-            onClick={() => router.push("/MyResources")}
-          >
-            My Resources
-          </button>
+          {/* CONTRIBUTOR CTA */}
+          <div className="my-res-wrap">
+            <span className="my-res-hint">
+              Contribute • Manage • Control visibility
+            </span>
+
+            <button
+              className="my-res-btn"
+              onClick={() => router.push("/MyResources")}
+            >
+              My Resources
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* STYLES */}
       <style jsx>{`
         /* ===== LAYOUT ===== */
         .res-wrap {
@@ -85,13 +89,6 @@ export default function ResourcesHeader() {
           z-index: 1;
           max-width: 960px;
           margin: 0 auto;
-        }
-
-        /* ===== AMBIENT ===== */
-        .res-ambient {
-          position: absolute;
-          inset: 0;
-          pointer-events: none;
         }
 
         /* ===== EYEBROW ===== */
@@ -127,11 +124,11 @@ export default function ResourcesHeader() {
 
         /* ===== CONTEXT ROW ===== */
         .res-context-row {
-          margin: 2.2rem auto 0;
+          margin: 2.4rem auto 0;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.9rem;
+          gap: 1.2rem;
           flex-wrap: wrap;
         }
 
@@ -162,28 +159,52 @@ export default function ResourcesHeader() {
           opacity: 0.6;
         }
 
-        /* ===== MY RESOURCES BUTTON ===== */
+        /* ===== MY RESOURCES CTA ===== */
+        .my-res-wrap {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.35rem;
+        }
+
+        .my-res-hint {
+          font-size: 0.65rem;
+          letter-spacing: 0.08em;
+          color: rgba(167, 139, 250, 0.85);
+          text-transform: uppercase;
+        }
+
         .my-res-btn {
-          padding: 0.55rem 1.4rem;
+          padding: 0.6rem 1.6rem;
           border-radius: 999px;
           font-size: 0.75rem;
           font-weight: 500;
           color: #e0e7ff;
           background: linear-gradient(
             180deg,
-            rgba(99, 102, 241, 0.25),
-            rgba(99, 102, 241, 0.12)
+            rgba(99, 102, 241, 0.35),
+            rgba(99, 102, 241, 0.18)
           );
-          border: 1px solid rgba(99, 102, 241, 0.45);
+          border: 1px solid rgba(99, 102, 241, 0.55);
           cursor: pointer;
-          transition: all 0.25s ease;
+          position: relative;
+          box-shadow:
+            0 0 0 0 rgba(99, 102, 241, 0.4);
+          animation: glow 2.8s infinite ease-in-out;
+          transition: transform 0.25s ease;
         }
 
         .my-res-btn:hover {
           transform: translateY(-1px);
           box-shadow:
-            0 0 0 1px rgba(99, 102, 241, 0.45),
-            0 10px 24px rgba(0, 0, 0, 0.65);
+            0 0 0 1px rgba(99, 102, 241, 0.6),
+            0 14px 28px rgba(0, 0, 0, 0.7);
+        }
+
+        @keyframes glow {
+          0% { box-shadow: 0 0 0 0 rgba(99,102,241,0.0); }
+          50% { box-shadow: 0 0 0 6px rgba(99,102,241,0.08); }
+          100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.0); }
         }
 
         /* ===== MOBILE ===== */
@@ -202,7 +223,7 @@ export default function ResourcesHeader() {
 
           .my-res-btn {
             font-size: 0.72rem;
-            padding: 0.5rem 1.2rem;
+            padding: 0.55rem 1.4rem;
           }
         }
       `}</style>

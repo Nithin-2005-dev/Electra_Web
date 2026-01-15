@@ -2,24 +2,14 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { auth } from "../../../lib/firebase";
+import { auth, db } from "../../../lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { SubjectData } from "../../../utils/Subjects";
 
-/* ===============================
-   CLIENT ONLY
-================================ */
-function ClientOnly({ children }) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  if (!mounted) return null;
-  return children;
-}
+/* ───────────────── HELPERS ───────────────── */
 
-/* ===============================
-   HELPERS
-================================ */
 function getSubjectsBySemester(semester) {
   const sem = SubjectData.find(
     (s) => String(s.semester) === String(semester)
@@ -28,31 +18,24 @@ function getSubjectsBySemester(semester) {
 }
 
 function normalizeDriveUrl(url) {
-  if (!url) return "";
-  let clean = url.trim().replace(/\/$/, "");
-  if (!clean.endsWith("/preview")) clean += "/preview";
-  return clean;
+  return url?.trim() || "";
 }
 
-/* ===============================
-   PAGE EXPORT
-================================ */
+function isCollegeEmail(email) {
+  return email?.endsWith("@ee.nits.ac.in");
+}
+
+/* ───────────────── PAGE ───────────────── */
+
 export default function UploadResourcePage() {
-  return (
-    <ClientOnly>
-      <UploadResourceInner />
-    </ClientOnly>
-  );
-}
-
-/* ===============================
-   MAIN
-================================ */
-function UploadResourceInner() {
   const router = useRouter();
+
   const [user, setUser] = useState(null);
+  const [eligible, setEligible] = useState(false);
+  const [checking, setChecking] = useState(true);
+
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [alert, setAlert] = useState(null);
   const [availableSubjects, setAvailableSubjects] = useState([]);
 
   const [form, setForm] = useState({
@@ -64,17 +47,42 @@ function UploadResourceInner() {
     visibility: "private",
   });
 
+  /* ───────── AUTH + ROLE CHECK (FIXED) ───────── */
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
-      if (!u) return router.push("/");
+    const unsub = onAuthStateChanged(auth, async (u) => {
+      if (!u) {
+        router.replace("/auth/sign-in");
+        return;
+      }
+
       setUser(u);
+
+      try {
+        const snap = await getDoc(doc(db, "users", u.uid));
+        const role = snap.exists() ? snap.data().role : null;
+
+        const allowed =
+          role === "admin" || isCollegeEmail(u.email);
+
+        setEligible(allowed);
+      } catch (err) {
+        console.error("Eligibility check failed", err);
+        setEligible(false);
+      } finally {
+        setChecking(false);
+      }
     });
+
     return () => unsub();
   }, [router]);
 
+  /* ───────── SUBMIT ───────── */
   async function handleSubmit(e) {
     e.preventDefault();
-    setError("");
+    setAlert(null);
+
+    if (!eligible) return;
+
     setLoading(true);
 
     try {
@@ -91,66 +99,143 @@ function UploadResourceInner() {
       );
 
       router.push("/MyResources");
-    } catch {
-      setError("Upload failed. Try again.");
+    } catch (err) {
+      setAlert({
+        type: "error",
+        title: "Upload failed",
+        message:
+          err?.response?.data?.message ||
+          "Something went wrong. Please contact Electra Dev Team.",
+      });
     } finally {
       setLoading(false);
     }
   }
 
-  return (
-    <>
-      <main className="root">
-        {/* HEADER */}
-        <header className="header">
-          <span className="kicker">UPLOAD</span>
-          <h1>Academic Resource</h1>
-          <p>
-            Contribute notes, books or PYQs.
-            <br />
-            You decide who sees them.
-          </p>
-        </header>
+  /* ───────── LOADING SCREEN ───────── */
+  if (checking) {
+    return (
+      <main className="center">
+        <div className="spinner" />
+        <p>Verifying access…</p>
 
-        {/* FORM */}
+        <style jsx>{`
+          .center {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            background: #000;
+            color: #9ca3af;
+          }
+          .spinner {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #222;
+            border-top-color: #22d3ee;
+            animation: spin 1s linear infinite;
+          }
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
+      </main>
+    );
+  }
+
+  return (
+    <main className="root">
+      {/* ───── HEADER ───── */}
+      <header className="header">
+        <span className="kicker">CONTRIBUTE</span>
+        <h1>Upload Academic Resource</h1>
+        <p className="desc">
+          Share verified Electrical Engineering resources with your peers.
+        </p>
+      </header>
+
+      {/* ───── ACCESS DENIED ───── */}
+    {!eligible && (
+  <div className="alert warning access-card">
+    <span className="badge">UPLOAD ACCESS</span>
+
+    <h3>Contribution limited to verified members</h3>
+
+    <p className="lead">
+      To keep Electra’s academic resources accurate, relevant, and
+      department-specific, uploads are currently limited.
+    </p>
+
+    <div className="rules">
+      <p>Who can upload:</p>
+      <ul>
+        <li>Electrical Engineering students ( @ee.nits.ac.in )</li>
+        <li>Electra administrators</li>
+      </ul>
+    </div>
+
+    <p className="muted">
+      You’re signed in with an account that doesn’t meet this requirement.
+      You can still browse and use all public resources.
+    </p>
+
+    <button onClick={() => router.push("/auth/sign-in")}>
+      Switch to college email
+    </button>
+  </div>
+)}
+
+      {/* ───── FORM ───── */}
+      {eligible && (
         <form className="card" onSubmit={handleSubmit}>
-          {/* SECTION */}
-          <Section >
-            <Field label="Resource Name">
+          {alert && (
+            <div className={`alert ${alert.type}`}>
+              <h3>{alert.title}</h3>
+              <p>{alert.message}</p>
+            </div>
+          )}
+
+          <Section title="Resource details">
+            <Field label="Resource name">
               <input
+                required
                 value={form.name}
                 onChange={(e) =>
                   setForm({ ...form, name: e.target.value })
                 }
-                placeholder="Unit 1 Control Systems Notes"
-                required
+                placeholder="Control Systems – Unit 1 Notes"
               />
             </Field>
 
-            <Field label="Google Drive Link">
+            <Field label="Google Drive file link">
               <input
+                required
                 value={form.driveUrl}
                 onChange={(e) =>
                   setForm({ ...form, driveUrl: e.target.value })
                 }
-                placeholder="https://drive.google.com/file/d/..."
-                required
+                placeholder="https://drive.google.com/file/d/FILE_ID/"
               />
+              <p className="hint">
+                Example:
+                <code>
+                  https://drive.google.com/file/d/1bB9ETheDJfZsWOmB16WUr-KyonCi_hFN/
+                </code>
+              </p>
             </Field>
           </Section>
 
-          {/* SECTION */}
-          <Section>
+          <Section title="Academic classification">
             <div className="grid">
               <Field label="Semester">
                 <select
+                  required
                   value={form.semester}
                   onChange={(e) => {
                     const sem = e.target.value;
                     setForm({ ...form, semester: sem, subject: "" });
                     setAvailableSubjects(getSubjectsBySemester(sem));
                   }}
-                  required
                 >
                   <option value="">Select</option>
                   {SubjectData.map((s) => (
@@ -163,12 +248,12 @@ function UploadResourceInner() {
 
               <Field label="Subject">
                 <select
-                  value={form.subject}
+                  required
                   disabled={!availableSubjects.length}
+                  value={form.subject}
                   onChange={(e) =>
                     setForm({ ...form, subject: e.target.value })
                   }
-                  required
                 >
                   <option value="">
                     {availableSubjects.length
@@ -177,7 +262,7 @@ function UploadResourceInner() {
                   </option>
                   {availableSubjects.map((s) => (
                     <option key={s.code} value={s.code}>
-                      {s.name} ({s.code})
+                      {s.name}
                     </option>
                   ))}
                 </select>
@@ -186,11 +271,11 @@ function UploadResourceInner() {
 
             <Field label="Category">
               <select
+                required
                 value={form.category}
                 onChange={(e) =>
                   setForm({ ...form, category: e.target.value })
                 }
-                required
               >
                 <option value="">Select</option>
                 <option value="notes">Notes</option>
@@ -201,8 +286,7 @@ function UploadResourceInner() {
             </Field>
           </Section>
 
-          {/* SECTION */}
-          <Section>
+          <Section title="Visibility">
             <Field label="Who can access this resource?">
               <select
                 value={form.visibility}
@@ -210,18 +294,18 @@ function UploadResourceInner() {
                   setForm({ ...form, visibility: e.target.value })
                 }
               >
-                <option value="private">Private (only me)</option>
-                <option value="public">Public (everyone)</option>
+                <option value="private">Private (only you)</option>
+                <option value="public">Public (all students)</option>
               </select>
             </Field>
+            <p className="hint">
+              You can change visibility later from <strong>My Resources</strong>.
+            </p>
           </Section>
 
-          {error && <p className="error">{error}</p>}
-
-          {/* ACTIONS */}
           <div className="actions">
             <button className="primary" disabled={loading}>
-              {loading ? "Uploading…" : "Upload"}
+              {loading ? "Uploading…" : "Upload resource"}
             </button>
             <button
               type="button"
@@ -231,11 +315,15 @@ function UploadResourceInner() {
               Cancel
             </button>
           </div>
-        </form>
-      </main>
 
-      {/* ================= STYLES ================= */}
-      <style jsx>{`
+          <p className="footer-note">
+            Facing issues? Contact the <strong>Electra Dev Team</strong>.
+          </p>
+        </form>
+      )}
+
+      {/* ───── STYLES ───── */}
+       <style jsx>{`
         .root {
           min-height: 100vh;
           background: #000;
@@ -247,6 +335,7 @@ function UploadResourceInner() {
         }
 
         .header {
+          max-width: 640px;
           text-align: center;
           margin-bottom: 3rem;
         }
@@ -260,10 +349,9 @@ function UploadResourceInner() {
         h1 {
           font-size: 2.6rem;
           margin: 0.6rem 0;
-          color: #fff;
         }
 
-        .header p {
+        .desc {
           color: #9ca3af;
           font-size: 0.95rem;
         }
@@ -277,21 +365,48 @@ function UploadResourceInner() {
           padding: 2.2rem;
         }
 
+        .alert {
+          border-radius: 14px;
+          padding: 1.2rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .alert.warning {
+          background: rgba(234,179,8,0.08);
+          border: 1px solid rgba(234,179,8,0.35);
+        }
+
+        .alert.error {
+          background: rgba(239,68,68,0.08);
+          border: 1px solid rgba(239,68,68,0.35);
+        }
+
+        .alert h3 {
+          margin-bottom: 0.4rem;
+        }
+
+        .alert button {
+          margin-top: 0.8rem;
+          background: #fff;
+          color: #000;
+          border-radius: 999px;
+          padding: 0.5rem 1.4rem;
+          font-weight: 600;
+        }
+
         .section {
           margin-bottom: 2.2rem;
         }
 
-        .section h3 {
-          font-size: 0.85rem;
-          color: #a1a1aa;
-          margin-bottom: 1rem;
+        .grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 0.8rem;
         }
 
         label {
           font-size: 0.75rem;
           color: #9ca3af;
-          margin-bottom: 0.4rem;
-          display: block;
         }
 
         input,
@@ -304,49 +419,38 @@ function UploadResourceInner() {
           border-radius: 10px;
         }
 
-        input:focus,
-        select:focus {
-          outline: none;
-          border-color: #3f3f46;
+        .hint {
+          font-size: 0.7rem;
+          color: #9ca3af;
+          margin-top: 0.4rem;
         }
-
-        .grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 0.8rem;
-        }
-
 
         .actions {
           display: flex;
           gap: 0.8rem;
-          margin-top: 1.8rem;
+          margin-top: 2rem;
         }
 
         .primary {
           flex: 1;
           background: #fff;
           color: #000;
-          border: none;
-          padding: 0.75rem;
           border-radius: 999px;
+          padding: 0.75rem;
           font-weight: 600;
-          cursor: pointer;
         }
 
         .secondary {
-          background: transparent;
           border: 1px solid #27272a;
-          color: #e5e7eb;
           padding: 0.75rem 1.6rem;
           border-radius: 999px;
-          cursor: pointer;
         }
 
-        .error {
-          color: #f87171;
-          font-size: 0.8rem;
-          margin-top: 0.6rem;
+        .footer-note {
+          margin-top: 1.6rem;
+          font-size: 0.75rem;
+          color: #9ca3af;
+          text-align: center;
         }
 
         @media (max-width: 520px) {
@@ -354,18 +458,56 @@ function UploadResourceInner() {
             grid-template-columns: 1fr;
           }
         }
+        .access-card {
+  text-align: left;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  color: #facc15;
+  margin-bottom: 0.6rem;
+}
+
+.lead {
+  color: #e5e7eb;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.rules {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid #27272a;
+  border-radius: 12px;
+  padding: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.rules p {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  margin-bottom: 0.4rem;
+}
+
+.rules ul {
+  margin: 0;
+  padding-left: 1rem;
+  font-size: 0.75rem;
+  color: #e5e7eb;
+}
+
       `}</style>
-    </>
+    </main>
   );
 }
 
-/* ===============================
-   SMALL COMPONENTS
-================================ */
+/* ───────────────── SMALL COMPONENTS ───────────────── */
+
 function Section({ title, children }) {
   return (
     <div className="section">
-      <h3>{title}</h3>
+      <h3 style={{ marginBottom: "0.8rem" }}>{title}</h3>
       {children}
     </div>
   );
@@ -379,3 +521,5 @@ function Field({ label, children }) {
     </div>
   );
 }
+
+

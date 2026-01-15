@@ -7,21 +7,27 @@ export async function POST(req) {
 
   try {
     const { semester, subject, category } = await req.json();
-    // 🔐 Validation (DO NOT REMOVE)
-    if (!semester && !subject) {
+
+    /* 🔐 VALIDATION */
+    if (!semester || !subject) {
       return NextResponse.json(
         { message: "semester and subject are required" },
         { status: 400 }
       );
     }
 
-    // 🔎 Base query
+    /* 🔎 BASE QUERY (BACKWARD COMPATIBLE) */
     const query = {
-      semester: semester,
-      subject: subject,
+      semester,
+      subject,
+      $or: [
+        { visibility: "public" },      // new public uploads
+        { createdBy: "admin" },        // explicit admin uploads
+        { ownerUid: null },            // legacy admin uploads
+      ],
     };
 
-    // 🎯 Optional category filter
+    /* 🎯 OPTIONAL CATEGORY FILTER */
     if (category && category !== "all") {
       query.category = category;
     }
@@ -35,7 +41,7 @@ export async function POST(req) {
     console.error("getRes error:", err);
 
     return NextResponse.json(
-      { message: "Something went wrong", error: err.message },
+      { message: "Something went wrong" },
       { status: 500 }
     );
   }

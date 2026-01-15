@@ -2,31 +2,61 @@ import { Resource } from "../../../../models/resources.model";
 import { ConnectDb } from "../../../database/dbConfig";
 import { NextResponse } from "next/server";
 import admin from "../../../lib/firebaseAdmin";
+import { User } from "../../../../models/user.model";
+
+const DRIVE_REGEX =
+  /^https:\/\/drive\.google\.com\/file\/d\/[a-zA-Z0-9_-]+\/?/;
 
 export async function POST(req) {
   await ConnectDb();
 
   try {
-    /* 1️⃣ AUTH CHECK */
+    /* ───────── AUTH CHECK ───────── */
     const authHeader = req.headers.get("authorization");
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (!authHeader?.startsWith("Bearer ")) {
       return NextResponse.json(
-        { message: "Unauthorized" },
+        {
+          title: "Authentication required",
+          message:
+            "Please sign in to upload resources.",
+        },
         { status: 401 }
       );
     }
 
     const token = authHeader.split(" ")[1];
     const decoded = await admin.auth().verifyIdToken(token);
-    console.log(decoded)
+
     const uid = decoded.uid;
-    const role = decoded.role || "member";
+    const email = decoded.email || "";
+    const firebaseName = decoded.name || "Unknown User";
 
-    /* 2️⃣ GET OWNER NAME (SAFE) */
-    let ownerName = decoded.name || null;
+    /* ───────── FETCH OPTIONAL PROFILE ───────── */
+    const dbUser = await User.findOne({ uid });
 
-    /* 3️⃣ BODY */
+    const role = dbUser?.role || "member";
+    const ownerName =
+      role === "admin"
+        ? "Electra Society"
+        : dbUser?.name || firebaseName;
+
+    /* ───────── ACCESS CONTROL ───────── */
+    const isAdmin = role === "admin";
+    const isElectricalStudent = email.endsWith("@ee.nits.ac.in");
+
+    if (!isAdmin && !isElectricalStudent) {
+      return NextResponse.json(
+        {
+          title: "Access restricted",
+          message:
+            "Only Electrical Engineering students can upload resources.\n\nPlease sign in using your official @ee.nits.ac.in email ID.",
+        },
+        { status: 403 }
+      );
+    }
+
+    /* ───────── REQUEST BODY ───────── */
     const {
       driveUrl,
       semester,
@@ -38,44 +68,64 @@ export async function POST(req) {
 
     if (!driveUrl || !semester || !subject || !category || !name) {
       return NextResponse.json(
-        { message: "All fields are mandatory" },
+        {
+          title: "Missing information",
+          message: "All fields are mandatory.",
+        },
         { status: 400 }
       );
     }
 
-    /* 4️⃣ VISIBILITY ENFORCEMENT */
-    let finalVisibility = "private";
-
-    if (role === "admin" && visibility === "public") {
-      finalVisibility = "public";
+    /* ───────── DRIVE LINK VALIDATION ───────── */
+    if (!DRIVE_REGEX.test(driveUrl)) {
+      return NextResponse.json(
+        {
+          title: "Invalid Drive link",
+          message:
+            "Please upload a valid Google Drive file link.\n\nExample:\nhttps://drive.google.com/file/d/FILE_ID/",
+        },
+        { status: 400 }
+      );
     }
 
-    /* 5️⃣ CREATE RESOURCE */
+    /* ───────── VISIBILITY RULE ───────── */
+    const finalVisibility =
+      isAdmin && visibility === "public"
+        ? "public"
+        : "private";
+
+    /* ───────── CREATE RESOURCE ───────── */
     const resource = await Resource.create({
       driveUrl,
       semester,
       subject,
       category,
       name,
-
       visibility: finalVisibility,
 
       ownerUid: uid,
-      ownerName: role === "admin" ? null : ownerName, // admin → Electra
-      createdBy: role === "admin" ? "admin" : "user",
+      ownerName,
+      createdBy: isAdmin ? "admin" : "user",
     });
 
     return NextResponse.json(
       {
-        message: "Resource uploaded successfully",
+        title: "Upload successful",
+        message:
+          "Your resource has been uploaded successfully.",
         id: resource._id,
       },
       { status: 201 }
     );
   } catch (err) {
-    console.error(err);
+    console.error("RESOURCE_UPLOAD_ERROR:", err);
+
     return NextResponse.json(
-      { message: "Server error" },
+      {
+        title: "Upload failed",
+        message:
+          "Something went wrong. Please try again.",
+      },
       { status: 500 }
     );
   }
