@@ -14,7 +14,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        router.push("/sign-in");
+        router.push("/auth/sign-in");
         return;
       }
 
@@ -45,212 +45,227 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="loader">
-        <div className="ring" />
-        <p>Loading your contribution hub…</p>
+      <main className="loader">
+        <div className="dot" />
+        <p>Loading your workspace…</p>
 
         <style jsx>{`
           .loader {
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: #05070c;
-            color: #9ca3af;
+            display: grid;
+            place-items: center;
+            background: #000;
+            color: #6b7280;
           }
-          .ring {
-            width: 48px;
-            height: 48px;
+          .dot {
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            border: 2px solid rgba(255,255,255,0.1);
-            border-top-color: #22d3ee;
-            animation: spin 1s linear infinite;
+            background: #fff;
+            animation: blink 1.2s infinite ease-in-out;
             margin-bottom: 1rem;
           }
-          @keyframes spin {
-            to { transform: rotate(360deg); }
+          @keyframes blink {
+            0%,100% { opacity: 0.2 }
+            50% { opacity: 1 }
           }
         `}</style>
-      </div>
+      </main>
     );
   }
 
   return (
     <main className="page">
-      <div className="wrap">
+      {/* INTRO */}
+      <section className="intro">
+        <span className="label">ELECTRA SOCIETY</span>
+        <h1>Your Contribution Space</h1>
+        <p className="lead">
+          This is where your academic work becomes part of a shared knowledge
+          system — helping juniors, peers, and future batches learn faster.
+        </p>
+      </section>
 
-        {/* HEADER */}
-        <header className="hero">
-          <p className="eyebrow">MY RESOURCES</p>
-          <h1>Your Contribution Hub</h1>
-          <p className="desc">
-            Upload, manage, and control how your academic resources appear across Electra.
-          </p>
-        </header>
+      {/* WHY CONTRIBUTE */}
+      <section className="why">
+        <h2>Why your contribution matters</h2>
+        <p>
+          Every note, assignment, or reference you upload reduces friction for
+          someone else. It saves hours, removes confusion, and creates a culture
+          where learning compounds instead of restarting every semester.
+        </p>
+        <p>
+          Electra is not a content dump. It is a curated academic memory of NIT
+          Silchar — built student by student.
+        </p>
+      </section>
 
-        {/* STATS */}
-        <section className="stats">
-          <Stat title="Total Resources" value={stats.total} />
-          <Stat title="Public" value={stats.publicCount} accent="cyan" />
-          <Stat title="Private" value={stats.privateCount} accent="red" />
-        </section>
+      {/* STATS */}
+      <section className="stats">
+        <Stat title="Total uploads" value={stats.total} />
+        <Stat title="Public resources" value={stats.publicCount} />
+        <Stat title="Private drafts" value={stats.privateCount} />
+      </section>
 
-        {/* LATEST */}
-        <section className="latest">
-          <h2>Latest Contribution</h2>
+      {/* CONTROL */}
+      <section className="control">
+        <h2>You stay in control</h2>
+        <p>
+          Not everything needs to be public. You can keep resources private —
+          for drafts, personal notes, or content you’re not ready to share.
+        </p>
+        <p>
+          You decide what the community sees. You can change visibility anytime.
+        </p>
+      </section>
 
-          {stats.lastUploaded ? (
-            <div className="latest-card">
-              <div className="dot" />
-              <div className="info">
-                <strong>{stats.lastUploaded.name}</strong>
-                <span>
-                  {stats.lastUploaded.subject} · Semester {stats.lastUploaded.semester}
-                </span>
-              </div>
-              <button onClick={() => router.push("/MyResources/manage-resources")}>
-                View
-              </button>
+      {/* LATEST */}
+      <section className="latest">
+        <h2>Latest activity</h2>
+
+        {stats.lastUploaded ? (
+          <div className="latest-card">
+            <div className="bar" />
+            <div>
+              <strong>{stats.lastUploaded.name}</strong>
+              <span>
+                {stats.lastUploaded.subject} · Semester{" "}
+                {stats.lastUploaded.semester}
+              </span>
             </div>
-          ) : (
-            <p className="muted">No uploads yet</p>
-          )}
-        </section>
+            <button onClick={() => router.push("/MyResources/manage-resources")}>
+              Open
+            </button>
+          </div>
+        ) : (
+          <p className="muted">You haven’t uploaded anything yet.</p>
+        )}
+      </section>
 
-        {/* COMMAND BAR */}
-        <section className="commands">
-          <button
-            className="primary"
-            onClick={() => router.push("/MyResources/upload-resources")}
-          >
-            Upload Resource
-          </button>
-
-          <button
-            className="secondary"
-            onClick={() => router.push("/MyResources/manage-resources")}
-          >
-            Manage Resources
-          </button>
-        </section>
-
-      </div>
+      {/* ACTIONS */}
+      <section className="actions">
+        <button
+          className="primary"
+          onClick={() => router.push("/MyResources/upload-resources")}
+        >
+          Upload resource
+        </button>
+        <button
+          className="secondary"
+          onClick={() => router.push("/MyResources/manage-resources")}
+        >
+          Manage my resources
+        </button>
+      </section>
 
       <style jsx>{`
         .page {
           min-height: 100vh;
-          {/* background: #05070c; */}
+          background: #000;
           color: #fff;
-          padding: 3rem 1.5rem;
+          padding: 4rem 1.5rem 6rem;
         }
 
-        .wrap {
-          max-width: 1100px;
-          margin: 0 auto;
+        section {
+          max-width: 920px;
+          margin: 0 auto 4rem;
         }
 
-        /* HERO */
-        .hero {
-          margin-bottom: 3rem;
-        }
-
-        .eyebrow {
+        .label {
           font-size: 0.7rem;
           letter-spacing: 0.35em;
-          color: #67e8f9;
+          color: #6b7280;
         }
 
         h1 {
-          font-size: 2.6rem;
-          margin: 0.6rem 0;
+          font-size: 3rem;
+          margin: 0.6rem 0 1rem;
         }
 
-        .desc {
+        h2 {
+          font-size: 1.25rem;
+          margin-bottom: 0.8rem;
+        }
+
+        .lead {
+          font-size: 1.05rem;
           color: #9ca3af;
-          max-width: 520px;
-          line-height: 1.6;
+          max-width: 640px;
+          line-height: 1.7;
         }
 
-        /* STATS */
+        p {
+          color: #9ca3af;
+          line-height: 1.7;
+          margin-bottom: 0.8rem;
+        }
+
         .stats {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           gap: 1.5rem;
-          margin-bottom: 3.5rem;
-        }
-
-        /* LATEST */
-        .latest h2 {
-          font-size: 1.1rem;
-          margin-bottom: 1rem;
         }
 
         .latest-card {
           display: flex;
           align-items: center;
           gap: 1.2rem;
-          background: rgba(255,255,255,0.03);
-          border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 18px;
+          border: 1px solid #1f2933;
           padding: 1.2rem 1.4rem;
-          max-width: 720px;
+          border-radius: 12px;
         }
 
-        .dot {
-          width: 10px;
-          height: 10px;
-          border-radius: 50%;
-          background: #22d3ee;
+        .bar {
+          width: 3px;
+          height: 32px;
+          background: #fff;
         }
 
-        .info {
-          flex: 1;
-        }
-
-        .info span {
-          color: #9ca3af;
+        .latest-card span {
+          display: block;
           font-size: 0.85rem;
+          color: #6b7280;
         }
 
         .latest-card button {
-          background: transparent;
-          border: 1px solid rgba(255,255,255,0.25);
+          margin-left: auto;
+          background: none;
+          border: 1px solid #374151;
           color: #fff;
-          padding: 0.45rem 1.2rem;
+          padding: 0.4rem 1.2rem;
           border-radius: 999px;
-          cursor: pointer;
         }
 
-        /* COMMAND BAR */
-        .commands {
-          margin-top: 4rem;
+        .actions {
           display: flex;
           gap: 1rem;
+          flex-wrap: wrap;
         }
 
         .primary {
-          background: rgba(34,211,238,0.15);
-          border: 1px solid rgba(34,211,238,0.6);
-          color: #67e8f9;
-          padding: 0.9rem 2.2rem;
+          background: #fff;
+          color: #000;
+          padding: 0.85rem 2.2rem;
           border-radius: 999px;
           font-weight: 600;
         }
 
         .secondary {
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.25);
+          background: none;
+          border: 1px solid #374151;
           color: #fff;
-          padding: 0.9rem 2.2rem;
+          padding: 0.85rem 2.2rem;
           border-radius: 999px;
         }
 
         .muted {
-          color: #9ca3af;
+          color: #6b7280;
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 800px) {
+          h1 {
+            font-size: 2.2rem;
+          }
           .stats {
             grid-template-columns: 1fr;
           }
@@ -260,34 +275,28 @@ export default function DashboardPage() {
   );
 }
 
-/* STAT */
-function Stat({ title, value, accent }) {
+function Stat({ title, value }) {
   return (
-    <div className={`stat ${accent || ""}`}>
+    <div className="stat">
       <span>{title}</span>
       <strong>{value}</strong>
 
       <style jsx>{`
         .stat {
-          background: rgba(255,255,255,0.03);
-          border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 18px;
+          border: 1px solid #1f2933;
           padding: 1.6rem;
+          border-radius: 12px;
         }
-
         span {
           font-size: 0.75rem;
-          color: #9ca3af;
+          color: #6b7280;
+          letter-spacing: 0.08em;
         }
-
         strong {
           display: block;
-          font-size: 2.2rem;
+          font-size: 2.4rem;
           margin-top: 0.4rem;
         }
-
-        .cyan strong { color: #22d3ee; }
-        .red strong { color: #f87171; }
       `}</style>
     </div>
   );

@@ -11,7 +11,7 @@ export default function ResourceCard({ item }) {
 
   // uploader label (new system)
   const uploadedBy =
-    item.visibility === "private" && item.createdBy === "user"
+    item.visibility === "public" && item.createdBy === "user"
       ? `Uploaded by ${item.ownerName || "User"}`
       : "Uploaded by Electra";
 
