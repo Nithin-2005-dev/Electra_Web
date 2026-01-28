@@ -8,6 +8,7 @@ import { cloudinaryImage, cloudinaryVideo } from "../../app/lib/cloudinary";
 
 export default function MerchCard({ product }) {
   const soldOut = !product.available;
+  const isComing = product.isComing 
 
   const [user, setUser] = useState(null);
   const [subscribed, setSubscribed] = useState(false);
@@ -28,14 +29,11 @@ export default function MerchCard({ product }) {
 
   const shouldLoop = isTouch ? inView : playing;
 
-  /* ───────── SAFE VIDEO HELPERS ───────── */
   const safePlay = async (video) => {
     if (!video || !video.paused) return;
     try {
       await video.play();
-    } catch {
-      // AbortError is expected during fast hover/scroll
-    }
+    } catch {}
   };
 
   const safePause = (video) => {
@@ -43,7 +41,6 @@ export default function MerchCard({ product }) {
     video.pause();
   };
 
-  /* ───────── AUTH ───────── */
   useEffect(() => {
     const unsub = auth.onAuthStateChanged((u) => {
       setUser(u || null);
@@ -52,36 +49,27 @@ export default function MerchCard({ product }) {
     return () => unsub();
   }, [product.interestedUsers]);
 
-  /* ───────── VIDEO CONTROL ───────── */
   const startPreview = () => {
     if (!product.video) return;
-
     setPlaying(true);
     setDirection("forward");
-
     safePause(backwardRef.current);
     if (backwardRef.current) backwardRef.current.currentTime = 0;
-
     if (forwardRef.current) forwardRef.current.currentTime = 0;
     safePlay(forwardRef.current);
   };
 
   const stopPreview = () => {
     setPlaying(false);
-
     safePause(forwardRef.current);
     safePause(backwardRef.current);
-
     if (forwardRef.current) forwardRef.current.currentTime = 0;
     if (backwardRef.current) backwardRef.current.currentTime = 0;
   };
 
-  /* ───────── INFINITE PING-PONG LOOP (NO FLICKER) ───────── */
   const onForwardEnd = () => {
     if (!shouldLoop) return;
-
     setDirection("backward");
-
     requestAnimationFrame(() => {
       if (!backwardRef.current) return;
       backwardRef.current.currentTime = 0;
@@ -91,9 +79,7 @@ export default function MerchCard({ product }) {
 
   const onBackwardEnd = () => {
     if (!shouldLoop) return;
-
     setDirection("forward");
-
     requestAnimationFrame(() => {
       if (!forwardRef.current) return;
       forwardRef.current.currentTime = 0;
@@ -101,35 +87,28 @@ export default function MerchCard({ product }) {
     });
   };
 
-  /* ───────── MOBILE VIEWPORT ───────── */
   useEffect(() => {
     if (!isTouch || !product.video || !cardRef.current) return;
-
     const observer = new IntersectionObserver(
       ([entry]) => {
         const visible = entry.intersectionRatio >= 0.85;
         setInView(visible);
-
         if (visible) startPreview();
         else stopPreview();
       },
       { threshold: [0, 0.85, 1] }
     );
-
     observer.observe(cardRef.current);
     return () => observer.disconnect();
   }, [isTouch, product.video]);
 
-  /* ───────── TOAST ───────── */
   const showToast = (msg) => {
     setToast(msg);
     setTimeout(() => setToast(null), 2500);
   };
 
-  /* ───────── NOTIFY ───────── */
   const toggleNotify = async () => {
     if (loading) return;
-
     if (!user) {
       showToast("Please sign in to get notified");
       return;
@@ -157,7 +136,6 @@ export default function MerchCard({ product }) {
     }
   };
 
-  /* 🔑 FIX: image visibility depends on actual video visibility */
   const showVideo =
     playing && (direction === "forward" || direction === "backward");
 
@@ -171,6 +149,7 @@ export default function MerchCard({ product }) {
       >
         <Link href={`/getyourmerch/${product.id}`} className="imageLink">
           <div className="imageWrap">
+            {isComing && <span className="COMING">COMING SOON</span>}
             {soldOut && <span className="sold">SOLD OUT</span>}
 
             <img
@@ -213,7 +192,7 @@ export default function MerchCard({ product }) {
           <p className="name">{product.name}</p>
           <p className="price">₹{product.price}</p>
 
-          {soldOut && (
+          {(soldOut || isComing) && (
             <button
               className="notifyBtn"
               onClick={toggleNotify}
@@ -222,12 +201,13 @@ export default function MerchCard({ product }) {
               {subscribed ? "SUBSCRIBED ✓" : "NOTIFY ME"}
             </button>
           )}
+          
         </div>
       </div>
 
       {toast && <div className="toast">{toast}</div>}
 
-      <style jsx>{`
+       <style jsx>{`
         .card {
           border-radius: 26px;
           padding: 1rem;
@@ -287,6 +267,34 @@ export default function MerchCard({ product }) {
           border-radius: 999px;
           font-size: 0.65rem;
         }
+.COMING {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 5;
+
+  background: linear-gradient(
+    135deg,
+    #fff1b8,
+    #f7c873,
+    #e6a23c,
+    #fbe29a
+  );
+  color: #2b1900;
+
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+
+  box-shadow:
+    0 4px 12px rgba(255, 200, 100, 0.45),
+    inset 0 0 6px rgba(255, 255, 255, 0.6);
+}
+
 
         .info {
           text-align: center;
