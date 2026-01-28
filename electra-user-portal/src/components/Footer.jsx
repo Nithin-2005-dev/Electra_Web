@@ -23,7 +23,7 @@ export default function Footer() {
     link: "/Team",
   },{
     name: "Merch",
-    link: "/gotyourmerch",
+    link: "/getyourmerch",
   },{
     name:"Dashboard",
     link:"/dashboard",

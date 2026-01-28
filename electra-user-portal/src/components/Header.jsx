@@ -93,7 +93,7 @@ export default function Header() {
                   className="dropdown"
                   onClick={() => setMerchOpen(false)}
                 >
-                  <Link href="/gotyourmerch">Products</Link>
+                  <Link href="/getyourmerch">Products</Link>
                   <Link href="/cart">Cart</Link>
                 </div>
               )}
@@ -173,7 +173,7 @@ export default function Header() {
                 {merchOpen && (
                   <div className="mobile-merch-items">
                     <Link
-                      href="/gotyourmerch"
+                      href="/getyourmerch"
                       onClick={() => setMenuOpen(false)}
                     >
                       Products

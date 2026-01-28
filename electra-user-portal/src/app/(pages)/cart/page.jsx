@@ -153,7 +153,7 @@ export default function CartPage() {
           <div className="icon">🛒</div>
           <h2>Your cart is empty</h2>
           <p>Add something you actually want to wear.</p>
-          <button onClick={() => router.push("/gotyourmerch")}>
+          <button onClick={() => router.push("/getyourmerch")}>
             Explore merch
           </button>
         </div>
@@ -212,7 +212,7 @@ export default function CartPage() {
 
   <button
     className="continue"
-    onClick={() => router.push("/gotyourmerch")}
+    onClick={() => router.push("/getyourmerch")}
   >
     ← Continue shopping
   </button>

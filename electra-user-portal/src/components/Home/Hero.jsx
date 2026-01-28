@@ -82,7 +82,7 @@ export default function Hero() {
           NIT Silchar — where ideas become impact.
         </p>
         <div className="actions">
-        <Link href={'/gotyourmerch'}>
+        <Link href={'/getyourmerch'}>
 <button className="primary">Explore Merch</button>
         </Link>
 
