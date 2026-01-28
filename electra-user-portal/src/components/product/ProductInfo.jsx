@@ -157,7 +157,7 @@ export default function ProductInfo({
         <div className="actions">
           <button
             className="add-cart"
-            disabled={!product?.available || !size || adding}
+            disabled={!product?.available || product.isComing || !size || adding}
             onClick={addToCart}
           >
             {adding ? "Adding…" : "Add to Cart"}
@@ -165,7 +165,7 @@ export default function ProductInfo({
 
           <button
             className="buy"
-            disabled={!product?.available || !size || buying}
+            disabled={!product?.available || product.isComing || !size || buying}
             onClick={() =>
               onBuy({
                 size,
