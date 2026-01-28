@@ -277,7 +277,7 @@ export default function DashboardPage() {
         <Action
           title="Merch Store"
           desc="Browse and order exclusive Electra merchandise"
-          onClick={() => router.push("/gotyourmerch")}
+          onClick={() => router.push("/getyourmerch")}
         />
         <Action
           title="My Orders"

@@ -169,7 +169,7 @@ export default function MerchCard({ product }) {
         onMouseEnter={!isTouch ? startPreview : undefined}
         onMouseLeave={!isTouch ? stopPreview : undefined}
       >
-        <Link href={`/gotyourmerch/${product.id}`} className="imageLink">
+        <Link href={`/getyourmerch/${product.id}`} className="imageLink">
           <div className="imageWrap">
             {soldOut && <span className="sold">SOLD OUT</span>}
 

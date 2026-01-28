@@ -40,7 +40,7 @@ export default function ProductPage() {
 
     const loadProduct = async () => {
       const snap = await getDoc(doc(db, "products", productId));
-      if (!snap.exists()) return router.replace("/gotyourmerch");
+      if (!snap.exists()) return router.replace("/getyourmerch");
 
       const data = snap.data();
       setProduct({
