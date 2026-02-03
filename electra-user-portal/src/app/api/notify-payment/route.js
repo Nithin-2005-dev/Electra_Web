@@ -69,13 +69,13 @@ export async function POST(req) {
 
     const user = userSnap.exists ? userSnap.data() : {};
 
-    /* ───────── SEND ADMIN EMAIL ───────── */
-    await resend.emails.send({
-      from: "Electra Orders <no-reply@electrasocietynits.com>",
-      to: ["societyelectra@gmail.com"],
-      subject: `Payment submitted — ${orderId}`,
-      html: adminEmailHtml(order, items),
-    });
+    // /* ───────── SEND ADMIN EMAIL ───────── */
+    // await resend.emails.send({
+    //   from: "Electra Orders <no-reply@electrasocietynits.com>",
+    //   to: ["societyelectra@gmail.com"],
+    //   subject: `Payment submitted — ${orderId}`,
+    //   html: adminEmailHtml(order, items),
+    // });
 
     /* ───────── SEND USER EMAIL ───────── */
     if (user.email) {
