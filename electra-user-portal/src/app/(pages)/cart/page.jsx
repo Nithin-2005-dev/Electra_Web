@@ -76,7 +76,7 @@ export default function CartPage() {
   );
 
   const printTotal = items.reduce(
-    (s, i) => s + (i.printName ? 50 * i.quantity : 0),
+    (s, i) => s + (i.printName ? 40 * i.quantity : 0),
     0
   );
 

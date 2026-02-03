@@ -22,12 +22,15 @@ export default function AdminProductsPage() {
 
   // form state
   const [name, setName] = useState("");
+  const [tagline, setTagline] = useState("");
+  const [desc, setDesc] = useState("");
+  const [description, setDescription] = useState(""); // optional short
   const [price, setPrice] = useState("");
-  const [description, setDescription] = useState("");
   const [imageMain, setImageMain] = useState("");
   const [gallery, setGallery] = useState("");
+  const [video, setVideo] = useState("");
 
-  /* ================= ADMIN GUARD (STRICT) ================= */
+  /* ================= ADMIN GUARD ================= */
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) {
@@ -38,12 +41,7 @@ export default function AdminProductsPage() {
       const userRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userRef);
 
-      // 🔐 STRICT ROLE CHECK
-      if (
-        !userSnap.exists() ||
-        !userSnap.data()?.role ||
-        userSnap.data().role !== "admin"
-      ) {
+      if (!userSnap.exists() || userSnap.data()?.role !== "admin") {
         router.replace("/");
         return;
       }
@@ -63,38 +61,41 @@ export default function AdminProductsPage() {
 
   /* ================= ADD PRODUCT ================= */
   const addProduct = async () => {
-    if (!name || !price || !imageMain) return;
+    if (!name || !price || !imageMain) return alert("Missing required fields");
 
     await addDoc(collection(db, "products"), {
       name,
+      tagline,
+      desc,
       description,
       price: Number(price),
 
-      // Cloudinary public_ids ONLY
       imageMain,
       imageGallery: gallery
         .split("\n")
         .map((s) => s.trim())
         .filter(Boolean),
+      video,
 
       available: true,
       createdAt: serverTimestamp(),
     });
 
     setName("");
-    setPrice("");
+    setTagline("");
+    setDesc("");
     setDescription("");
+    setPrice("");
     setImageMain("");
     setGallery("");
+    setVideo("");
 
     loadProducts();
   };
 
   /* ================= TOGGLE STOCK ================= */
   const toggleAvailability = async (id, current) => {
-    await updateDoc(doc(db, "products", id), {
-      available: !current,
-    });
+    await updateDoc(doc(db, "products", id), { available: !current });
 
     setProducts((prev) =>
       prev.map((p) =>
@@ -126,7 +127,6 @@ export default function AdminProductsPage() {
     <main className="wrap_admin_products">
       <h1>Admin · Products</h1>
 
-      {/* ADD PRODUCT */}
       <section className="card">
         <h2>Add Product</h2>
 
@@ -137,16 +137,28 @@ export default function AdminProductsPage() {
         />
 
         <input
+          placeholder="Tagline"
+          value={tagline}
+          onChange={(e) => setTagline(e.target.value)}
+        />
+
+        <textarea
+          placeholder="Full description"
+          value={desc}
+          onChange={(e) => setDesc(e.target.value)}
+        />
+
+        <textarea
+          placeholder="Short description (optional)"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+
+        <input
           placeholder="Price"
           type="number"
           value={price}
           onChange={(e) => setPrice(e.target.value)}
-        />
-
-        <textarea
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
         />
 
         <input
@@ -161,18 +173,23 @@ export default function AdminProductsPage() {
           onChange={(e) => setGallery(e.target.value)}
         />
 
+        <input
+          placeholder="Video public_id (Cloudinary)"
+          value={video}
+          onChange={(e) => setVideo(e.target.value)}
+        />
+
         <button onClick={addProduct}>Add Product</button>
       </section>
 
-      {/* PRODUCT LIST */}
       <section className="list">
         {products.map((p) => (
           <div key={p.id} className="item">
             <strong>{p.name}</strong>
+            <small>{p.tagline}</small>
             <span>₹{p.price}</span>
-            <span>
-              Status: {p.available ? "Available" : "Out of stock"}
-            </span>
+            <span>Status: {p.available ? "Available" : "Out of stock"}</span>
+            {p.video && <small>🎥 Video attached</small>}
 
             <button
               className={p.available ? "danger" : "ok"}
@@ -192,10 +209,6 @@ export default function AdminProductsPage() {
           padding: 2rem;
           max-width: 900px;
           margin: auto;
-        }
-
-        h1 {
-          margin-bottom: 1.5rem;
         }
 
         .card {
