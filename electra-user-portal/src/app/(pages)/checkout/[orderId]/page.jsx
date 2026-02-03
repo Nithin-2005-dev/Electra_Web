@@ -18,7 +18,10 @@ export default function CheckoutPage() {
   const [order, setOrder] = useState(null);
   const [txnId, setTxnId] = useState("");
   const [file, setFile] = useState(null);
+
+  const [deliveryType, setDeliveryType] = useState(null); // inside | outside
   const [outside, setOutside] = useState(false);
+
   const [address, setAddress] = useState({
     fullName: "",
     phone: "",
@@ -27,7 +30,7 @@ export default function CheckoutPage() {
     pincode: "",
   });
 
-  const [showQR, setShowQR] = useState(false); // 🔹 NEW
+  const [showQR, setShowQR] = useState(false);
 
   const DELIVERY_CHARGE = 100;
   const PRINT_NAME_CHARGE = 40;
@@ -35,8 +38,9 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [payError, setPayError] = useState("");
 
-  /* ───────── LOAD ORDER ───────── */
+  /* LOAD ORDER */
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) return router.replace("/auth/sign-in");
@@ -81,7 +85,13 @@ export default function CheckoutPage() {
     return () => unsub();
   }, [orderId, router]);
 
-  /* ───────── PRICE CALC ───────── */
+  /* DELIVERY MAP */
+  useEffect(() => {
+    if (deliveryType === "outside") setOutside(true);
+    if (deliveryType === "inside") setOutside(false);
+  }, [deliveryType]);
+
+  /* PRICE */
   const printTotal =
     order?.items.reduce(
       (s, i) =>
@@ -95,28 +105,28 @@ export default function CheckoutPage() {
   const deliveryFee = outside ? DELIVERY_CHARGE : 0;
   const finalAmount = order?.amount + printTotal + deliveryFee;
 
-  /* ───────── UPI DEEP LINK ───────── */
+  /* UPI LINK */
   const upiLink = useMemo(() => {
-  if (!finalAmount || !order) return "#";
+    if (!finalAmount || !order) return "#";
 
-  const items = order.items
-    .map(i => `${i.productName.slice(0,10)}x${i.quantity || 1}`)
-    .join(", ");
+    const items = order.items
+      .map(i => `${i.productName.slice(0,10)}x${i.quantity || 1}`)
+      .join(", ");
 
-  const note = `Ord ${orderId.slice(0,6)} | ${items}`.slice(0, 70);
+    const note = `Ord ${orderId.slice(0,6)} | ${items}`.slice(0, 70);
 
-  const params = new URLSearchParams({
-    pa: "manishromi03@oksbi",
-    pn: "Electra Society",
-    am: finalAmount.toString(),
-    cu: "INR",
-    tn: note,
-  });
+    const params = new URLSearchParams({
+      pa: "manishromi03@oksbi",
+      pn: "Electra Society",
+      am: finalAmount.toString(),
+      cu: "INR",
+      tn: note,
+    });
 
-  return `upi://pay?${params.toString()}`;
-}, [finalAmount, order, orderId]);
+    return `upi://pay?${params.toString()}`;
+  }, [finalAmount, order, orderId]);
 
-  /* ───────── CLOUDINARY UPLOAD ───────── */
+  /* UPLOAD */
   const uploadScreenshot = async (file) => {
     const fd = new FormData();
     fd.append("file", file);
@@ -135,7 +145,7 @@ export default function CheckoutPage() {
     return data.secure_url;
   };
 
-  /* ───────── SUBMIT ───────── */
+  /* SUBMIT */
   const submitProof = async () => {
     if (!txnId || !file) {
       setError("Transaction ID and screenshot are required");
@@ -186,7 +196,55 @@ export default function CheckoutPage() {
     }
   };
 
-  if (loading) return <main className="loading">Loading…</main>;
+  const handlePayClick = (e) => {
+    if (!deliveryType) {
+      e.preventDefault();
+      setPayError("Please select delivery option first.");
+      return;
+    }
+    setPayError("");
+  };
+
+  if (loading) {
+  return (
+    <main className="loading">
+      <div className="skeleton" />
+      <div className="skeleton" />
+      <div className="skeleton" />
+
+      <style jsx>{`
+        .loading {
+          min-height: 100vh;
+          display: grid;
+          place-items: center;
+          gap: 1rem;
+          background: #000;
+        }
+
+        .skeleton {
+          width: 420px;
+          height: 120px;
+          border-radius: 18px;
+          background: linear-gradient(
+            90deg,
+            #111 25%,
+            #1a1a1a 37%,
+            #111 63%
+          );
+          background-size: 400% 100%;
+          animation: shimmer 1.4s infinite;
+        }
+
+        @keyframes shimmer {
+          to {
+            background-position: -400% 0;
+          }
+        }
+      `}</style>
+    </main>
+  );
+}
+
   if (!order) return <main>{error}</main>;
 
   return (
@@ -195,15 +253,44 @@ export default function CheckoutPage() {
         <h1>Complete Payment</h1>
         <p className="step">Scan → Pay → Upload proof</p>
 
-        {/* 🔹 TOGGLED PAY / QR */}
+        {/* DELIVERY */}
+        <div className="delivery">
+          <p className="label">Delivery type *</p>
+          <div className="delivery-options">
+            <button
+              className={deliveryType === "inside" ? "active" : ""}
+              onClick={() => {
+                setDeliveryType("inside");
+                setPayError("");
+              }}
+            >
+              Inside campus (Free)
+            </button>
+            <button
+              className={deliveryType === "outside" ? "active" : ""}
+              onClick={() => {
+                setDeliveryType("outside");
+                setPayError("");
+              }}
+            >
+              Outside campus (+₹100)
+            </button>
+          </div>
+          {payError && <p className="error">{payError}</p>}
+        </div>
+
+        {/* PAY / QR */}
         {!showQR ? (
           <>
-            <a href={upiLink} className="upi-btn">
+            <a href={upiLink} className="upi-btn" onClick={handlePayClick}>
               Pay via UPI App
             </a>
             <button
               className="link-btn"
-              onClick={() => setShowQR(true)}
+              onClick={() => {
+                setShowQR(true);
+                setPayError("");
+              }}
             >
               Or scan QR instead
             </button>
@@ -216,14 +303,16 @@ export default function CheckoutPage() {
             />
             <button
               className="link-btn"
-              onClick={() => setShowQR(false)}
+              onClick={() => {
+                setShowQR(false);
+                setPayError("");
+              }}
             >
               Use UPI App instead
             </button>
           </>
         )}
 
-        {/* ⬇ rest unchanged */}
         <label>
           Transaction ID *
           <input value={txnId} onChange={(e) => setTxnId(e.target.value)} />
@@ -232,15 +321,6 @@ export default function CheckoutPage() {
         <label>
           Payment Screenshot *
           <input type="file" onChange={(e) => setFile(e.target.files[0])} />
-        </label>
-
-        <label className="checkbox">
-          <input
-            type="checkbox"
-            checked={outside}
-            onChange={(e) => setOutside(e.target.checked)}
-          />
-          Outside campus (+₹100 delivery)
         </label>
 
         {outside && (
@@ -264,7 +344,6 @@ export default function CheckoutPage() {
           {submitting ? "Submitting…" : "Submit for verification"}
         </button>
       </section>
-
 
       <aside className="summary">
         <h2>Order Summary</h2>
@@ -318,6 +397,46 @@ export default function CheckoutPage() {
       </aside>
 
  <style jsx>{`
+ .delivery {
+  margin-bottom: 1.2rem;
+}
+
+.delivery .label {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-bottom: 0.4rem;
+}
+
+.delivery-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.delivery-options button {
+  padding: 0.75rem;
+  border-radius: 12px;
+  background: #000;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #9ca3af;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.delivery-options button.active {
+  background: linear-gradient(180deg,#22d3ee,#0ea5e9);
+  color: #000;
+  border-color: transparent;
+  font-weight: 700;
+  box-shadow: 0 8px 20px rgba(34,211,238,0.35);
+}
+
+.delivery-options button:hover {
+  border-color: #22d3ee;
+  color: #fff;
+}
+
   .pay-box {
   display: flex;
   flex-direction: column;
