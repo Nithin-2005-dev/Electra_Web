@@ -87,12 +87,9 @@ export default function ProductInfo({
         });
       }
 
-      /* ✅ RESET INPUTS */
       setSize(null);
       setPrintName(false);
       setPrintedName("");
-
-      /* 🔔 SHOW TOAST */
       setToast(true);
     } catch (err) {
       console.error("Add to cart failed:", err);
@@ -106,7 +103,18 @@ export default function ProductInfo({
     <>
       <section className="info">
         <h1 className="title">{product?.name}</h1>
+
+        {product?.tagline && (
+          <p className="tagline">{product.tagline}</p>
+        )}
+
         <div className="price">₹{product?.price}</div>
+
+        {product?.desc && (
+          <div className="desc-block">
+            <p>{product.desc}</p>
+          </div>
+        )}
 
         {/* SIZE */}
         <div className="block">
@@ -139,7 +147,7 @@ export default function ProductInfo({
               checked={printName}
               onChange={() => setPrintName((p) => !p)}
             />
-            <span>Print name on T-shirt (+₹50)</span>
+            <span>Print name on T-shirt (+₹40)</span>
           </label>
 
           {printName && (
@@ -181,7 +189,6 @@ export default function ProductInfo({
         {!product?.available && <span className="out">Out of stock</span>}
       </section>
 
-      {/* 🔔 TOAST */}
       {toast && (
         <div className="toast">
           <span>Added to cart</span>
@@ -194,7 +201,24 @@ export default function ProductInfo({
       <style jsx>{`
         .info { display:flex; flex-direction:column; gap:1.4rem; }
         .title { font-size:2rem; font-weight:700; }
+
+        .tagline {
+          color:#9ca3af;
+          font-size:0.9rem;
+          margin-top:-0.5rem;
+        }
+
         .price { font-size:1.5rem; color:#22d3ee; font-weight:700; }
+
+        .desc-block {
+          background:rgba(255,255,255,0.04);
+          border:1px solid rgba(255,255,255,0.08);
+          padding:0.8rem;
+          border-radius:10px;
+          font-size:0.85rem;
+          line-height:1.5;
+          color:#e5e7eb;
+        }
 
         .block { display:flex; flex-direction:column; gap:0.6rem; }
         .block-head {
@@ -243,10 +267,7 @@ export default function ProductInfo({
           border:1px solid rgba(255,255,255,0.25);
         }
 
-        .actions {
-          display:flex;
-          gap:0.8rem;
-        }
+        .actions { display:flex; gap:0.8rem; }
 
         .add-cart {
           flex:1;
@@ -268,12 +289,8 @@ export default function ProductInfo({
           font-weight:800;
         }
 
-        button:disabled {
-          opacity:0.5;
-          cursor:not-allowed;
-        }
+        button:disabled { opacity:0.5; cursor:not-allowed; }
 
-        /* TOAST (FIXED) */
         .toast {
           position:fixed;
           bottom:26px;
@@ -300,39 +317,7 @@ export default function ProductInfo({
           cursor:pointer;
         }
 
-        .out {
-          color:#ef4444;
-          font-size:0.85rem;
-        }
-        /* ───────── MOBILE TOAST FIX ───────── */
-@media (max-width: 480px) {
-  .toast {
-    bottom: 16px;                 /* avoid home indicator */
-    left: 50%;
-    transform: translateX(-50%);
-    max-width: calc(100% - 24px); /* prevent overflow */
-    padding: 0.65rem 0.9rem;
-    gap: 0.6rem;
-    font-size: 0.6rem;
-  }
-
-  .toast span,
-  .toast p {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .toast button {
-    font-size: 0.7rem;
-    min-width: 44px;              /* thumb target */
-  }
-
-  .out {
-    font-size: 0.75rem;
-  }
-}
-
+        .out { color:#ef4444; font-size:0.85rem; }
       `}</style>
     </>
   );

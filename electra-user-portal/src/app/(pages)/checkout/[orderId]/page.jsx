@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { auth, db } from "../../../lib/firebase";
 import {
@@ -27,8 +27,10 @@ export default function CheckoutPage() {
     pincode: "",
   });
 
+  const [showQR, setShowQR] = useState(false); // 🔹 NEW
+
   const DELIVERY_CHARGE = 100;
-  const PRINT_NAME_CHARGE = 50;
+  const PRINT_NAME_CHARGE = 40;
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -59,7 +61,6 @@ export default function CheckoutPage() {
         return;
       }
 
-      // normalize legacy buy-now orders
       if (!data.items) {
         data.items = [
           {
@@ -93,6 +94,27 @@ export default function CheckoutPage() {
 
   const deliveryFee = outside ? DELIVERY_CHARGE : 0;
   const finalAmount = order?.amount + printTotal + deliveryFee;
+
+  /* ───────── UPI DEEP LINK ───────── */
+  const upiLink = useMemo(() => {
+  if (!finalAmount || !order) return "#";
+
+  const items = order.items
+    .map(i => `${i.productName.slice(0,10)}x${i.quantity || 1}`)
+    .join(", ");
+
+  const note = `Ord ${orderId.slice(0,6)} | ${items}`.slice(0, 70);
+
+  const params = new URLSearchParams({
+    pa: "manishromi03@oksbi",
+    pn: "Electra Society",
+    am: finalAmount.toString(),
+    cu: "INR",
+    tn: note,
+  });
+
+  return `upi://pay?${params.toString()}`;
+}, [finalAmount, order, orderId]);
 
   /* ───────── CLOUDINARY UPLOAD ───────── */
   const uploadScreenshot = async (file) => {
@@ -145,8 +167,6 @@ export default function CheckoutPage() {
 
         totalAmountPaid: finalAmount,
         paymentStatus: "pending_verification",
-
-        // 🔥 REQUIRED FOR ADMIN FLOW
         fulfillmentStatus: "placed",
 
         updatedAt: serverTimestamp(),
@@ -166,57 +186,44 @@ export default function CheckoutPage() {
     }
   };
 
-  /* ───────── LOADING UI ───────── */
- if (loading) {
-    return (
-      <main className="loading">
-        <div className="skeleton" />
-        <div className="skeleton" />
-        <div className="skeleton" />
-
-        <style jsx>{`
-          .loading {
-            min-height: 100vh;
-            display: grid;
-            place-items: center;
-            gap: 1rem;
-            background: #000;
-          }
-          .skeleton {
-            width: 420px;
-            height: 120px;
-            border-radius: 18px;
-            background: linear-gradient(
-              90deg,
-              #111 25%,
-              #1a1a1a 37%,
-              #111 63%
-            );
-            background-size: 400% 100%;
-            animation: shimmer 1.4s infinite;
-          }
-          @keyframes shimmer {
-            to {
-              background-position: -400% 0;
-            }
-          }
-        `}</style>
-      </main>
-    );
-  }
-
+  if (loading) return <main className="loading">Loading…</main>;
   if (!order) return <main>{error}</main>;
 
-
-  /* ───────── UI ───────── */
   return (
     <main className="checkout">
       <section className="payment">
         <h1>Complete Payment</h1>
         <p className="step">Scan → Pay → Upload proof</p>
 
-        <img src="/upi-qr.png" className="qr" />
+        {/* 🔹 TOGGLED PAY / QR */}
+        {!showQR ? (
+          <>
+            <a href={upiLink} className="upi-btn">
+              Pay via UPI App
+            </a>
+            <button
+              className="link-btn"
+              onClick={() => setShowQR(true)}
+            >
+              Or scan QR instead
+            </button>
+          </>
+        ) : (
+          <>
+            <img
+              src="https://res.cloudinary.com/dqa3ov76r/image/upload/v1770106226/j4ohbb1vaxbyclf4czoi.png"
+              className="qr"
+            />
+            <button
+              className="link-btn"
+              onClick={() => setShowQR(false)}
+            >
+              Use UPI App instead
+            </button>
+          </>
+        )}
 
+        {/* ⬇ rest unchanged */}
         <label>
           Transaction ID *
           <input value={txnId} onChange={(e) => setTxnId(e.target.value)} />
@@ -258,6 +265,7 @@ export default function CheckoutPage() {
         </button>
       </section>
 
+
       <aside className="summary">
         <h2>Order Summary</h2>
 
@@ -271,7 +279,7 @@ export default function CheckoutPage() {
                 </p>
                 {item.printName && (
                   <p className="meta">
-                    Printed name: {item.printedName} <span>(+₹50 each)</span>
+                    Printed name: {item.printedName} <span>(+₹40 each)</span>
                   </p>
                 )}
               </div>
@@ -310,6 +318,41 @@ export default function CheckoutPage() {
       </aside>
 
  <style jsx>{`
+  .pay-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.upi-btn {
+  width: 100%;
+  padding: 0.85rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg,#22d3ee,#0ea5e9);
+  color: #000;
+  font-weight: 800;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 10px 28px rgba(34,211,238,0.35);
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 0.75rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.qr {
+  width: 220px;
+  border-radius: 14px;
+}
+
+
         .checkout {
           min-height: 100vh;
           background: #000;
