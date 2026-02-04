@@ -56,7 +56,6 @@ export default function ProductPage() {
 
     loadProduct();
   }, [productId, router]);
-  console.log(user)
   /* ───────── ORDER NOW ───────── */
   const orderNow = async () => {
   if (buying || !product.available) return;
