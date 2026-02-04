@@ -151,7 +151,11 @@ export default function CheckoutPage() {
       setError("Transaction ID and screenshot are required");
       return;
     }
-
+    if (!deliveryType) {
+      setPayError("Please select delivery option first.");
+      return;
+    }
+    setPayError("");
     if (outside) {
       const { fullName, phone, addressLine, city, pincode } = address;
       if (!fullName || !phone || !addressLine || !city || !pincode) {

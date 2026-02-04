@@ -21,7 +21,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) return;
-
+      // if(!user.phone) router.push('/auth/profile');
       const snap = await getDoc(doc(db, "users", user.uid));
       if (snap.exists()) {
         setUserData(snap.data());

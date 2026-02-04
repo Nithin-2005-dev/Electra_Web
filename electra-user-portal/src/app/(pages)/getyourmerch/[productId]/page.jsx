@@ -56,11 +56,10 @@ export default function ProductPage() {
 
     loadProduct();
   }, [productId, router]);
-
+  console.log(user)
   /* ───────── ORDER NOW ───────── */
   const orderNow = async () => {
   if (buying || !product.available) return;
-
   if (!selectedSize) {
     alert("Please select a size");
     return;
@@ -71,7 +70,6 @@ export default function ProductPage() {
     return;
   }
 
-  const user = auth.currentUser;
   if (!user) return router.push("/auth/sign-in");
 
   setBuying(true);

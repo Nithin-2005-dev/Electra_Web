@@ -43,7 +43,6 @@ export default function ProductInfo({
       router.push("/auth/sign-in");
       return;
     }
-
     if (printName && !printedName.trim()) {
       alert("Please enter the name to be printed");
       return;
