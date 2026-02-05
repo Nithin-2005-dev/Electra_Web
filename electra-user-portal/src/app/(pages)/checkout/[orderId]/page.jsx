@@ -39,6 +39,10 @@ const [qrLoading, setQrLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [payError, setPayError] = useState("");
+  useEffect(() => {
+  setShowQR(false);
+  setQrLoading(false);
+}, [deliveryType, finalAmount]);
 
   /* LOAD ORDER */
   useEffect(() => {
@@ -147,6 +151,16 @@ const [qrLoading, setQrLoading] = useState(false);
     const data = await res.json();
     return data.secure_url;
   };
+  const handleQRClick = () => {
+  if (!deliveryType) {
+    setPayError("Please select delivery option first.");
+    return;
+  }
+
+  setPayError("");
+  setQrLoading(true);
+  setShowQR(true);
+};
 
   /* SUBMIT */
   const submitProof = async () => {
@@ -292,16 +306,13 @@ const [qrLoading, setQrLoading] = useState(false);
             <a href={upiLink} className="upi-btn" onClick={handlePayClick}>
               Pay via UPI App
             </a>
-            <button
-              className="link-btn"
-              onClick={() => {
-                setShowQR(true);
-                 setShowQR(true);
-                setPayError("");
-              }}
-            >
-              Or scan QR instead
-            </button>
+           <button
+  className="link-btn"
+  onClick={handleQRClick}
+>
+  Or scan QR instead
+</button>
+
           </>
         ) : (
            <>
