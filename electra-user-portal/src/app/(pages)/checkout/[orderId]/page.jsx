@@ -642,6 +642,43 @@ useEffect(() => {
   font-weight: 600;
   white-space: nowrap;
 }
+.qr-loader {
+  width: 220px;
+  height: 220px;
+  margin: 1.2rem auto;
+  border-radius: 16px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+
+  background: linear-gradient(
+    90deg,
+    #111 25%,
+    #1a1a1a 37%,
+    #111 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s infinite;
+
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.qr-loader::before {
+  content: "Generating QR";
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #9ca3af;
+  letter-spacing: 0.02em;
+}
+
+.qr-loader::after {
+  content: "Please wait…";
+  font-size: 0.7rem;
+  color: #6b7280;
+}
 
 /* DIVIDER */
 .summary hr {
