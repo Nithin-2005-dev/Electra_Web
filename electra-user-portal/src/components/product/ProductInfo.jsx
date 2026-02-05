@@ -290,31 +290,57 @@ export default function ProductInfo({
 
         button:disabled { opacity:0.5; cursor:not-allowed; }
 
-        .toast {
-          position:fixed;
-          bottom:26px;
-          left:50%;
-          transform:translateX(-50%);
-          background:rgba(20,20,20,0.85);
-          backdrop-filter:blur(12px);
-          border:1px solid rgba(255,255,255,0.18);
-          color:#fff;
-          padding:0.75rem 1.2rem;
-          border-radius:999px;
-          display:flex;
-          gap:1rem;
-          align-items:center;
-          box-shadow:0 18px 40px rgba(0,0,0,0.7);
-          z-index:100;
-        }
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
 
-        .toast button {
-          background:none;
-          border:none;
-          color:#22d3ee;
-          font-weight:600;
-          cursor:pointer;
-        }
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  max-width: calc(100vw - 32px); /* 👈 critical */
+  width: max-content;
+
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
+  z-index: 100;
+
+  font-size: 0.9rem;
+}
+
+/* Button */
+.toast button {
+  background: none;
+  border: none;
+  color: #22d3ee;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  padding: 0;
+}
+
+/* 📱 Small screens */
+@media (max-width: 420px) {
+  .toast {
+    flex-direction: column;
+    gap: 0.4rem;
+    border-radius: 16px;
+    text-align: center;
+    padding: 0.75rem 1rem;
+  }
+
+  .toast button {
+    font-size: 0.85rem;
+  }
+}
+
 
         .out { color:#ef4444; font-size:0.85rem; }
       `}</style>

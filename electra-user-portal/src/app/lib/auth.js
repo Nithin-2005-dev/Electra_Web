@@ -1,43 +1,48 @@
 import {
-  signInWithEmailLink,
   sendSignInLinkToEmail,
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
+  signInWithEmailLink,
 } from "firebase/auth";
 import { auth } from "./firebase";
 
 /* ---------- EMAIL MAGIC LINK ---------- */
 export const sendEmailLink = async (email) => {
+  if (!email || typeof email !== "string") {
+    throw new Error("Invalid email");
+  }
+
+  const baseUrl = process.env.APP_BASE_URL;
+  if (!baseUrl) {
+    throw new Error("NEXT_PUBLIC_APP_BASE_URL is not defined");
+  }
+
   const actionCodeSettings = {
-    url: `${window.location.origin}/auth/verify`,
+    url: `${baseUrl}/auth/verify`,
     handleCodeInApp: true,
   };
 
   await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-  localStorage.setItem("emailForSignIn", email);
+
+  // Persist email for same-device verification
+  window.localStorage.setItem("emailForSignIn", email);
 };
 
+/* ---------- VERIFY EMAIL LINK ---------- */
 export const verifyEmailLink = async (link) => {
-  const email = localStorage.getItem("emailForSignIn");
-  if (!email) throw new Error("Missing email");
+  let email = window.localStorage.getItem("emailForSignIn");
 
-  return signInWithEmailLink(auth, email, link);
-};
-
-/* ---------- PHONE OTP ---------- */
-export const initRecaptcha = (containerId) => {
-  if (window.recaptchaVerifier) return;
-
-  window.recaptchaVerifier = new RecaptchaVerifier(
-    auth,
-    containerId,
-    { size: "invisible" }
-  );
-};
-
-export const sendPhoneOTP = async (phone) => {
-  if (!window.recaptchaVerifier) {
-    throw new Error("Recaptcha not initialized");
+  // Fallback for different device / cleared storage
+  if (!email) {
+    email = window.prompt("Please confirm your email");
   }
-  return signInWithPhoneNumber(auth, phone, window.recaptchaVerifier);
+
+  if (!email) {
+    throw new Error("Email is required to complete sign-in");
+  }
+
+  const result = await signInWithEmailLink(auth, email, link);
+
+  // Cleanup
+  window.localStorage.removeItem("emailForSignIn");
+
+  return result;
 };

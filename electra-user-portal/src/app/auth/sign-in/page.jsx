@@ -13,21 +13,30 @@ import { sendEmailLink } from "../../lib/auth";
 export default function SignInPage() {
   const router = useRouter();
 
+  const [mounted, setMounted] = useState(false);
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  /* ---------- AUTH LISTENER (CRITICAL) ---------- */
+  // ✅ Prevent hydration issues
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // ✅ Auth state listener
+  useEffect(() => {
+    if (!mounted) return;
+
     const unsub = onAuthStateChanged(auth, (user) => {
       if (user) {
-        // user is REALLY signed in now
         router.replace("/dashboard");
       }
     });
 
     return () => unsub();
-  }, [router]);
+  }, [mounted, router]);
+
+  if (!mounted) return null;
 
   /* ---------- GOOGLE SIGN-IN ---------- */
   const handleGoogle = async () => {
@@ -37,7 +46,6 @@ export default function SignInPage() {
 
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
-      // redirect handled by onAuthStateChanged
     } catch {
       setMessage("Google sign-in failed");
     } finally {
@@ -54,7 +62,7 @@ export default function SignInPage() {
       setMessage("");
 
       await sendEmailLink(email);
-      setMessage("Check your email to complete sign-in.");
+      setMessage("📩 Check your email to complete sign-in.");
     } catch {
       setMessage("Failed to send email link.");
     } finally {
@@ -69,6 +77,7 @@ export default function SignInPage() {
         <p className="sub">Access your Electra account</p>
 
         <button
+          suppressHydrationWarning
           className="google"
           onClick={handleGoogle}
           disabled={loading}
@@ -83,6 +92,7 @@ export default function SignInPage() {
         <label>
           Email
           <input
+            suppressHydrationWarning
             type="email"
             placeholder="you@example.com"
             value={email}
@@ -91,6 +101,7 @@ export default function SignInPage() {
         </label>
 
         <button
+          suppressHydrationWarning
           className="primary"
           disabled={loading || !email.includes("@")}
           onClick={handleEmail}

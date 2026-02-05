@@ -3,28 +3,38 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { verifyEmailLink } from "../../lib/auth";
-import { auth } from "../../lib/firebase";
+
+export const dynamic = "force-dynamic";
 
 export default function VerifyPage() {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [otp, setOtp] = useState(Array(6).fill(""));
   const [emailVerified, setEmailVerified] = useState(false);
   const [error, setError] = useState("");
   const inputsRef = useRef([]);
 
-  /* ----- HARD GUARD: SIGN-UP ONLY ----- */
+  // Prevent hydration mismatch
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Guard + email verification
+  useEffect(() => {
+    if (!mounted) return;
+
     const phone = sessionStorage.getItem("signupPhone");
     if (!phone) {
       router.replace("/auth/sign-in");
       return;
     }
 
-    const link = window.location.href;
-    verifyEmailLink(link)
+    verifyEmailLink(window.location.href)
       .then(() => setEmailVerified(true))
       .catch(() => setError("Invalid email link"));
-  }, [router]);
+  }, [mounted, router]);
+
+  if (!mounted) return null;
 
   const verifyPhone = async () => {
     try {
@@ -44,6 +54,7 @@ export default function VerifyPage() {
         {otp.map((v, i) => (
           <input
             key={i}
+            suppressHydrationWarning
             ref={(el) => (inputsRef.current[i] = el)}
             value={v}
             maxLength={1}
@@ -56,7 +67,10 @@ export default function VerifyPage() {
         ))}
       </div>
 
-      <button onClick={verifyPhone}>Verify</button>
+      <button suppressHydrationWarning onClick={verifyPhone}>
+        Verify
+      </button>
+
       {error && <p>{error}</p>}
     </main>
   );
