@@ -39,11 +39,7 @@ const [qrLoading, setQrLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [payError, setPayError] = useState("");
-  useEffect(() => {
-  setShowQR(false);
-  setQrLoading(false);
-}, [deliveryType, finalAmount]);
-
+  
   /* LOAD ORDER */
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
@@ -161,6 +157,10 @@ const [qrLoading, setQrLoading] = useState(false);
   setQrLoading(true);
   setShowQR(true);
 };
+useEffect(() => {
+  setShowQR(false);
+  setQrLoading(false);
+}, [deliveryType, finalAmount]);
 
   /* SUBMIT */
   const submitProof = async () => {
