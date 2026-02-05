@@ -1,4 +1,5 @@
 "use client";
+
 import "../../../../components/product/product.css";
 import { useEffect, useState } from "react";
 import {
@@ -24,25 +25,43 @@ import LoadingScreen from "../../../../components/product/LoadingScreen";
 export default function ProductPage() {
   const { productId } = useParams();
   const router = useRouter();
+
+  const [user, setUser] = useState(null);
+
   const [selectedSize, setSelectedSize] = useState("");
   const [printName, setPrintName] = useState(false);
   const [printedName, setPrintedName] = useState("");
+
   const [product, setProduct] = useState(null);
   const [active, setActive] = useState(null);
+
   const [loading, setLoading] = useState(true);
-  const [showSizeChart, setShowSizeChart] = useState(false);
   const [buying, setBuying] = useState(false);
+  const [showSizeChart, setShowSizeChart] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
-  
+
+  /* ───────── AUTH LISTENER ───────── */
+  useEffect(() => {
+    const unsub = auth.onAuthStateChanged((u) => {
+      setUser(u);
+    });
+    return () => unsub();
+  }, []);
+
   /* ───────── LOAD PRODUCT ───────── */
   useEffect(() => {
     if (!productId) return;
 
     const loadProduct = async () => {
       const snap = await getDoc(doc(db, "products", productId));
-      if (!snap.exists()) return router.replace("/getyourmerch");
+
+      if (!snap.exists()) {
+        router.replace("/getyourmerch");
+        return;
+      }
 
       const data = snap.data();
+
       setProduct({
         ...data,
         productId,
@@ -50,79 +69,90 @@ export default function ProductPage() {
           ? data.imageGallery
           : [],
       });
+
       setActive(data.imageMain);
       setLoading(false);
     };
 
     loadProduct();
   }, [productId, router]);
+
   /* ───────── ORDER NOW ───────── */
   const orderNow = async () => {
-  if (buying || !product.available) return;
-  if (!selectedSize) {
-    alert("Please select a size");
-    return;
-  }
+    if (buying || !product?.available) return;
 
-  if (printName && !printedName.trim()) {
-    alert("Please enter the name to be printed");
-    return;
-  }
+    if (!selectedSize) {
+      alert("Please select a size");
+      return;
+    }
 
-  if (!user) return router.push("/auth/sign-in");
+    if (printName && !printedName.trim()) {
+      alert("Please enter the name to be printed");
+      return;
+    }
 
-  setBuying(true);
+    if (!user) {
+      router.push("/auth/sign-in");
+      return;
+    }
 
-  // prevent duplicate pending order for same product + size
-  const q = query(
-    collection(db, "orders"),
-    where("userId", "==", user.uid),
-    where("paymentStatus", "==", "pending_payment")
-  );
+    setBuying(true);
 
-  const snap = await getDocs(q);
+    try {
+      // prevent duplicate pending order
+      const q = query(
+        collection(db, "orders"),
+        where("userId", "==", user.uid),
+        where("paymentStatus", "==", "pending_payment")
+      );
 
-  const existing = snap.docs
-    .map(d => d.data())
-    .find(o =>
-      o.items?.some(
-        i => i.productId === productId && i.size === selectedSize
-      )
-    );
+      const snap = await getDocs(q);
 
-  if (existing) {
-    router.push(`/checkout/${existing.orderId}`);
-    return;
-  }
+      const existing = snap.docs
+        .map((d) => d.data())
+        .find((o) =>
+          o.items?.some(
+            (i) =>
+              i.productId === productId &&
+              i.size === selectedSize
+          )
+        );
 
-  const orderId = `ORD-${nanoid(6).toUpperCase()}`;
+      if (existing) {
+        router.push(`/checkout/${existing.orderId}`);
+        return;
+      }
 
-  const item = {
-    productId,
-    productName: product.name,
-    price: product.price,
-    size: selectedSize,
-    printName,
-    printedName: printName ? printedName.trim() : null,
-    quantity:1
+      const orderId = `ORD-${nanoid(6).toUpperCase()}`;
+
+      const item = {
+        productId,
+        productName: product.name,
+        price: product.price,
+        size: selectedSize,
+        printName,
+        printedName: printName ? printedName.trim() : null,
+        quantity: 1,
+      };
+
+      await setDoc(doc(db, "orders", orderId), {
+        orderId,
+        userId: user.uid,
+        items: [item],
+        amount: product.price,
+        paymentStatus: "pending_payment",
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+
+      router.push(`/checkout/${orderId}`);
+    } finally {
+      setBuying(false);
+    }
   };
 
-  await setDoc(doc(db, "orders", orderId), {
-    orderId,
-    userId: user.uid,
-    items: [item],
-    amount: product.price,
-    paymentStatus: "pending_payment",
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  });
-
-  router.push(`/checkout/${orderId}`);
-};
-
-
+  /* ───────── RENDER ───────── */
   if (loading) return <LoadingScreen />;
-
   if (!product || !active) return null;
 
   return (
@@ -155,7 +185,12 @@ export default function ProductPage() {
         />
       )}
 
-      {buying && <LoadingScreen overlay text="Redirecting to checkout…" />}
+      {buying && (
+        <LoadingScreen
+          overlay
+          text="Redirecting to checkout…"
+        />
+      )}
     </main>
   );
 }
