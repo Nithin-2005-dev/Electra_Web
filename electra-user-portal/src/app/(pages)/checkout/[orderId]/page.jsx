@@ -18,7 +18,7 @@ export default function CheckoutPage() {
   const [order, setOrder] = useState(null);
   const [txnId, setTxnId] = useState("");
   const [file, setFile] = useState(null);
-
+const [qrLoading, setQrLoading] = useState(false);
   const [deliveryType, setDeliveryType] = useState(null); // inside | outside
   const [outside, setOutside] = useState(false);
 
@@ -105,26 +105,29 @@ export default function CheckoutPage() {
   const deliveryFee = outside ? DELIVERY_CHARGE : 0;
   const finalAmount = order?.amount + printTotal + deliveryFee;
 
+  const paymentNote = useMemo(() => {
+  if (!order) return "";
+  const items = order.items
+    .map(i => `${i.productName.slice(0, 10)}x${i.quantity || 1}`)
+    .join(", ");
+  return `Ord ${orderId.slice(0, 6)} | ${items}`.slice(0, 70);
+}, [order, orderId]);
+
   /* UPI LINK */
-  const upiLink = useMemo(() => {
-    if (!finalAmount || !order) return "#";
+ const upiLink = useMemo(() => {
+  if (!finalAmount || !order) return "#";
 
-    const items = order.items
-      .map(i => `${i.productName.slice(0,10)}x${i.quantity || 1}`)
-      .join(", ");
+  const params = new URLSearchParams({
+    pa: "manishromi03@oksbi",
+    pn: "Electra Society",
+    am: finalAmount.toString(),
+    cu: "INR",
+    tn: paymentNote,
+  });
 
-    const note = `Ord ${orderId.slice(0,6)} | ${items}`.slice(0, 70);
+  return `upi://pay?${params.toString()}`;
+}, [finalAmount, order, paymentNote]);
 
-    const params = new URLSearchParams({
-      pa: "manishromi03@oksbi",
-      pn: "Electra Society",
-      am: finalAmount.toString(),
-      cu: "INR",
-      tn: note,
-    });
-
-    return `upi://pay?${params.toString()}`;
-  }, [finalAmount, order, orderId]);
 
   /* UPLOAD */
   const uploadScreenshot = async (file) => {
@@ -293,6 +296,7 @@ export default function CheckoutPage() {
               className="link-btn"
               onClick={() => {
                 setShowQR(true);
+                 setShowQR(true);
                 setPayError("");
               }}
             >
@@ -300,21 +304,38 @@ export default function CheckoutPage() {
             </button>
           </>
         ) : (
-          <>
-            <img
-              src="https://res.cloudinary.com/dqa3ov76r/image/upload/v1770106226/j4ohbb1vaxbyclf4czoi.png"
-              className="qr"
-            />
-            <button
-              className="link-btn"
-              onClick={() => {
-                setShowQR(false);
-                setPayError("");
-              }}
-            >
-              Use UPI App instead
-            </button>
-          </>
+           <>
+  {qrLoading && (
+    <div className="qr-loader">
+      Generating QR…
+    </div>
+  )}
+
+  <img
+    className="qr"
+    alt="UPI QR"
+    style={{ display: qrLoading ? "none" : "block" }}
+    src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
+      upiLink
+    )}`}
+    onLoad={() => setQrLoading(false)}
+    onError={() => setQrLoading(false)}
+  />
+
+  <p className="qr-note">{paymentNote}</p>
+
+  <button
+   className="link-btn"
+    onClick={() => {
+      setShowQR(false);
+      setQrLoading(false);
+      setPayError("");
+    }}
+  >
+    Pay via UPI App
+  </button>
+</>
+
         )}
 
         <label>
