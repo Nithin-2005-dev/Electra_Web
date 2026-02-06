@@ -32,7 +32,7 @@ const [qrLoading, setQrLoading] = useState(false);
 
   const [showQR, setShowQR] = useState(false);
 
-  const DELIVERY_CHARGE = 100;
+  const DELIVERY_CHARGE = 179;
   const PRINT_NAME_CHARGE = 40;
 
   const [loading, setLoading] = useState(true);
