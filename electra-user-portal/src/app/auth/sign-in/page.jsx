@@ -63,8 +63,9 @@ export default function SignInPage() {
 
       await sendEmailLink(email);
       setMessage("📩 Check your email to complete sign-in.");
-    } catch {
-      setMessage("Failed to send email link.");
+    } catch (err) {
+      const code = err?.code ? ` (${err.code})` : "";
+      setMessage(`Failed to send email link${code}.`);
     } finally {
       setLoading(false);
     }

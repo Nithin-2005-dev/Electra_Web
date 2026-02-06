@@ -12,6 +12,7 @@ export default function VerifyPage() {
   const [otp, setOtp] = useState(Array(6).fill(""));
   const [emailVerified, setEmailVerified] = useState(false);
   const [error, setError] = useState("");
+  const [hasPhone, setHasPhone] = useState(false);
   const inputsRef = useRef([]);
 
   // Prevent hydration mismatch
@@ -24,13 +25,15 @@ export default function VerifyPage() {
     if (!mounted) return;
 
     const phone = sessionStorage.getItem("signupPhone");
-    if (!phone) {
-      router.replace("/auth/sign-in");
-      return;
-    }
+    setHasPhone(Boolean(phone));
 
     verifyEmailLink(window.location.href)
-      .then(() => setEmailVerified(true))
+      .then(() => {
+        setEmailVerified(true);
+        if (!phone) {
+          router.replace("/dashboard");
+        }
+      })
       .catch(() => setError("Invalid email link"));
   }, [mounted, router]);
 
@@ -38,6 +41,10 @@ export default function VerifyPage() {
 
   const verifyPhone = async () => {
     try {
+      if (!window.confirmationResult) {
+        setError("Verification expired. Please restart sign-up.");
+        return;
+      }
       const code = otp.join("");
       await window.confirmationResult.confirm(code);
       router.push("/auth/profile");
@@ -50,26 +57,30 @@ export default function VerifyPage() {
     <main>
       <p>Email: {emailVerified ? "Verified" : "Waiting"}</p>
 
-      <div>
-        {otp.map((v, i) => (
-          <input
-            key={i}
-            suppressHydrationWarning
-            ref={(el) => (inputsRef.current[i] = el)}
-            value={v}
-            maxLength={1}
-            onChange={(e) => {
-              const n = [...otp];
-              n[i] = e.target.value;
-              setOtp(n);
-            }}
-          />
-        ))}
-      </div>
+      {hasPhone && (
+        <>
+          <div>
+            {otp.map((v, i) => (
+              <input
+                key={i}
+                suppressHydrationWarning
+                ref={(el) => (inputsRef.current[i] = el)}
+                value={v}
+                maxLength={1}
+                onChange={(e) => {
+                  const n = [...otp];
+                  n[i] = e.target.value;
+                  setOtp(n);
+                }}
+              />
+            ))}
+          </div>
 
-      <button suppressHydrationWarning onClick={verifyPhone}>
-        Verify
-      </button>
+          <button suppressHydrationWarning onClick={verifyPhone}>
+            Verify
+          </button>
+        </>
+      )}
 
       {error && <p>{error}</p>}
     </main>
