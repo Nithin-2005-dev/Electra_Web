@@ -198,151 +198,315 @@ export default function ProductInfo({
       )}
 
       <style jsx>{`
-        .info { display:flex; flex-direction:column; gap:1.4rem; }
-        .title { font-size:2rem; font-weight:700; }
+        .info { 
+          display: flex; 
+          flex-direction: column; 
+          gap: 1.4rem;
+          width: 100%;
+          max-width: 100%;
+        }
+
+        .title { 
+          font-size: clamp(1.5rem, 4vw, 2rem);
+          font-weight: 700;
+          line-height: 1.2;
+          word-wrap: break-word;
+        }
 
         .tagline {
-          color:#9ca3af;
-          font-size:0.9rem;
-          margin-top:-0.5rem;
+          color: #9ca3af;
+          font-size: clamp(0.8rem, 2vw, 0.9rem);
+          margin-top: -0.5rem;
+          line-height: 1.4;
         }
 
-        .price { font-size:1.5rem; color:#22d3ee; font-weight:700; }
+        .price { 
+          font-size: clamp(1.25rem, 3vw, 1.5rem);
+          color: #22d3ee;
+          font-weight: 700;
+        }
 
         .desc-block {
-          background:rgba(255,255,255,0.04);
-          border:1px solid rgba(255,255,255,0.08);
-          padding:0.8rem;
-          border-radius:10px;
-          font-size:0.85rem;
-          line-height:1.5;
-          color:#e5e7eb;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.08);
+          padding: clamp(0.6rem, 2vw, 0.8rem);
+          border-radius: 10px;
+          font-size: clamp(0.8rem, 2vw, 0.85rem);
+          line-height: 1.6;
+          color: #e5e7eb;
         }
 
-        .block { display:flex; flex-direction:column; gap:0.6rem; }
+        .block { 
+          display: flex;
+          flex-direction: column;
+          gap: 0.6rem;
+          width: 100%;
+        }
+
         .block-head {
-          display:flex;
-          justify-content:space-between;
-          font-size:0.85rem;
-          color:#9ca3af;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: clamp(0.8rem, 2vw, 0.85rem);
+          color: #9ca3af;
+          gap: 0.5rem;
         }
 
         .size-chart {
-          background:none;
-          border:none;
-          color:#9ca3af;
-          text-decoration:underline;
-          cursor:pointer;
+          background: none;
+          border: none;
+          color: #9ca3af;
+          text-decoration: underline;
+          cursor: pointer;
+          font-size: clamp(0.75rem, 2vw, 0.85rem);
+          padding: 0;
+          white-space: nowrap;
         }
 
-        .sizes { display:flex; gap:0.6rem; }
+        .sizes { 
+          display: flex;
+          gap: clamp(0.4rem, 1.5vw, 0.6rem);
+          flex-wrap: wrap;
+          width: 100%;
+        }
 
         .size-btn {
-          padding:0.6rem 1rem;
-          border-radius:10px;
-          border:1px solid rgba(255,255,255,0.25);
-          background:transparent;
-          color:#fff;
-          cursor:pointer;
+          padding: clamp(0.5rem, 2vw, 0.6rem) clamp(0.8rem, 2.5vw, 1rem);
+          border-radius: 10px;
+          border: 1px solid rgba(255,255,255,0.25);
+          background: transparent;
+          color: #fff;
+          cursor: pointer;
+          font-size: clamp(0.8rem, 2vw, 0.9rem);
+          transition: all 0.2s ease;
+          flex-shrink: 0;
+          min-width: 44px;
+          text-align: center;
+        }
+
+        .size-btn:hover {
+          border-color: rgba(255,255,255,0.4);
         }
 
         .size-btn.active {
-          background:#22d3ee;
-          color:#000;
-          font-weight:700;
+          background: #22d3ee;
+          border-color: #22d3ee;
+          color: #000;
+          font-weight: 700;
         }
 
         .print-toggle {
-          display:flex;
-          gap:0.6rem;
-          align-items:center;
+          display: flex;
+          gap: 0.6rem;
+          align-items: center;
+          cursor: pointer;
+          font-size: clamp(0.8rem, 2vw, 0.9rem);
+        }
+
+        .print-toggle input[type="checkbox"] {
+          width: 18px;
+          height: 18px;
+          cursor: pointer;
+          flex-shrink: 0;
         }
 
         .print-input {
-          padding:0.65rem;
-          border-radius:10px;
-          background:#000;
-          color:#fff;
-          border:1px solid rgba(255,255,255,0.25);
+          padding: clamp(0.55rem, 2vw, 0.65rem);
+          border-radius: 10px;
+          background: #000;
+          color: #fff;
+          border: 1px solid rgba(255,255,255,0.25);
+          font-size: clamp(0.85rem, 2vw, 0.95rem);
+          width: 100%;
+          transition: border-color 0.2s ease;
         }
 
-        .actions { display:flex; gap:0.8rem; }
+        .print-input:focus {
+          outline: none;
+          border-color: #22d3ee;
+        }
+
+        .actions { 
+          display: flex;
+          gap: clamp(0.5rem, 2vw, 0.8rem);
+          width: 100%;
+          flex-wrap: wrap;
+        }
 
         .add-cart {
-          flex:1;
-          padding:0.85rem;
-          border-radius:14px;
-          border:1px solid rgba(255,255,255,0.3);
-          background:transparent;
-          color:#fff;
-          font-weight:700;
+          flex: 1;
+          min-width: 140px;
+          padding: clamp(0.75rem, 2vw, 0.85rem);
+          border-radius: 14px;
+          border: 1px solid rgba(255,255,255,0.3);
+          background: transparent;
+          color: #fff;
+          font-weight: 700;
+          font-size: clamp(0.85rem, 2vw, 0.95rem);
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .add-cart:hover:not(:disabled) {
+          background: rgba(255,255,255,0.05);
+          border-color: rgba(255,255,255,0.5);
         }
 
         .buy {
-          flex:1;
-          padding:0.85rem;
-          border-radius:14px;
-          border:none;
-          background:linear-gradient(180deg,#22d3ee,#0ea5e9);
-          color:#000;
-          font-weight:800;
+          flex: 1;
+          min-width: 140px;
+          padding: clamp(0.75rem, 2vw, 0.85rem);
+          border-radius: 14px;
+          border: none;
+          background: linear-gradient(180deg,#22d3ee,#0ea5e9);
+          color: #000;
+          font-weight: 800;
+          font-size: clamp(0.85rem, 2vw, 0.95rem);
+          cursor: pointer;
+          transition: all 0.2s ease;
         }
 
-        button:disabled { opacity:0.5; cursor:not-allowed; }
+        .buy:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(34, 211, 238, 0.3);
+        }
 
-.toast {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(20, 20, 20, 0.85);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  color: #fff;
-  padding: 0.75rem 1rem;
-  border-radius: 999px;
+        button:disabled { 
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
 
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+        .toast {
+          position: fixed;
+          bottom: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(20, 20, 20, 0.85);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          color: #fff;
+          padding: 0.75rem 1rem;
+          border-radius: 999px;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          max-width: calc(100vw - 32px);
+          width: max-content;
+          box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
+          z-index: 100;
+          font-size: clamp(0.8rem, 2vw, 0.9rem);
+          animation: slideUp 0.3s ease;
+        }
 
-  max-width: calc(100vw - 32px); /* 👈 critical */
-  width: max-content;
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translate(-50%, 20px);
+          }
+          to {
+            opacity: 1;
+            transform: translate(-50%, 0);
+          }
+        }
 
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
-  z-index: 100;
+        .toast button {
+          background: none;
+          border: none;
+          color: #22d3ee;
+          font-weight: 600;
+          cursor: pointer;
+          white-space: nowrap;
+          padding: 0;
+          font-size: inherit;
+        }
 
-  font-size: 0.9rem;
-}
+        .out { 
+          color: #ef4444;
+          font-size: clamp(0.8rem, 2vw, 0.85rem);
+          font-weight: 600;
+        }
 
-/* Button */
-.toast button {
-  background: none;
-  border: none;
-  color: #22d3ee;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  padding: 0;
-}
+        /* Tablet */
+        @media (max-width: 768px) {
+          .info {
+            gap: 1.2rem;
+          }
 
-/* 📱 Small screens */
-@media (max-width: 420px) {
-  .toast {
-    flex-direction: column;
-    gap: 0.4rem;
-    border-radius: 16px;
-    text-align: center;
-    padding: 0.75rem 1rem;
-  }
+          .sizes {
+            gap: 0.5rem;
+          }
 
-  .toast button {
-    font-size: 0.85rem;
-  }
-}
+          .size-btn {
+            min-width: 42px;
+          }
+        }
 
+        /* Small Mobile */
+        @media (max-width: 480px) {
+          .info {
+            gap: 1rem;
+          }
 
-        .out { color:#ef4444; font-size:0.85rem; }
+          .actions {
+            flex-direction: column;
+          }
+
+          .add-cart,
+          .buy {
+            width: 100%;
+            min-width: unset;
+          }
+
+          .sizes {
+            gap: 0.4rem;
+          }
+
+          .size-btn {
+            padding: 0.5rem 0.7rem;
+            min-width: 40px;
+            font-size: 0.85rem;
+          }
+        }
+
+        /* Very Small Mobile */
+        @media (max-width: 375px) {
+          .toast {
+            flex-direction: column;
+            gap: 0.4rem;
+            border-radius: 16px;
+            text-align: center;
+            padding: 0.75rem 1rem;
+          }
+
+          .toast button {
+            font-size: 0.85rem;
+          }
+
+          .sizes {
+            gap: 0.35rem;
+          }
+
+          .size-btn {
+            padding: 0.45rem 0.6rem;
+            min-width: 38px;
+            font-size: 0.8rem;
+          }
+        }
+
+        /* Landscape Mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+          .info {
+            gap: 0.8rem;
+          }
+
+          .actions {
+            flex-direction: row;
+          }
+
+          .sizes {
+            gap: 0.4rem;
+          }
+        }
       `}</style>
     </>
   );
