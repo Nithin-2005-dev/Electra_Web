@@ -35,9 +35,8 @@ export default function UploadResourcePage() {
   const [checking, setChecking] = useState(true);
 
   const [loading, setLoading] = useState(false);
-  const [alert, setAlert] = useState(null);
   const [availableSubjects, setAvailableSubjects] = useState([]);
-
+  const [toast, setToast] = useState(null);
   const [form, setForm] = useState({
     name: "",
     driveUrl: "",
@@ -46,6 +45,13 @@ export default function UploadResourcePage() {
     category: "",
     visibility: "private",
   });
+  useEffect(() => {
+  return () => {
+    if (window.__toastTimer) {
+      clearTimeout(window.__toastTimer);
+    }
+  };
+}, []);
 
   /* ───────── AUTH + ROLE CHECK (FIXED) ───────── */
   useEffect(() => {
@@ -79,7 +85,6 @@ export default function UploadResourcePage() {
   /* ───────── SUBMIT ───────── */
   async function handleSubmit(e) {
     e.preventDefault();
-    setAlert(null);
 
     if (!eligible) return;
 
@@ -100,13 +105,21 @@ export default function UploadResourcePage() {
 
       router.push("/MyResources");
     } catch (err) {
-      setAlert({
-        type: "error",
-        title: "Upload failed",
-        message:
-          err?.response?.data?.message ||
-          "Something went wrong. Please contact Electra Dev Team.",
-      });
+    setToast({
+  message:
+    err?.response?.data?.message ||
+    "Something went wrong. Please contact Electra Dev Team.",
+});
+
+if (window.__toastTimer) {
+  clearTimeout(window.__toastTimer);
+}
+
+window.__toastTimer = setTimeout(() => {
+  setToast(null);
+}, 4000);
+
+
     } finally {
       setLoading(false);
     }
@@ -145,6 +158,12 @@ export default function UploadResourcePage() {
 
   return (
     <main className="root">
+     {toast && (
+  <div className="toast">
+    {toast.message}
+  </div>
+)}
+
       {/* ───── HEADER ───── */}
       <header className="header">
         <span className="kicker">CONTRIBUTE</span>
@@ -188,12 +207,6 @@ export default function UploadResourcePage() {
       {/* ───── FORM ───── */}
       {eligible && (
         <form className="card" onSubmit={handleSubmit}>
-          {alert && (
-            <div className={`alert ${alert.type}`}>
-              <h3>{alert.title}</h3>
-              <p>{alert.message}</p>
-            </div>
-          )}
 
           <Section title="Resource details">
             <Field label="Resource name">
@@ -323,142 +336,218 @@ export default function UploadResourcePage() {
       )}
 
       {/* ───── STYLES ───── */}
-       <style jsx>{`
-        .root {
-          min-height: 100vh;
-          background: #000;
-          color: #e5e7eb;
-          padding: 4rem 1.5rem;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
+      <style jsx>{`
+        /* ───────── ROOT ───────── */
+.root {
+  min-height: 100vh;
+  background: #000;
+  color: #e5e7eb;
+  padding: 4rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-        .header {
-          max-width: 640px;
-          text-align: center;
-          margin-bottom: 3rem;
-        }
+/* tighten padding on small screens */
+@media (max-width: 520px) {
+  .root {
+    padding: 2.5rem 1.25rem;
+  }
+}
 
-        .kicker {
-          font-size: 0.65rem;
-          letter-spacing: 0.35em;
-          color: #6b7280;
-        }
+/* ───────── HEADER ───────── */
+.header {
+  max-width: 640px;
+  text-align: center;
+  margin-bottom: 3rem;
+}
 
-        h1 {
-          font-size: 2.6rem;
-          margin: 0.6rem 0;
-        }
+.kicker {
+  font-size: 0.65rem;
+  letter-spacing: 0.35em;
+  color: #6b7280;
+  margin-bottom: 0.3rem;
+}
 
-        .desc {
-          color: #9ca3af;
-          font-size: 0.95rem;
-        }
+h1 {
+  font-size: clamp(1.9rem, 6vw, 2.6rem);
+  margin: 0.6rem 0;
+  font-weight: 600;
+  line-height: 1.15;
+}
 
-        .card {
-          width: 100%;
-          max-width: 560px;
-          background: #0a0a0a;
-          border: 1px solid #18181b;
-          border-radius: 22px;
-          padding: 2.2rem;
-        }
+.desc {
+  color: #9ca3af;
+  font-size: clamp(0.85rem, 3.5vw, 0.95rem);
+  max-width: 34ch;
+  margin: 0.5rem auto 0;
+  line-height: 1.5;
+}
 
-        .alert {
-          border-radius: 14px;
-          padding: 1.2rem;
-          margin-bottom: 1.5rem;
-        }
+/* ───────── CARD ───────── */
+.card {
+  width: 100%;
+  max-width: 560px;
+  background: #0a0a0a;
+  border: 1px solid #18181b;
+  border-radius: 22px;
+  padding: 2.2rem;
+}
 
-        .alert.warning {
-          background: rgba(234,179,8,0.08);
-          border: 1px solid rgba(234,179,8,0.35);
-        }
+@media (max-width: 520px) {
+  .card {
+    padding: 1.4rem;
+    border-radius: 18px;
+  }
+}
 
-        .alert.error {
-          background: rgba(239,68,68,0.08);
-          border: 1px solid rgba(239,68,68,0.35);
-        }
+/* ───────── ALERTS ───────── */
+.alert {
+  border-radius: 14px;
+  padding: 1.2rem;
+  margin-bottom: 1.5rem;
+}
 
-        .alert h3 {
-          margin-bottom: 0.4rem;
-        }
+.alert.warning {
+  background: rgba(234,179,8,0.08);
+  border: 1px solid rgba(234,179,8,0.35);
+}
 
-        .alert button {
-          margin-top: 0.8rem;
-          background: #fff;
-          color: #000;
-          border-radius: 999px;
-          padding: 0.5rem 1.4rem;
-          font-weight: 600;
-        }
+.alert.error {
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.35);
+}
 
-        .section {
-          margin-bottom: 2.2rem;
-        }
+.alert h3 {
+  margin-bottom: 0.4rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
 
-        .grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 0.8rem;
-        }
+.alert button {
+  margin-top: 0.8rem;
+  background: #fff;
+  color: #000;
+  border-radius: 999px;
+  padding: 0.55rem 1.4rem;
+  font-weight: 600;
+}
 
-        label {
-          font-size: 0.75rem;
-          color: #9ca3af;
-        }
+/* ───────── SECTIONS (HIERARCHY FIX) ───────── */
+.section {
+  margin-bottom: 2.2rem;
+}
 
-        input,
-        select {
-          width: 100%;
-          background: #000;
-          border: 1px solid #27272a;
-          color: #e5e7eb;
-          padding: 0.7rem;
-          border-radius: 10px;
-        }
+.section h3 {
+  font-size: clamp(0.9rem, 3vw, 1rem);
+  font-weight: 600;
+  color: #f9fafb;
+  margin-bottom: 1rem;
+  letter-spacing: 0.02em;
+}
 
-        .hint {
-          font-size: 0.7rem;
-          color: #9ca3af;
-          margin-top: 0.4rem;
-        }
+/* add rhythm between fields */
+.section > div {
+  margin-bottom: 1.1rem;
+}
 
-        .actions {
-          display: flex;
-          gap: 0.8rem;
-          margin-top: 2rem;
-        }
+/* ───────── GRID ───────── */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
 
-        .primary {
-          flex: 1;
-          background: #fff;
-          color: #000;
-          border-radius: 999px;
-          padding: 0.75rem;
-          font-weight: 600;
-        }
+@media (max-width: 520px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
 
-        .secondary {
-          border: 1px solid #27272a;
-          padding: 0.75rem 1.6rem;
-          border-radius: 999px;
-        }
+/* ───────── LABELS (SECONDARY LEVEL) ───────── */
+label {
+  font-size: clamp(0.7rem, 2.4vw, 0.75rem);
+  color: #d1d5db;
+  display: block;
+  margin-bottom: 0.35rem;
+  font-weight: 500;
+}
 
-        .footer-note {
-          margin-top: 1.6rem;
-          font-size: 0.75rem;
-          color: #9ca3af;
-          text-align: center;
-        }
+/* ───────── INPUTS ───────── */
+input,
+select {
+  width: 100%;
+  background: #000;
+  border: 1px solid #27272a;
+  color: #e5e7eb;
+  padding: 0.75rem 0.8rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  min-height: 44px; /* mobile tap target */
+}
 
-        @media (max-width: 520px) {
-          .grid {
-            grid-template-columns: 1fr;
-          }
-        }
-        .access-card {
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #52525b;
+}
+
+/* ───────── HELPER TEXT (LOWEST PRIORITY) ───────── */
+.hint {
+  font-size: clamp(0.55rem, 2.2vw, 0.7rem);
+  color: #9ca3af;
+  margin-top: 0.35rem;
+  max-width: 30ch;
+  line-height: 1.35;
+}
+
+/* ───────── ACTIONS (RESPONSIVE FIX) ───────── */
+.actions {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 2rem;
+}
+
+@media (max-width: 420px) {
+  .actions {
+    flex-direction: column;
+  }
+}
+
+.primary {
+  flex: 1;
+  background: #fff;
+  color: #000;
+  border-radius: 999px;
+  padding: 0.85rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.secondary {
+  flex: 1;
+  border: 1px solid #27272a;
+  padding: 0.85rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  background: transparent;
+  color: #e5e7eb;
+}
+
+/* ───────── FOOTER NOTE ───────── */
+.footer-note {
+  margin-top: 1.6rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
+  text-align: center;
+  max-width: 26ch;
+  line-height: 1.5;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ───────── ACCESS CARD ───────── */
+.access-card {
   text-align: left;
 }
 
@@ -495,6 +584,34 @@ export default function UploadResourcePage() {
   padding-left: 1rem;
   font-size: 0.75rem;
   color: #e5e7eb;
+}
+
+/* ───────── TOAST ───────── */
+.toast {
+  position: fixed;
+  bottom: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+  padding: 0.75rem 1.2rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  z-index: 9999;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }
 
       `}</style>
