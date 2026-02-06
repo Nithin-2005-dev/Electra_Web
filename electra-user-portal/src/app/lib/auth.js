@@ -1,6 +1,8 @@
 import {
   sendSignInLinkToEmail,
   signInWithEmailLink,
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
 } from "firebase/auth";
 import { auth } from "./firebase";
 
@@ -10,7 +12,9 @@ export const sendEmailLink = async (email) => {
     throw new Error("Invalid email");
   }
 
-  const baseUrl = process.env.APP_BASE_URL;
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_BASE_URL ||
+    (typeof window !== "undefined" ? window.location.origin : "");
   if (!baseUrl) {
     throw new Error("NEXT_PUBLIC_APP_BASE_URL is not defined");
   }
@@ -24,6 +28,41 @@ export const sendEmailLink = async (email) => {
 
   // Persist email for same-device verification
   window.localStorage.setItem("emailForSignIn", email);
+};
+
+/* ---------- PHONE OTP ---------- */
+let recaptchaVerifier;
+
+export const initRecaptcha = (containerId = "recaptcha") => {
+  if (typeof window === "undefined") return null;
+
+  if (recaptchaVerifier) {
+    return recaptchaVerifier;
+  }
+
+  recaptchaVerifier = new RecaptchaVerifier(
+    auth,
+    containerId,
+    { size: "invisible" }
+  );
+
+  // Render immediately so it is ready for the OTP request.
+  recaptchaVerifier.render().catch(() => {});
+
+  return recaptchaVerifier;
+};
+
+export const sendPhoneOTP = async (phone) => {
+  if (!phone || typeof phone !== "string") {
+    throw new Error("Invalid phone number");
+  }
+
+  const verifier = initRecaptcha("recaptcha");
+  if (!verifier) {
+    throw new Error("Recaptcha not initialized");
+  }
+
+  return signInWithPhoneNumber(auth, phone, verifier);
 };
 
 /* ---------- VERIFY EMAIL LINK ---------- */

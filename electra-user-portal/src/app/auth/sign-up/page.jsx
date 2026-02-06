@@ -12,6 +12,11 @@ export default function SignUpPage() {
   const [error, setError] = useState("");
 
   const handleContinue = async () => {
+    if (!email.includes("@") || !phone) {
+      setError("Enter a valid email and phone number");
+      return;
+    }
+
     try {
       setLoading(true);
       setError("");
@@ -26,7 +31,8 @@ export default function SignUpPage() {
 
       router.push("/auth/verify");
     } catch (err) {
-      setError("Verification setup failed");
+      const code = err?.code ? ` (${err.code})` : "";
+      setError(`Verification setup failed${code}`);
     } finally {
       setLoading(false);
     }
