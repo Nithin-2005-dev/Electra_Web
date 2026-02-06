@@ -125,7 +125,7 @@ export default function ProductInfo({
           </div>
 
           <div className="sizes">
-            {["S", "M", "L", "XL","2XL","3XL"].map((s) => (
+            {["XS","S", "M", "L", "XL","2XL","3XL"].map((s) => (
               <button
                 key={s}
                 type="button"
