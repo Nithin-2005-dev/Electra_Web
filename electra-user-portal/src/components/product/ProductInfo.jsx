@@ -7,6 +7,8 @@ import {
   getDoc,
   setDoc,
   updateDoc,
+  arrayUnion,
+  arrayRemove,
   serverTimestamp,
 } from "firebase/firestore";
 import { useRouter } from "next/navigation";
@@ -25,14 +27,59 @@ export default function ProductInfo({
 }) {
   const router = useRouter();
   const [adding, setAdding] = useState(false);
-  const [toast, setToast] = useState(false);
+  const [toast, setToast] = useState("");
+  const [sizeError, setSizeError] = useState("");
+  const [nameError, setNameError] = useState("");
+  const [notifyLoading, setNotifyLoading] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
 
   /* ───────── AUTO HIDE TOAST ───────── */
   useEffect(() => {
     if (!toast) return;
-    const t = setTimeout(() => setToast(false), 3200);
+    const t = setTimeout(() => setToast(""), 3200);
     return () => clearTimeout(t);
   }, [toast]);
+
+  useEffect(() => {
+    const unsub = auth.onAuthStateChanged((u) => {
+      if (!u) {
+        setSubscribed(false);
+        setCartCount(0);
+        return;
+      }
+      const list = product?.interestedUsers || [];
+      setSubscribed(Array.isArray(list) && list.includes(u.uid));
+    });
+    return () => unsub();
+  }, [product?.interestedUsers]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadCartState = async () => {
+      const user = auth.currentUser;
+      if (!user || !product?.productId) {
+        setCartCount(0);
+        return;
+      }
+      try {
+        const snap = await getDoc(doc(db, "users", user.uid));
+        const cartItems = snap.data()?.cart?.items || {};
+        const count = Object.values(cartItems).reduce(
+          (s, i) => s + (Number(i?.quantity) || 0),
+          0
+        );
+        if (!cancelled) setCartCount(count);
+      } catch {
+        if (!cancelled) setCartCount(0);
+      }
+    };
+
+    loadCartState();
+    return () => {
+      cancelled = true;
+    };
+  }, [product?.productId]);
 
   /* ───────── ADD TO CART ───────── */
   const addToCart = async () => {
@@ -44,7 +91,7 @@ export default function ProductInfo({
       return;
     }
     if (printName && !printedName.trim()) {
-      alert("Please enter the name to be printed");
+      setNameError("Please enter the name to be printed.");
       return;
     }
 
@@ -89,7 +136,10 @@ export default function ProductInfo({
       setSize(null);
       setPrintName(false);
       setPrintedName("");
-      setToast(true);
+      setToast("Added to cart");
+      setSizeError("");
+      setNameError("");
+      setCartCount((c) => Math.max(1, c + 1));
     } catch (err) {
       console.error("Add to cart failed:", err);
       alert("Failed to add to cart");
@@ -130,7 +180,10 @@ export default function ProductInfo({
                 key={s}
                 type="button"
                 className={`size-btn ${size === s ? "active" : ""}`}
-                onClick={() => setSize(s)}
+                onClick={() => {
+                  setSize(s);
+                  if (sizeError) setSizeError("");
+                }}
               >
                 {s}
               </button>
@@ -155,46 +208,142 @@ export default function ProductInfo({
               placeholder="Enter name to print"
               maxLength={12}
               value={printedName}
-              onChange={(e) => setPrintedName(e.target.value)}
+              onChange={(e) => {
+                setPrintedName(e.target.value);
+                if (nameError) setNameError("");
+              }}
             />
           )}
         </div>
 
-        {/* ACTIONS */}
-        <div className="actions">
-          <button
-            className="add-cart"
-            disabled={!product?.available || product.isComing || !size || adding}
-            onClick={addToCart}
-          >
-            {adding ? "Adding…" : "Add to Cart"}
-          </button>
+        {/* ACTIONS / NOTIFY */}
+        {!product?.available || product.isComing ? (
+          <div className="actions">
+            <button
+              className="notify"
+              disabled={notifyLoading}
+              onClick={async () => {
+                if (notifyLoading) return;
+                const user = auth.currentUser;
+                if (!user) {
+                  setToast("Please sign in to get notified");
+                  return;
+                }
+                if (!product?.productId) return;
+                try {
+                  setNotifyLoading(true);
+                  const ref = doc(db, "products", product.productId);
+                  if (subscribed) {
+                    await updateDoc(ref, {
+                      interestedUsers: arrayRemove(user.uid),
+                    });
+                    setSubscribed(false);
+                    setToast("Unsubscribed");
+                  } else {
+                    await updateDoc(ref, {
+                      interestedUsers: arrayUnion(user.uid),
+                    });
+                    setSubscribed(true);
+                    setToast("You'll be notified");
+                  }
+                } finally {
+                  setNotifyLoading(false);
+                }
+              }}
+            >
+              {subscribed ? "SUBSCRIBED ✓" : "NOTIFY ME"}
+            </button>
+          </div>
+        ) : (
+          <div className="actions">
+            <button
+              className="add-cart"
+              disabled={product?.available === false || product.isComing || adding}
+              onClick={() => {
+                if (!size) {
+                  setSizeError("Please select a size before continuing.");
+                  return;
+                }
+                if (printName && !printedName.trim()) {
+                  setNameError("Please enter the name to be printed.");
+                  return;
+                }
+                setSizeError("");
+                setNameError("");
+                addToCart();
+              }}
+            >
+              {adding ? "Adding…" : "Add to Cart"}
+            </button>
 
-          <button
-            className="buy"
-            disabled={!product?.available || product.isComing || !size || buying}
-            onClick={() =>
-              onBuy({
-                size,
-                printName,
-                printedName: printName ? printedName.trim() : null,
-              })
-            }
-          >
-            {buying ? "Processing…" : "Buy It Now"}
-          </button>
-        </div>
+            <button
+              className="buy"
+              disabled={product?.available === false || product.isComing || buying}
+              onClick={() => {
+                if (!size) {
+                  setSizeError("Please select a size before continuing.");
+                  return;
+                }
+                if (printName && !printedName.trim()) {
+                  setNameError("Please enter the name to be printed.");
+                  return;
+                }
+                setSizeError("");
+                setNameError("");
+                onBuy({
+                  size,
+                  printName,
+                  printedName: printName ? printedName.trim() : null,
+                });
+              }}
+            >
+              {buying ? "Processing…" : "Buy It Now"}
+            </button>
+          </div>
+        )}
+
+        {sizeError && (
+          <div className="size-error">
+            <span className="dot" />
+            <span>{sizeError}</span>
+          </div>
+        )}
+
+        {nameError && (
+          <div className="size-error">
+            <span className="dot" />
+            <span>{nameError}</span>
+          </div>
+        )}
 
         {!product?.available && <span className="out">Out of stock</span>}
       </section>
 
       {toast && (
         <div className="toast">
-          <span>Added to cart</span>
-          <button onClick={() => router.push("/cart")}>
-            View cart →
-          </button>
+          <span>{toast}</span>
+          {toast === "Added to cart" && (
+            <button onClick={() => router.push("/cart")}>
+              View cart →
+            </button>
+          )}
         </div>
+      )}
+
+      {cartCount > 0 && (
+        <button
+          className="cart-fab"
+          onClick={() => router.push("/cart")}
+          aria-label="Open cart"
+          title="Open cart"
+        >
+          <span className="cart-emoji" aria-hidden="true">
+            🛒
+          </span>
+          <span className="cart-badge" aria-hidden="true">
+            {cartCount}
+          </span>
+        </button>
       )}
 
       <style jsx>{`
@@ -420,10 +569,117 @@ export default function ProductInfo({
           font-size: inherit;
         }
 
+        .cart-fab {
+          position: fixed;
+          right: 18px;
+          bottom: 18px;
+          width: 58px;
+          height: 58px;
+          border-radius: 999px;
+          background:
+            radial-gradient(120% 120% at 20% 15%, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 45%),
+            linear-gradient(180deg, #1b1f26 0%, #13161b 55%, #0b0d11 100%);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          box-shadow:
+            0 16px 34px rgba(0, 0, 0, 0.65),
+            inset 0 1px 0 rgba(255,255,255,0.18),
+            inset 0 -10px 18px rgba(0,0,0,0.55),
+            0 0 18px rgba(148, 163, 184, 0.35);
+          cursor: pointer;
+          z-index: 200;
+          display: grid;
+          place-items: center;
+          transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+          animation: floaty 3.2s ease-in-out infinite;
+        }
+
+        .cart-fab:hover {
+          transform: translateY(-4px) scale(1.03);
+          border-color: rgba(148, 163, 184, 0.6);
+          box-shadow:
+            0 22px 44px rgba(0, 0, 0, 0.75),
+            inset 0 1px 0 rgba(255,255,255,0.35),
+            inset 0 -10px 18px rgba(0,0,0,0.65),
+            0 0 28px rgba(148, 163, 184, 0.45);
+        }
+
+        .cart-emoji {
+          font-size: 1.18rem;
+          line-height: 1;
+          display: block;
+          filter: drop-shadow(0 2px 6px rgba(0,0,0,0.55));
+          transform: translateY(1px);
+        }
+
+        .cart-badge {
+          position: absolute;
+          top: -4px;
+          right: -4px;
+          min-width: 18px;
+          height: 18px;
+          padding: 0 5px;
+          border-radius: 999px;
+          background: #111827;
+          color: #e5e7eb;
+          font-size: 0.65rem;
+          font-weight: 700;
+          display: grid;
+          place-items: center;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          box-shadow: 0 6px 14px rgba(0,0,0,0.5);
+        }
+
+        @keyframes floaty {
+          0% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-4px);
+          }
+          100% {
+            transform: translateY(0);
+          }
+        }
+
         .out { 
           color: #ef4444;
           font-size: clamp(0.8rem, 2vw, 0.85rem);
           font-weight: 600;
+        }
+
+        .size-error {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem 0.75rem;
+          border-radius: 999px;
+          border: 1px solid rgba(248, 113, 113, 0.35);
+          background: rgba(248, 113, 113, 0.08);
+          color: #fca5a5;
+          font-size: clamp(0.78rem, 2vw, 0.85rem);
+          font-weight: 600;
+          width: fit-content;
+        }
+
+        .size-error .dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 999px;
+          background: #f87171;
+          box-shadow: 0 0 10px rgba(248, 113, 113, 0.6);
+        }
+
+        .notify {
+          width: 100%;
+          padding: clamp(0.75rem, 2vw, 0.85rem);
+          border-radius: 999px;
+          background: transparent;
+          border: 1px solid rgba(255,255,255,0.35);
+          color: #fff;
+          font-weight: 700;
+          font-size: clamp(0.85rem, 2vw, 0.95rem);
+          letter-spacing: 0.12em;
+          cursor: pointer;
         }
 
         /* Tablet */

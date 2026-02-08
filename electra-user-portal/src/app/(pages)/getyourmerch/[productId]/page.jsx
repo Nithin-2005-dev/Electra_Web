@@ -78,15 +78,21 @@ export default function ProductPage() {
   }, [productId, router]);
 
   /* ───────── ORDER NOW ───────── */
-  const orderNow = async () => {
+  const orderNow = async (payload = {}) => {
     if (buying || !product?.available) return;
 
-    if (!selectedSize) {
+    const {
+      size = selectedSize,
+      printName: wantPrintName = printName,
+      printedName: wantPrintedName = printedName,
+    } = payload;
+
+    if (!size) {
       alert("Please select a size");
       return;
     }
 
-    if (printName && !printedName.trim()) {
+    if (wantPrintName && !String(wantPrintedName || "").trim()) {
       alert("Please enter the name to be printed");
       return;
     }
@@ -114,7 +120,10 @@ export default function ProductPage() {
           o.items?.some(
             (i) =>
               i.productId === productId &&
-              i.size === selectedSize
+              i.size === size &&
+              Boolean(i.printName) === Boolean(wantPrintName) &&
+              String(i.printedName || "").trim() ===
+                String(wantPrintedName || "").trim()
           )
         );
 
@@ -129,9 +138,11 @@ export default function ProductPage() {
         productId,
         productName: product.name,
         price: product.price,
-        size: selectedSize,
-        printName,
-        printedName: printName ? printedName.trim() : null,
+        size,
+        printName: wantPrintName,
+        printedName: wantPrintName
+          ? String(wantPrintedName || "").trim()
+          : null,
         quantity: 1,
       };
 
@@ -140,6 +151,7 @@ export default function ProductPage() {
         userId: user.uid,
         items: [item],
         amount: product.price,
+        printNameCharge: printName ? 40 : 0,
         paymentStatus: "pending_payment",
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),

@@ -94,11 +94,18 @@ export default function OrderDetailsPage() {
       },
     ];
 
-  const totalPaid =
-    order.totalAmountPaid ??
+  const printChargeFromItems =
+    (order.items || []).reduce(
+      (s, i) => s + (i.printName ? 40 * (i.quantity || 1) : 0),
+      0
+    ) || 0;
+
+  const totalDue =
     order.amount +
-      (order.printNameCharge || 0) +
-      (order.deliveryCharge || 0);
+    (order.printNameCharge ?? printChargeFromItems) +
+    (order.deliveryCharge || 0);
+
+  const totalPaid = order.totalAmountPaid ?? totalDue;
 
   return (
     <main className="page">
@@ -112,15 +119,38 @@ export default function OrderDetailsPage() {
         </div>
 
         <div className="amountBox">
-          <span >Total paid:</span>
-          <strong>₹{totalPaid}</strong>
+          <span>
+            {order.paymentStatus === "pending_payment"
+              ? "Total due:"
+              : "Total paid:"}
+          </span>
+          <strong>
+            ₹{order.paymentStatus === "pending_payment" ? totalDue : totalPaid}
+          </strong>
         </div>
       </header>
 
-      {/* PROGRESS */}
-      <section className="panel">
-        <ProgressBar order={order} />
-      </section>
+      {/* PROGRESS / PAYMENT */}
+      {order.paymentStatus === "pending_payment" ? (
+        <section className="panel payNotice">
+          <div>
+            <h2 className="sectionTitle">Payment Pending</h2>
+            <p className="muted">
+              Complete payment to start order processing.
+            </p>
+          </div>
+          <button
+            className="payBtn"
+            onClick={() => router.push(`/checkout/${order.orderId}`)}
+          >
+            Continue Payment
+          </button>
+        </section>
+      ) : (
+        <section className="panel">
+          <ProgressBar order={order} />
+        </section>
+      )}
 
       {/* ITEMS */}
       <section className="panel">
@@ -146,7 +176,11 @@ export default function OrderDetailsPage() {
 
       {/* PAYMENT SUMMARY */}
       <section className="panel payment">
-        <h2 className="sectionTitle">Payment Summary</h2>
+        <h2 className="sectionTitle">
+          {order.paymentStatus === "pending_payment"
+            ? "Payment Due"
+            : "Payment Summary"}
+        </h2>
 
         <div className="payRow">
           <span>Base amount</span>
@@ -170,18 +204,26 @@ export default function OrderDetailsPage() {
         <div className="divider" />
 
         <div className="payRow total">
-          <span>Total paid</span>
-          <span>₹{totalPaid}</span>
+          <span>
+            {order.paymentStatus === "pending_payment"
+              ? "Total due"
+              : "Total paid"}
+          </span>
+          <span>
+            ₹{order.paymentStatus === "pending_payment" ? totalDue : totalPaid}
+          </span>
         </div>
       </section>
 
       {/* TIMELINE */}
-      <section className="panel timeline">
-        <Timeline label="Placed" date={order.createdAt} />
-        <Timeline label="Approved" date={order.approvedAt} />
-        <Timeline label="Shipped" date={order.shippedAt} />
-        <Timeline label="Delivered" date={order.deliveredAt} />
-      </section>
+      {order.paymentStatus !== "pending_payment" && (
+        <section className="panel timeline">
+          <Timeline label="Placed" date={order.createdAt} />
+          <Timeline label="Approved" date={order.approvedAt} />
+          <Timeline label="Shipped" date={order.shippedAt} />
+          <Timeline label="Delivered" date={order.deliveredAt} />
+        </section>
+      )}
 
       <style jsx>{`
         .page {
@@ -301,8 +343,32 @@ export default function OrderDetailsPage() {
           gap: 0.6rem;
         }
 
+        .payNotice {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .payBtn {
+          padding: 0.65rem 1.4rem;
+          border-radius: 999px;
+          border: none;
+          background: linear-gradient(180deg,#ffffff,#e5e7eb);
+          color: #000;
+          font-weight: 700;
+          font-size: 0.8rem;
+          letter-spacing: 0.12em;
+          cursor: pointer;
+        }
+
         @media (max-width: 640px) {
           .header {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .payNotice {
             flex-direction: column;
             align-items: flex-start;
           }

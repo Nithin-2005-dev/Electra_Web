@@ -21,6 +21,8 @@ export default function CartPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
+  const [selected, setSelected] = useState({});
+  const [checkoutError, setCheckoutError] = useState("");
 
   /* ───────── LOAD CART ───────── */
   useEffect(() => {
@@ -32,12 +34,38 @@ export default function CartPage() {
 
       const snap = await getDoc(doc(db, "users", user.uid));
       const cartItems = snap.data()?.cart?.items || {};
+      const itemsArr = Object.entries(cartItems).map(([key, value]) => ({
+        key,
+        ...value,
+      }));
 
-      setItems(
-        Object.entries(cartItems).map(([key, value]) => ({
-          key,
-          ...value,
-        }))
+      const uniqueProductIds = Array.from(
+        new Set(itemsArr.map((i) => i.productId).filter(Boolean))
+      );
+      const productSnaps = await Promise.all(
+        uniqueProductIds.map((id) => getDoc(doc(db, "products", id)))
+      );
+      const productMap = productSnaps.reduce((acc, s, idx) => {
+        acc[uniqueProductIds[idx]] = s.exists() ? s.data() : {};
+        return acc;
+      }, {});
+
+      const merged = itemsArr.map((i) => {
+        const meta = productMap[i.productId] || {};
+        return {
+          ...i,
+          available: meta.available,
+          isComing: meta.isComing,
+        };
+      });
+
+      setItems(merged);
+      setSelected(
+        merged.reduce((acc, i) => {
+          const blocked = i.available === false || i.isComing;
+          acc[i.key] = !blocked;
+          return acc;
+        }, {})
       );
       setLoading(false);
     });
@@ -62,6 +90,12 @@ export default function CartPage() {
   /* ───────── REMOVE ITEM ───────── */
   const removeItem = async (key) => {
     setItems((prev) => prev.filter((i) => i.key !== key));
+    setSelected((prev) => {
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+    setCheckoutError("");
 
     await updateDoc(doc(db, "users", auth.currentUser.uid), {
       [`cart.items.${key}`]: deleteField(),
@@ -69,13 +103,166 @@ export default function CartPage() {
     });
   };
 
+  const updateCartItemKey = async (key, nextSize, nextPrintedName) => {
+    const userId = auth.currentUser.uid;
+    const userRef = doc(db, "users", userId);
+    const snap = await getDoc(userRef);
+    const cartItems = snap.data()?.cart?.items || {};
+    const current = cartItems[key];
+    if (!current) return;
+
+    const printName = !!current.printName;
+    const safeName = printName ? (nextPrintedName || "").trim() : "";
+    const nextKey = `${current.productId}_${nextSize}_${printName ? safeName : "no-print"}`;
+
+    if (nextKey === key) {
+      setCheckoutError("");
+      return;
+    }
+
+    const existing = cartItems[nextKey];
+
+    const updatedItem = {
+      ...current,
+      size: nextSize,
+      printedName: printName ? safeName : null,
+    };
+
+    // merge if same product+size+name exists
+    if (existing) {
+      const mergedQty =
+        (Number(existing.quantity) || 0) + (Number(current.quantity) || 0);
+
+      await updateDoc(userRef, {
+        [`cart.items.${nextKey}`]: {
+          ...existing,
+          ...updatedItem,
+          quantity: mergedQty,
+        },
+        [`cart.items.${key}`]: deleteField(),
+        "cart.updatedAt": serverTimestamp(),
+      });
+
+      setItems((prev) =>
+        prev
+          .filter((i) => i.key !== key)
+          .map((i) =>
+            i.key === nextKey
+              ? { ...i, ...updatedItem, quantity: mergedQty }
+              : i
+          )
+      );
+    } else {
+      await updateDoc(userRef, {
+        [`cart.items.${nextKey}`]: updatedItem,
+        [`cart.items.${key}`]: deleteField(),
+        "cart.updatedAt": serverTimestamp(),
+      });
+
+      setItems((prev) =>
+        prev.map((i) =>
+          i.key === key ? { ...updatedItem, key: nextKey } : i
+        )
+      );
+    }
+
+    setSelected((prev) => {
+      const next = { ...prev };
+      const wasSelected = !!next[key];
+      delete next[key];
+      next[nextKey] = wasSelected;
+      return next;
+    });
+    setCheckoutError("");
+  };
+
+  const updatePrintToggle = async (key, nextPrintName) => {
+    const userId = auth.currentUser.uid;
+    const userRef = doc(db, "users", userId);
+    const snap = await getDoc(userRef);
+    const cartItems = snap.data()?.cart?.items || {};
+    const current = cartItems[key];
+    if (!current) return;
+
+    const safeName = (current.printedName || "").trim();
+    const nextKey = `${current.productId}_${current.size}_${
+      nextPrintName ? safeName || "" : "no-print"
+    }`;
+
+    const updatedItem = {
+      ...current,
+      printName: nextPrintName,
+      printedName: nextPrintName ? safeName : null,
+    };
+
+    if (nextKey === key) {
+      await updateDoc(userRef, {
+        [`cart.items.${key}`]: updatedItem,
+        "cart.updatedAt": serverTimestamp(),
+      });
+      setItems((prev) =>
+        prev.map((i) => (i.key === key ? { ...updatedItem, key } : i))
+      );
+      setCheckoutError("");
+      return;
+    }
+
+    const existing = cartItems[nextKey];
+    if (existing) {
+      const mergedQty =
+        (Number(existing.quantity) || 0) + (Number(current.quantity) || 0);
+      await updateDoc(userRef, {
+        [`cart.items.${nextKey}`]: {
+          ...existing,
+          ...updatedItem,
+          quantity: mergedQty,
+        },
+        [`cart.items.${key}`]: deleteField(),
+        "cart.updatedAt": serverTimestamp(),
+      });
+
+      setItems((prev) =>
+        prev
+          .filter((i) => i.key !== key)
+          .map((i) =>
+            i.key === nextKey
+              ? { ...i, ...updatedItem, quantity: mergedQty }
+              : i
+          )
+      );
+    } else {
+      await updateDoc(userRef, {
+        [`cart.items.${nextKey}`]: updatedItem,
+        [`cart.items.${key}`]: deleteField(),
+        "cart.updatedAt": serverTimestamp(),
+      });
+
+      setItems((prev) =>
+        prev.map((i) =>
+          i.key === key ? { ...updatedItem, key: nextKey } : i
+        )
+      );
+    }
+
+    setSelected((prev) => {
+      const next = { ...prev };
+      const wasSelected = !!next[key];
+      delete next[key];
+      next[nextKey] = wasSelected;
+      return next;
+    });
+    setCheckoutError("");
+  };
+
   /* ───────── TOTALS ───────── */
-  const baseTotal = items.reduce(
+  const selectedItems = items.filter((i) => selected[i.key]);
+
+  const baseTotal = selectedItems.reduce(
     (s, i) => s + (typeof i.price === "number" ? i.price * i.quantity : 0),
     0
   );
 
-  const printTotal = items.reduce(
+  const printTotal = selectedItems.reduce(
     (s, i) => s + (i.printName ? 40 * i.quantity : 0),
     0
   );
@@ -84,24 +271,45 @@ export default function CartPage() {
 
   /* ───────── CHECKOUT ───────── */
   const proceedToCheckout = async () => {
-    if (!items.length || processing) return;
+    if (!selectedItems.length || processing) return;
+    const blocked = selectedItems.find(
+      (i) => i.available === false || i.isComing
+    );
+    if (blocked) {
+      setCheckoutError("Some selected items are unavailable. Unselect them to continue.");
+      return;
+    }
+    const invalid = selectedItems.find(
+      (i) => i.printName && !String(i.printedName || "").trim()
+    );
+    if (invalid) {
+      setCheckoutError("Please add the printed name for selected items.");
+      return;
+    }
 
     setProcessing(true);
+    setCheckoutError("");
 
     const orderId = `ORD-${nanoid(6).toUpperCase()}`;
 
     await setDoc(doc(db, "orders", orderId), {
       orderId,
       userId: auth.currentUser.uid,
-      items,
+      items: selectedItems,
       amount: baseTotal,
+      printNameCharge: printTotal,
       paymentStatus: "pending_payment",
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
 
+    const toDelete = selectedItems.reduce((acc, i) => {
+      acc[`cart.items.${i.key}`] = deleteField();
+      return acc;
+    }, {});
     await updateDoc(doc(db, "users", auth.currentUser.uid), {
-      cart: { items: {} },
+      ...toDelete,
+      "cart.updatedAt": serverTimestamp(),
     });
 
     router.push(`/checkout/${orderId}`);
@@ -221,15 +429,86 @@ export default function CartPage() {
       <section className="items">
         {items.map((item) => (
           <div key={item.key} className="item">
+            <label className="select">
+              <input
+                type="checkbox"
+                checked={!!selected[item.key]}
+                disabled={item.available === false || item.isComing}
+                onChange={(e) =>
+                  setSelected((prev) => ({
+                    ...prev,
+                    [item.key]: e.target.checked,
+                  }))
+                }
+              />
+            </label>
             <img src={cloudinaryImage(item.image, "q_auto,f_auto,w_200/")} />
 
             <div className="meta">
               <h3>{item.productName}</h3>
-              <p className="muted">Size: {item.size}</p>
+              {(item.available === false || item.isComing) && (
+                <span className="badge warn">
+                  {item.isComing ? "Coming soon" : "Unavailable"}
+                </span>
+              )}
+              <div className="row-inline">
+                <span className="muted">Size</span>
+                <select
+                  className="size-edit"
+                  value={item.size}
+                  onChange={(e) =>
+                    updateCartItemKey(item.key, e.target.value, item.printedName)
+                  }
+                >
+                  {["XS","S", "M", "L", "XL","2XL","3XL"].map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
               {item.printName && (
-                <span className="badge">Printed: {item.printedName}</span>
+                <div className="row-inline">
+                  <span className="muted">Printed name</span>
+                  <input
+                    className="name-edit"
+                    value={item.printedName || ""}
+                    maxLength={12}
+                    onChange={(e) => {
+                      setItems((prev) =>
+                        prev.map((i) =>
+                          i.key === item.key
+                            ? { ...i, printedName: e.target.value }
+                            : i
+                        )
+                      );
+                      if (checkoutError) setCheckoutError("");
+                    }}
+                    onBlur={(e) =>
+                      updateCartItemKey(item.key, item.size, e.target.value)
+                    }
+                  />
+                </div>
               )}
+
+              <div className="row-inline">
+                {item.printName ? (
+                  <button
+                    className="name-action remove"
+                    onClick={() => updatePrintToggle(item.key, false)}
+                  >
+                    Remove name
+                  </button>
+                ) : (
+                  <button
+                    className="name-action add"
+                    onClick={() => updatePrintToggle(item.key, true)}
+                  >
+                    Add name (+₹40)
+                  </button>
+                )}
+              </div>
 
               <div className="qty">
                 <button onClick={() => updateQty(item.key, item.quantity - 1)}>
@@ -271,7 +550,11 @@ export default function CartPage() {
           <span>₹{grandTotal}</span>
         </div>
 
-        <button onClick={proceedToCheckout} disabled={processing}>
+        {checkoutError && (
+          <div className="checkout-error">{checkoutError}</div>
+        )}
+
+        <button onClick={proceedToCheckout} disabled={processing || !selectedItems.length}>
           {processing ? "Processing…" : "Proceed to Checkout"}
         </button>
       </aside>
@@ -305,7 +588,7 @@ export default function CartPage() {
 
 .item {
   display: grid;
-  grid-template-columns: 110px 1fr auto;
+  grid-template-columns: 28px 110px 1fr auto;
   gap: 1.2rem;
   padding: 1.2rem;
   background: linear-gradient(180deg, #121212, #0b0b0b);
@@ -325,6 +608,70 @@ export default function CartPage() {
   object-fit: contain;
   border-radius: 14px;
   background: #000;
+}
+
+.select {
+  display: grid;
+  place-items: center;
+}
+
+.select input {
+  width: 18px;
+  height: 18px;
+  accent-color: #22d3ee;
+}
+
+.row-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.4rem;
+}
+
+.size-edit,
+.name-edit {
+  background: #000;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 0.35rem 0.5rem;
+}
+
+.name-edit {
+  width: 140px;
+}
+
+.name-action {
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.04);
+  color: #e5e7eb;
+  cursor: pointer;
+}
+
+.name-action.add {
+  border-color: rgba(34,211,238,0.4);
+  color: #67e8f9;
+}
+
+.name-action.remove {
+  border-color: rgba(239,68,68,0.35);
+  color: #fca5a5;
+}
+
+.checkout-error {
+  margin-top: 0.8rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 12px;
+  border: 1px solid rgba(248,113,113,0.35);
+  background: rgba(248,113,113,0.08);
+  color: #fca5a5;
+  font-size: 0.8rem;
 }
 
 /* ───────── META ───────── */
@@ -348,6 +695,12 @@ export default function CartPage() {
   border-radius: 999px;
   background: rgba(34,211,238,0.12);
   color: var(--accent);
+}
+
+.badge.warn {
+  background: rgba(239,68,68,0.12);
+  color: #fca5a5;
+  border: 1px solid rgba(239,68,68,0.25);
 }
 
 /* ───────── QTY ───────── */
@@ -477,14 +830,50 @@ export default function CartPage() {
   }
 
   .item {
-    grid-template-columns: 90px 1fr;
+    grid-template-columns: 28px 90px 1fr;
     gap: 1rem;
   }
 
   .price {
-    grid-column: span 2;
+    grid-column: span 3;
     text-align: right;
     margin-top: 0.4rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .item {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .select {
+    justify-self: start;
+  }
+
+  .item img {
+    width: 100%;
+    max-width: 220px;
+    height: auto;
+    justify-self: center;
+  }
+
+  .price {
+    grid-column: 1 / -1;
+    text-align: left;
+  }
+
+  .row-inline {
+    flex-wrap: wrap;
+  }
+
+  .size-edit,
+  .name-edit {
+    width: 100%;
+  }
+
+  .qty {
+    flex-wrap: wrap;
   }
 }
 /* ───────── BREADCRUMB ───────── */
@@ -577,5 +966,3 @@ export default function CartPage() {
     </main>
   );
 }
-
-

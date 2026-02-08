@@ -46,13 +46,21 @@ export default function OrderCard({ order, onApprove, onReject }) {
   const handleApprove = async () => {
     if (loadingAction) return;
     setLoadingAction("approve");
-    await onApprove(order.orderId);
+    try {
+      await onApprove(order.orderId);
+    } finally {
+      setLoadingAction(null);
+    }
   };
 
   const handleReject = async () => {
     if (loadingAction) return;
     setLoadingAction("reject");
-    await onReject(order.orderId);
+    try {
+      await onReject(order.orderId);
+    } finally {
+      setLoadingAction(null);
+    }
   };
 
   return (
@@ -133,6 +141,21 @@ export default function OrderCard({ order, onApprove, onReject }) {
           label="Delivery Charge"
           value={`₹${order.deliveryCharge || 0}`}
         />
+        {order.paymentScreenshotUrl && (
+          <a
+            href={order.paymentScreenshotUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="text-cyan-300 underline text-sm"
+          >
+            View Payment Screenshot
+          </a>
+        )}
+        {order.deliveryAddress && (
+          <span className="col-span-1 sm:col-span-2 text-slate-300">
+            Delivery: {formatAddress(order.deliveryAddress)}
+          </span>
+        )}
       </div>
 
       {/* ───── ACTIONS ───── */}
@@ -224,6 +247,19 @@ function Detail({ label, value }) {
       {label}: <span className="text-slate-200">{value}</span>
     </span>
   );
+}
+
+function formatAddress(addr) {
+  if (!addr) return "—";
+  return [
+    addr.fullName,
+    addr.phone,
+    addr.addressLine,
+    addr.city,
+    addr.pincode,
+  ]
+    .filter(Boolean)
+    .join(", ");
 }
 
 function StatusPill({ label, tone }) {

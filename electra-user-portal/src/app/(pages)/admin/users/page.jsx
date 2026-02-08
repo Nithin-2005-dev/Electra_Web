@@ -6,8 +6,8 @@ import { auth, db } from "../../../../app/lib/firebase";
 import {
   collection,
   getDocs,
-  query,
-  where,
+  doc,
+  getDoc,
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -24,65 +24,188 @@ export default function AdminUsersPage() {
   const [stream, setStream] = useState("");
   const [role, setRole] = useState("");
   const [hasOrders, setHasOrders] = useState("");
+  const [createdAfter, setCreatedAfter] = useState("");
+  const [ordersAfter, setOrdersAfter] = useState("");
+  const [orderedProduct, setOrderedProduct] = useState("");
 
   /* ───── ADMIN GUARD + LOAD DATA ───── */
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
-      if (!user) return router.replace("/");
+      if (!user) {
+        router.replace("/");
+        return;
+      }
 
-      const adminCheck = await getDocs(
-        query(
-          collection(db, "users"),
-          where("uid", "==", user.uid),
-          where("role", "==", "admin")
-        )
-      );
+      try {
+        const ref = doc(db, "users", user.uid);
+        const snap = await getDoc(ref);
 
-      if (adminCheck.empty) return router.replace("/");
+        if (!snap.exists() || snap.data().role !== "admin") {
+          router.replace("/");
+          return;
+        }
 
-      const usersSnap = await getDocs(collection(db, "users"));
-      const ordersSnap = await getDocs(collection(db, "orders"));
+        /* Load users */
+        const usersSnap = await getDocs(collection(db, "users"));
+        const usersData = usersSnap.docs.map((d) => {
+          const data = d.data();
+          return {
+            id: d.id,
+            uid: data.uid || d.id,
+            name: data.name?.trim() || "",
+            email: data.email?.trim() || "",
+            phone: data.phone?.trim() || "",
+            stream: data.stream?.trim() || "",
+            year: data.year ? String(data.year).trim() : "",
+            role: data.role?.trim() || "",
+            createdAt: data.createdAt || null,
+          };
+        });
 
-      const ordersByUser = {};
-      ordersSnap.forEach((d) => {
-        const o = d.data();
-        ordersByUser[o.userId] ||= [];
-        ordersByUser[o.userId].push(o);
-      });
+        /* Load orders */
+        const ordersSnap = await getDocs(collection(db, "orders"));
+        const map = {};
 
-      setOrdersMap(ordersByUser);
-      setUsers(usersSnap.docs.map((d) => d.data()));
-      setLoading(false);
+        ordersSnap.forEach((d) => {
+          const o = d.data();
+          if (!o.userId) return;
+
+          if (!map[o.userId]) map[o.userId] = [];
+
+          map[o.userId].push({
+            id: d.id,
+            ...o,
+            totalAmountPaid: Number(o.totalAmountPaid) || 0,
+          });
+        });
+
+        setUsers(usersData);
+        setOrdersMap(map);
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        router.replace("/");
+      }
     });
 
     return () => unsub();
   }, [router]);
 
-  /* ───── FILTER LOGIC ───── */
+  /* Date conversion */
+  const createdAfterDate = createdAfter
+    ? new Date(createdAfter + ":00")
+    : null;
+
+  const ordersAfterDate = ordersAfter
+    ? new Date(ordersAfter + ":00")
+    : null;
+
+  /* Orders filter */
+  const getFilteredOrders = (uid) => {
+    let orders = ordersMap[uid] || [];
+
+    if (ordersAfterDate) {
+      orders = orders.filter((o) => {
+        const d = getDateFromTimestamp(o.createdAt || o.timestamp);
+        return d && d.getTime() >= ordersAfterDate.getTime();
+      });
+    }
+
+    return orders;
+  };
+
+  /* ───── FILTER USERS ───── */
   const filteredUsers = useMemo(() => {
+    const qSearch = search.trim().toLowerCase();
+    const qProduct = orderedProduct.trim().toLowerCase();
+
     return users.filter((u) => {
-      const orders = ordersMap[u.uid] || [];
+      const orders = getFilteredOrders(u.uid);
+      const createdAt = getDateFromTimestamp(u.createdAt);
 
-      if (
-        search &&
-        ![u.name, u.email, u.phone, u.uid]
+      /* Search */
+      if (qSearch) {
+        const fields = [u.name, u.email, u.phone, u.uid]
           .filter(Boolean)
-          .some((v) =>
-            v.toLowerCase().includes(search.toLowerCase())
-          )
-      )
-        return false;
+          .map((v) => String(v).toLowerCase());
 
-      if (year && u.year !== year) return false;
+        if (!fields.some((v) => v.includes(qSearch))) return false;
+      }
+
+      if (year && String(u.year) !== String(year)) return false;
       if (stream && u.stream !== stream) return false;
       if (role && u.role !== role) return false;
 
+      /* Created After */
+      if (createdAfterDate) {
+        if (!createdAt) return false;
+        if (createdAt.getTime() < createdAfterDate.getTime()) return false;
+      }
+
+      /* Orders existence */
       if (hasOrders === "yes" && orders.length === 0) return false;
       if (hasOrders === "no" && orders.length > 0) return false;
 
+      /* Ordered product */
+      if (qProduct) {
+        const match = orders.some((o) =>
+          getOrderProductNames(o).some((p) =>
+            p.toLowerCase().includes(qProduct)
+          )
+        );
+        if (!match) return false;
+      }
+
       return true;
     });
-  }, [users, ordersMap, search, year, stream, role, hasOrders]);
+  }, [
+    users,
+    ordersMap,
+    search,
+    year,
+    stream,
+    role,
+    hasOrders,
+    createdAfterDate,
+    ordersAfterDate,
+    orderedProduct,
+  ]);
+
+  /* Unique stream list (trimmed, no duplicates) */
+  const streamOptions = useMemo(() => {
+    return [...new Set(users.map((u) => u.stream).filter(Boolean))];
+  }, [users]);
+
+  /* CSV Export */
+  const exportCsv = () => {
+    const rows = filteredUsers.map((u) => {
+      const orders = getFilteredOrders(u.uid);
+
+      const totalSpent = orders.reduce(
+        (s, o) => s + (o.totalAmountPaid || 0),
+        0
+      );
+
+      const products = uniqueList(
+        orders.flatMap((o) => getOrderProductNames(o))
+      );
+
+      return {
+        name: u.name,
+        email: u.email,
+        phone: u.phone,
+        stream: u.stream,
+        year: u.year,
+        role: u.role,
+        createdAt: formatDateForCsv(u.createdAt),
+        ordersCount: orders.length,
+        totalSpent,
+        orderedProducts: products.join(" | "),
+      };
+    });
+
+    downloadCsv(toCsv(rows), `users-${Date.now()}.csv`);
+  };
 
   if (loading) {
     return (
@@ -94,88 +217,66 @@ export default function AdminUsersPage() {
 
   return (
     <main className="min-h-screen bg-black text-white p-8">
-      {/* HEADER */}
-      <header className="mb-6">
-        <h1 className="text-2xl font-bold mb-4">
-          Admin · Users
-        </h1>
+      <h1 className="text-2xl font-bold mb-4">Admin · Users</h1>
 
-        {/* SEARCH */}
-        <input
-          placeholder="Search name / email / phone / uid"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full mb-4 px-4 py-2 bg-black border border-white/10 rounded-lg text-sm"
-        />
+      <input
+        placeholder="Search name / email / phone / uid"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="w-full mb-4 px-4 py-2 bg-black border border-white/10 rounded-lg text-sm"
+      />
 
-        {/* FILTERS */}
-        <div className="flex flex-wrap gap-3">
-          <Select value={year} onChange={setYear} label="Year">
-            <option value="">All</option>
-            <option value="1">1st Year</option>
-            <option value="2">2nd Year</option>
-            <option value="3">3rd Year</option>
-            <option value="4">4th Year</option>
-            <option value="m.tech">M.Tech</option>
-            <option value="phd">PhD</option>
-            <option value="mba">MBA</option>
-            <option value="faculty">Faculty</option>
-            <option value="alumni">Alumni</option>
-          </Select>
+      <div className="flex flex-wrap gap-3 mb-6">
+        <DateFilter label="User Created After" value={createdAfter} setValue={setCreatedAfter} />
+        <DateFilter label="Orders After" value={ordersAfter} setValue={setOrdersAfter} />
 
-          <Select value={stream} onChange={setStream} label="Stream">
-            <option value="">All</option>
-            {[...new Set(users.map((u) => u.stream))].map(
-              (s) =>
-                s && (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                )
-            )}
-          </Select>
+        <TextFilter label="Ordered Product" value={orderedProduct} setValue={setOrderedProduct} />
 
-          <Select value={role} onChange={setRole} label="Role">
-            <option value="">All</option>
-            <option value="member">Member</option>
-            <option value="admin">Admin</option>
-          </Select>
+        <Select label="Year" value={year} onChange={setYear}>
+          <option value="">All</option>
+          <option value="1">1st</option>
+          <option value="2">2nd</option>
+          <option value="3">3rd</option>
+          <option value="4">4th</option>
+        </Select>
 
-          <Select
-            value={hasOrders}
-            onChange={setHasOrders}
-            label="Orders"
-          >
-            <option value="">All</option>
-            <option value="yes">Has orders</option>
-            <option value="no">No orders</option>
-          </Select>
-        </div>
-      </header>
+        <Select label="Stream" value={stream} onChange={setStream}>
+          <option value="">All</option>
+          {streamOptions.map((s) => (
+            <option key={s}>{s}</option>
+          ))}
+        </Select>
 
-      {/* USERS LIST */}
-      <section className="space-y-3">
+        <Select label="Role" value={role} onChange={setRole}>
+          <option value="">All</option>
+          <option value="member">member</option>
+          <option value="admin">admin</option>
+        </Select>
+
+        <Select label="Orders" value={hasOrders} onChange={setHasOrders}>
+          <option value="">All</option>
+          <option value="yes">Has orders</option>
+          <option value="no">No orders</option>
+        </Select>
+
+        <button
+          onClick={exportCsv}
+          className="px-4 py-2 bg-white text-black rounded-lg text-sm"
+        >
+          Export ({filteredUsers.length})
+        </button>
+      </div>
+
+      <div className="space-y-3">
         {filteredUsers.map((u) => {
-          const orders = ordersMap[u.uid] || [];
-          const spent = orders.reduce(
-            (s, o) => s + (o.totalAmountPaid || 0),
-            0
-          );
+          const orders = getFilteredOrders(u.uid);
+          const spent = orders.reduce((s, o) => s + o.totalAmountPaid, 0);
 
           return (
             <div
               key={u.uid}
-              onClick={() =>
-                router.push(`/admin/users/${u.uid}`)
-              }
-              className="
-                cursor-pointer
-                p-4 rounded-xl
-                bg-[#0b0f15]
-                border border-white/10
-                hover:border-cyan-400/40
-                transition
-              "
+              onClick={() => router.push(`/admin/users/${u.uid}`)}
+              className="p-4 bg-[#0b0f15] rounded-xl border border-white/10 cursor-pointer"
             >
               <div className="flex justify-between">
                 <div>
@@ -183,43 +284,109 @@ export default function AdminUsersPage() {
                   <p className="text-xs text-slate-400">
                     {u.email} · {u.phone}
                   </p>
-                  <p className="text-xs text-slate-500 mt-1">
-                    {u.stream} · Year {u.year} · {u.college}
-                  </p>
                 </div>
-
                 <div className="text-right text-sm">
-                  <p>
-                    <strong>{orders.length}</strong> orders
-                  </p>
-                  <p className="text-cyan-300">
-                    ₹{spent}
-                  </p>
-                  <p className="text-xs text-slate-400">
-                    {u.role}
-                  </p>
+                  <p>{orders.length} orders</p>
+                  <p className="text-cyan-300">₹{spent}</p>
                 </div>
               </div>
             </div>
           );
         })}
-      </section>
+      </div>
     </main>
   );
 }
 
-/* ───── SMALL SELECT COMPONENT ───── */
+/* UI Components */
+
 function Select({ label, value, onChange, children }) {
   return (
-    <label className="text-xs text-slate-400 flex flex-col gap-1">
+    <label className="text-xs text-slate-400 flex flex-col">
       {label}
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="bg-black border border-white/10 rounded-lg px-3 py-2 text-sm"
+        className="bg-black border border-white/10 px-3 py-2 rounded"
       >
         {children}
       </select>
     </label>
   );
 }
+
+function DateFilter({ label, value, setValue }) {
+  return (
+    <label className="text-xs text-slate-400 flex flex-col">
+      {label}
+      <input
+        type="datetime-local"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        className="bg-black border border-white/10 px-3 py-2 rounded"
+      />
+    </label>
+  );
+}
+
+function TextFilter({ label, value, setValue }) {
+  return (
+    <label className="text-xs text-slate-400 flex flex-col">
+      {label}
+      <input
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        className="bg-black border border-white/10 px-3 py-2 rounded"
+      />
+    </label>
+  );
+}
+
+/* Helpers */
+
+function getDateFromTimestamp(value) {
+  if (!value) return null;
+  if (value.toDate) return value.toDate();
+  if (value.seconds) return new Date(value.seconds * 1000);
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function formatDateForCsv(value) {
+  const d = getDateFromTimestamp(value);
+  return d ? d.toISOString() : "";
+}
+
+function getOrderProductNames(order) {
+  if (!order) return [];
+  if (Array.isArray(order.items)) {
+    return order.items.map((i) => i.productName || i.productId).filter(Boolean);
+  }
+  return [order.productName || order.productId].filter(Boolean);
+}
+
+function uniqueList(arr) {
+  return [...new Set(arr)];
+}
+
+function toCsv(rows) {
+  if (!rows.length) return "";
+  const keys = Object.keys(rows[0]);
+  const header = keys.join(",");
+  const lines = rows.map((r) =>
+    keys.map((k) => `"${String(r[k] ?? "").replace(/"/g, '""')}"`).join(",")
+  );
+  return [header, ...lines].join("\n");
+}
+
+function downloadCsv(csv, filename) {
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+

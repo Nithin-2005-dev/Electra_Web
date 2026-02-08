@@ -179,6 +179,14 @@ useEffect(() => {
         setError("Please complete delivery address");
         return;
       }
+      if (phone.length !== 10) {
+        setError("Please enter a valid 10-digit phone number");
+        return;
+      }
+      if (pincode.length !== 6) {
+        setError("Please enter a valid 6-digit pincode");
+        return;
+      }
     }
 
     try {
@@ -294,7 +302,7 @@ useEffect(() => {
                 setPayError("");
               }}
             >
-              Outside campus (+₹100)
+              Outside campus (+₹{DELIVERY_CHARGE})
             </button>
           </div>
           {payError && <p className="error">{payError}</p>}
@@ -361,16 +369,69 @@ useEffect(() => {
 
         {outside && (
           <div className="address">
-            {Object.keys(address).map((k) => (
+            <label>
+              Full name
               <input
-                key={k}
-                placeholder={k}
-                value={address[k]}
+                placeholder="Full name"
+                value={address.fullName}
                 onChange={(e) =>
-                  setAddress({ ...address, [k]: e.target.value })
+                  setAddress({ ...address, fullName: e.target.value })
                 }
               />
-            ))}
+            </label>
+            <label>
+              Phone number
+              <input
+                type="tel"
+                inputMode="numeric"
+                pattern="[0-9]{10}"
+                maxLength={10}
+                placeholder="10-digit phone number"
+                value={address.phone}
+                onChange={(e) =>
+                  setAddress({
+                    ...address,
+                    phone: e.target.value.replace(/[^0-9]/g, ""),
+                  })
+                }
+              />
+            </label>
+            <label>
+              Address
+              <input
+                placeholder="House no, street, area"
+                value={address.addressLine}
+                onChange={(e) =>
+                  setAddress({ ...address, addressLine: e.target.value })
+                }
+              />
+            </label>
+            <label>
+              City
+              <input
+                placeholder="City"
+                value={address.city}
+                onChange={(e) =>
+                  setAddress({ ...address, city: e.target.value })
+                }
+              />
+            </label>
+            <label>
+              Pincode
+              <input
+                inputMode="numeric"
+                pattern="[0-9]{6}"
+                maxLength={6}
+                placeholder="6-digit pincode"
+                value={address.pincode}
+                onChange={(e) =>
+                  setAddress({
+                    ...address,
+                    pincode: e.target.value.replace(/[^0-9]/g, ""),
+                  })
+                }
+              />
+            </label>
           </div>
         )}
 
@@ -422,7 +483,7 @@ useEffect(() => {
         {outside && (
           <div className="row">
             <span>Delivery</span>
-            <span>₹100</span>
+            <span>₹{DELIVERY_CHARGE}</span>
           </div>
         )}
 
@@ -573,6 +634,14 @@ useEffect(() => {
           display: grid;
           gap: 0.6rem;
           margin-bottom: 0.8rem;
+        }
+
+        .address label {
+          font-size: 0.75rem;
+          color: #9ca3af;
+          display: flex;
+          flex-direction: column;
+          gap: 0.35rem;
         }
 
         button {

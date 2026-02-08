@@ -251,7 +251,11 @@ function OrderCard({ order }) {
   const totalPaid =
     order.totalAmountPaid ??
     order.amount +
-      (order.printNameCharge || 0) +
+      (order.printNameCharge ??
+        (order.items || []).reduce(
+          (s, i) => s + (i.printName ? 40 * (i.quantity || 1) : 0),
+          0
+        )) +
       (order.deliveryCharge || 0);
 
   const items = order.items || [
