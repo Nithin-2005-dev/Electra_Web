@@ -16,18 +16,15 @@ export default function MerchCard({ product }) {
   const [toast, setToast] = useState(null);
 
   const [playing, setPlaying] = useState(false);
-  const [direction, setDirection] = useState("forward");
-  const [inView, setInView] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
+  const [showVideoDelayed, setShowVideoDelayed] = useState(false);
 
   const cardRef = useRef(null);
   const forwardRef = useRef(null);
-  const backwardRef = useRef(null);
 
   const isTouch =
     typeof window !== "undefined" &&
     window.matchMedia("(hover: none)").matches;
-
-  const shouldLoop = isTouch ? inView : playing;
 
   const safePlay = async (video) => {
     if (!video || !video.paused) return;
@@ -41,6 +38,9 @@ export default function MerchCard({ product }) {
     video.pause();
   };
 
+  const markVideoReady = () => setVideoReady(true);
+  const markVideoNotReady = () => setVideoReady(false);
+
   useEffect(() => {
     const unsub = auth.onAuthStateChanged((u) => {
       setUser(u || null);
@@ -49,12 +49,23 @@ export default function MerchCard({ product }) {
     return () => unsub();
   }, [product.interestedUsers]);
 
+  useEffect(() => {
+    setVideoReady(false);
+    setShowVideoDelayed(false);
+  }, [product.video]);
+
+  useEffect(() => {
+    if (!playing || !videoReady) {
+      setShowVideoDelayed(false);
+      return;
+    }
+    const t = setTimeout(() => setShowVideoDelayed(true), 120);
+    return () => clearTimeout(t);
+  }, [playing, videoReady]);
+
   const startPreview = () => {
     if (!product.video) return;
     setPlaying(true);
-    setDirection("forward");
-    safePause(backwardRef.current);
-    if (backwardRef.current) backwardRef.current.currentTime = 0;
     if (forwardRef.current) forwardRef.current.currentTime = 0;
     safePlay(forwardRef.current);
   };
@@ -62,29 +73,7 @@ export default function MerchCard({ product }) {
   const stopPreview = () => {
     setPlaying(false);
     safePause(forwardRef.current);
-    safePause(backwardRef.current);
     if (forwardRef.current) forwardRef.current.currentTime = 0;
-    if (backwardRef.current) backwardRef.current.currentTime = 0;
-  };
-
-  const onForwardEnd = () => {
-    if (!shouldLoop) return;
-    setDirection("backward");
-    requestAnimationFrame(() => {
-      if (!backwardRef.current) return;
-      backwardRef.current.currentTime = 0;
-      safePlay(backwardRef.current);
-    });
-  };
-
-  const onBackwardEnd = () => {
-    if (!shouldLoop) return;
-    setDirection("forward");
-    requestAnimationFrame(() => {
-      if (!forwardRef.current) return;
-      forwardRef.current.currentTime = 0;
-      safePlay(forwardRef.current);
-    });
   };
 
   useEffect(() => {
@@ -92,7 +81,6 @@ export default function MerchCard({ product }) {
     const observer = new IntersectionObserver(
       ([entry]) => {
         const visible = entry.intersectionRatio >= 0.85;
-        setInView(visible);
         if (visible) startPreview();
         else stopPreview();
       },
@@ -136,8 +124,7 @@ export default function MerchCard({ product }) {
     }
   };
 
-  const showVideo =
-    playing && (direction === "forward" || direction === "backward");
+  const showVideo = showVideoDelayed && videoReady && playing;
 
   return (
     <>
@@ -161,28 +148,16 @@ export default function MerchCard({ product }) {
             {product.video && (
               <video
                 ref={forwardRef}
-                className={`video ${
-                  showVideo && direction === "forward" ? "show" : ""
-                }`}
+                className={`video ${showVideo ? "show" : ""}`}
                 src={cloudinaryVideo(product.video, "q_auto,f_auto/")}
+                poster={cloudinaryImage(product.imageMain, "q_auto,f_auto,w_900/")}
                 muted
                 playsInline
+                loop
                 preload="auto"
-                onEnded={onForwardEnd}
-              />
-            )}
-
-            {product.video && (
-              <video
-                ref={backwardRef}
-                className={`video reverse ${
-                  showVideo && direction === "backward" ? "show" : ""
-                }`}
-                src={cloudinaryVideo(product.video, "q_auto,f_auto/")}
-                muted
-                playsInline
-                preload="auto"
-                onEnded={onBackwardEnd}
+                onLoadStart={markVideoNotReady}
+                onLoadedData={markVideoReady}
+                onCanPlayThrough={markVideoReady}
               />
             )}
           </div>
@@ -243,18 +218,15 @@ export default function MerchCard({ product }) {
           inset: 0;
           width: 100%;
           height: 100%;
-          object-fit: contain; /* 🔧 FIX: match image */
+          object-fit: contain; /* match image */
           opacity: 0;
           transition: opacity 0.3s ease;
           scale: 1.5;
+          pointer-events: none;
         }
 
         .video.show {
           opacity: 1;
-        }
-
-        .reverse {
-          transform: scaleX(-1);
         }
 
         .sold {
@@ -359,3 +331,4 @@ export default function MerchCard({ product }) {
     </>
   );
 }
+
