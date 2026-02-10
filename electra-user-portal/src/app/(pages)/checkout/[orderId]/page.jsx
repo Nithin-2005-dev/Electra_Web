@@ -281,6 +281,12 @@ useEffect(() => {
       <section className="payment">
         <h1>Complete Payment</h1>
         <p className="step">Scan → Pay → Upload proof</p>
+        <div className="pay-note">
+          After you pay, please come back here and upload the
+          transaction ID and payment screenshot to confirm your order.
+          <br></br>
+          If this page disappears. Go to dashboard ➡ My orders and check your order status.
+        </div>
 
         {/* DELIVERY */}
         <div className="delivery">
@@ -597,6 +603,53 @@ useEffect(() => {
           font-size: 0.85rem;
           color: #9ca3af;
           margin-bottom: 1.2rem;
+        }
+
+        .pay-note {
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-left: 4px solid #22d3ee;
+          background: #0b1114;
+          color: #e5e7eb;
+          padding: 0.95rem 1.05rem;
+          border-radius: 12px;
+          font-size: 0.92rem;
+          font-weight: 600;
+          line-height: 1.5;
+          margin-bottom: 1.2rem;
+          letter-spacing: 0.01em;
+          display: flex;
+          gap: 0.6rem;
+          align-items: flex-start;
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+        }
+
+        .pay-note::before {
+          content: "IMPORTANT:";
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0.18rem 0.5rem;
+          border-radius: 8px;
+          font-size: 0.62rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: #0b0f12;
+          background: #22d3ee;
+          flex: 0 0 auto;
+        }
+
+        @media (max-width: 640px) {
+          .pay-note {
+            font-size: 0.85rem;
+            padding: 0.85rem 0.9rem;
+            gap: 0.5rem;
+          }
+
+          .pay-note::before {
+            font-size: 0.55rem;
+            padding: 0.18rem 0.42rem;
+          }
         }
 
         .qr {

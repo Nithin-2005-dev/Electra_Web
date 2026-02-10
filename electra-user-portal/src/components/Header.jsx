@@ -99,7 +99,7 @@ export default function Header() {
               )}
             </div>
 
-            {user && (
+            {user ? (
               <Link
                 href="/dashboard"
                 className={`nav-link ${
@@ -107,6 +107,15 @@ export default function Header() {
                 }`}
               >
                 Dashboard
+              </Link>
+            ) : (
+              <Link
+                href="/auth/sign-in"
+                className={`nav-link ${
+                  pathname === "/auth/sign-in" ? "active" : ""
+                }`}
+              >
+                Sign in
               </Link>
             )}
 
@@ -189,8 +198,8 @@ export default function Header() {
               </div>
             </div>
 
-            {user && (
-              <div className="mobile-cta">
+            <div className="mobile-cta">
+              {user ? (
                 <Link
                   href="/dashboard"
                   className="cta-btn"
@@ -198,8 +207,16 @@ export default function Header() {
                 >
                   Dashboard
                 </Link>
-              </div>
-            )}
+              ) : (
+                <Link
+                  href="/auth/sign-in"
+                  className="cta-btn"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Sign in
+                </Link>
+              )}
+            </div>
 
             {role === "admin" && (
               <div className="mobile-cta">
