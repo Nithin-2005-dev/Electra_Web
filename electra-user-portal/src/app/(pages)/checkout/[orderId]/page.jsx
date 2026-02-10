@@ -31,6 +31,7 @@ const [qrLoading, setQrLoading] = useState(false);
   });
 
   const [showQR, setShowQR] = useState(false);
+  const [showAppPicker, setShowAppPicker] = useState(false);
 
   const DELIVERY_CHARGE = 179;
   const PRINT_NAME_CHARGE = 40;
@@ -234,6 +235,16 @@ useEffect(() => {
     setPayError("");
   };
 
+  const openPaymentApp = (scheme) => {
+    if (!deliveryType) {
+      setPayError("Please select delivery option first.");
+      return;
+    }
+    setPayError("");
+    setShowAppPicker(false);
+    window.location.href = scheme;
+  };
+
   if (loading) {
   return (
     <main className="loading">
@@ -317,9 +328,15 @@ useEffect(() => {
         {/* PAY / QR */}
         {!showQR ? (
           <>
-            <a href={upiLink} className="upi-btn" onClick={handlePayClick}>
-              Pay via UPI App
-            </a>
+            <button
+              className="upi-btn"
+              onClick={() => {
+                handlePayClick({ preventDefault: () => {} });
+                setShowAppPicker(true);
+              }}
+            >
+              Pay Now
+            </button>
            <button
   className="link-btn"
   onClick={handleQRClick}
@@ -361,6 +378,37 @@ useEffect(() => {
   </button>
 </>
 
+        )}
+
+        {showAppPicker && (
+          <div className="app-modal" onClick={() => setShowAppPicker(false)}>
+            <div className="app-sheet" onClick={(e) => e.stopPropagation()}>
+              <h3>Select payment app</h3>
+              <p className="app-sub">We’ll open the chosen UPI app directly.</p>
+
+              <div className="app-grid">
+                <button onClick={() => openPaymentApp(`gpay://upi/pay?${upiLink.split("?")[1]}`)}>
+                  Google Pay
+                </button>
+                <button onClick={() => openPaymentApp(`phonepe://pay?${upiLink.split("?")[1]}`)}>
+                  PhonePe
+                </button>
+                <button onClick={() => openPaymentApp(`paytmmp://pay?${upiLink.split("?")[1]}`)}>
+                  Paytm
+                </button>
+                <button onClick={() => openPaymentApp(`whatsapp://pay?${upiLink.split("?")[1]}`)}>
+                  WhatsApp Pay
+                </button>
+                <button onClick={() => openPaymentApp(upiLink)}>
+                  Any UPI App
+                </button>
+              </div>
+
+              <button className="app-close" onClick={() => setShowAppPicker(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
         )}
 
         <label>
@@ -560,19 +608,79 @@ useEffect(() => {
   box-shadow: 0 10px 28px rgba(34,211,238,0.35);
 }
 
-.link-btn {
-  background: none;
-  border: none;
-  color: #9ca3af;
-  font-size: 0.75rem;
-  cursor: pointer;
-  text-decoration: underline;
-}
+        .link-btn {
+          background: none;
+          border: none;
+          color: #9ca3af;
+          font-size: 0.75rem;
+          cursor: pointer;
+          text-decoration: underline;
+        }
 
-.qr {
-  width: 220px;
-  border-radius: 14px;
-}
+        .qr {
+          width: 220px;
+          border-radius: 14px;
+        }
+
+        .app-modal {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.7);
+          backdrop-filter: blur(6px);
+          display: flex;
+          align-items: flex-end;
+          justify-content: center;
+          z-index: 200;
+        }
+
+        .app-sheet {
+          width: 100%;
+          max-width: 520px;
+          background: #0b0b0b;
+          border-radius: 22px 22px 0 0;
+          padding: 1.6rem;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .app-sheet h3 {
+          margin: 0 0 0.4rem;
+          font-size: 1.05rem;
+        }
+
+        .app-sub {
+          color: #9ca3af;
+          font-size: 0.8rem;
+          margin-bottom: 1rem;
+        }
+
+        .app-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 0.7rem;
+        }
+
+        .app-grid button {
+          padding: 0.85rem;
+          border-radius: 12px;
+          background: #000;
+          border: 1px solid rgba(255,255,255,0.12);
+          color: #fff;
+          font-weight: 600;
+          cursor: pointer;
+        }
+
+        .app-close {
+          margin-top: 1rem;
+          background: none;
+          border: 1px solid rgba(255,255,255,0.2);
+          color: #fff;
+        }
+
+        @media (max-width: 520px) {
+          .app-grid {
+            grid-template-columns: 1fr;
+          }
+        }
 
 
         .checkout {

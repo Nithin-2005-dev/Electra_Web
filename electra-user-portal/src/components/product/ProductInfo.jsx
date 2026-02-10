@@ -12,6 +12,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { useRouter } from "next/navigation";
+import { logMerchEvent } from "../../app/lib/merchAnalytics";
 
 export default function ProductInfo({
   product,
@@ -133,6 +134,15 @@ export default function ProductInfo({
         });
       }
 
+      logMerchEvent("add_to_cart_success", {
+        productId: product.productId,
+        meta: {
+          size,
+          printName,
+          printedName: printName ? printedName.trim() : null,
+        },
+      });
+
       setSize(null);
       setPrintName(false);
       setPrintedName("");
@@ -142,6 +152,9 @@ export default function ProductInfo({
       setCartCount((c) => Math.max(1, c + 1));
     } catch (err) {
       console.error("Add to cart failed:", err);
+      logMerchEvent("add_to_cart_failed", {
+        productId: product?.productId,
+      });
       alert("Failed to add to cart");
     } finally {
       setAdding(false);
@@ -260,16 +273,35 @@ export default function ProductInfo({
               className="add-cart"
               disabled={product?.available === false || product.isComing || adding}
               onClick={() => {
+                const attemptMeta = {
+                  sizeSelected: !!size,
+                  printName,
+                  nameValid: !printName || !!printedName.trim(),
+                  isLoggedIn: !!auth.currentUser,
+                };
+
                 if (!size) {
+                  logMerchEvent("add_to_cart_attempt", {
+                    productId: product?.productId,
+                    meta: { ...attemptMeta, status: "missing_size" },
+                  });
                   setSizeError("Please select a size before continuing.");
                   return;
                 }
                 if (printName && !printedName.trim()) {
+                  logMerchEvent("add_to_cart_attempt", {
+                    productId: product?.productId,
+                    meta: { ...attemptMeta, status: "missing_print_name" },
+                  });
                   setNameError("Please enter the name to be printed.");
                   return;
                 }
                 setSizeError("");
                 setNameError("");
+                logMerchEvent("add_to_cart_attempt", {
+                  productId: product?.productId,
+                  meta: { ...attemptMeta, status: "submitted" },
+                });
                 addToCart();
               }}
             >
