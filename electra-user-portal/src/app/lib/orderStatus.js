@@ -9,7 +9,7 @@ export function deriveOrderStep(order) {
   }
 
   /* ───────── PAYMENT NOT DONE ───────── */
-  if (order.paymentStatus === "pending_verfication") {
+  if (order.paymentStatus === "pending_verification") {
     return { step: "placed", terminal: false };
   }
 

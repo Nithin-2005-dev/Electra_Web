@@ -104,7 +104,8 @@ const [qrLoading, setQrLoading] = useState(false);
     ) || 0;
 
   const deliveryFee = outside ? DELIVERY_CHARGE : 0;
-  const finalAmount = order?.amount + printTotal + deliveryFee;
+  const baseAmount = Number(order?.amount) || 0;
+  const finalAmount = baseAmount + printTotal + deliveryFee;
 
   const paymentNote = useMemo(() => {
   if (!order) return "";
