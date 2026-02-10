@@ -1,4 +1,4 @@
-import { adminDb } from "../../../lib/firebaseAdmin";
+import admin, { adminDb } from "../../../lib/firebaseAdmin";
 import { requireAdmin } from "../../../lib/adminGaurd";
 
 function toMillis(value) {
@@ -7,6 +7,14 @@ function toMillis(value) {
   if (value.seconds) return value.seconds * 1000;
   const d = new Date(value);
   return Number.isNaN(d.getTime()) ? null : d.getTime();
+}
+
+function chunk(arr, size) {
+  const out = [];
+  for (let i = 0; i < arr.length; i += size) {
+    out.push(arr.slice(i, i + size));
+  }
+  return out;
 }
 
 export async function GET(req) {
@@ -30,10 +38,7 @@ export async function GET(req) {
       eventsQuery = eventsQuery.where("createdAt", ">=", startDate);
     }
 
-    const [eventsSnap, productsSnap] = await Promise.all([
-      eventsQuery.get(),
-      adminDb.collection("products").get(),
-    ]);
+    const eventsSnap = await eventsQuery.get();
 
     const events = eventsSnap.docs.map((d) => {
       const data = d.data();
@@ -48,37 +53,11 @@ export async function GET(req) {
       };
     });
 
-    const products = {};
-    productsSnap.forEach((d) => {
-      const data = d.data();
-      products[d.id] = {
-        id: d.id,
-        name: data.name || data.productName || d.id,
-        image: data.imageMain || null,
-      };
-    });
-
-    const userIds = [
-      ...new Set(events.map((e) => e.userId).filter(Boolean)),
-    ].slice(0, 120);
-
-  const userDocs = await Promise.all(
-    userIds.map((uid) => adminDb.collection("users").doc(uid).get())
-  );
-
-    const users = {};
-    userDocs.forEach((snap) => {
-      if (!snap.exists) return;
-      const data = snap.data();
-    users[snap.id] = {
-      name: data.name || "",
-      email: data.email || "",
-      phone: data.phone || "",
-      uid: data.uid || snap.id,
-    };
-  });
-
-    const ordersSnap = await adminDb.collection("orders").get();
+    let ordersQuery = adminDb.collection("orders");
+    if (startDate) {
+      ordersQuery = ordersQuery.where("createdAt", ">=", startDate);
+    }
+    const ordersSnap = await ordersQuery.get();
     const orders = ordersSnap.docs.map((d) => {
       const data = d.data();
       return {
@@ -94,6 +73,62 @@ export async function GET(req) {
         printNameCharge: Number(data.printNameCharge) || 0,
         deliveryCharge: Number(data.deliveryCharge) || 0,
         items: Array.isArray(data.items) ? data.items : [],
+      };
+    });
+
+    const productIdSet = new Set(
+      events.map((e) => e.productId).filter(Boolean)
+    );
+    orders.forEach((o) => {
+      (o.items || []).forEach((i) => {
+        if (i.productId) productIdSet.add(i.productId);
+      });
+    });
+
+    const products = {};
+    const productIds = [...productIdSet];
+    if (productIds.length) {
+      const idChunks = chunk(productIds, 10);
+      const productSnaps = await Promise.all(
+        idChunks.map((ids) =>
+          adminDb
+            .collection("products")
+            .where(admin.firestore.FieldPath.documentId(), "in", ids)
+            .get()
+        )
+      );
+      productSnaps.forEach((snap) => {
+        snap.forEach((d) => {
+          const data = d.data();
+          products[d.id] = {
+            id: d.id,
+            name: data.name || data.productName || d.id,
+            image: data.imageMain || null,
+          };
+        });
+      });
+    }
+
+    const userIds = [
+      ...new Set([
+        ...events.map((e) => e.userId).filter(Boolean),
+        ...orders.map((o) => o.userId).filter(Boolean),
+      ]),
+    ].slice(0, 200);
+
+    const userDocs = await Promise.all(
+      userIds.map((uid) => adminDb.collection("users").doc(uid).get())
+    );
+
+    const users = {};
+    userDocs.forEach((snap) => {
+      if (!snap.exists) return;
+      const data = snap.data();
+    users[snap.id] = {
+      name: data.name || "",
+      email: data.email || "",
+      phone: data.phone || "",
+      uid: data.uid || snap.id,
       };
     });
 

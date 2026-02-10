@@ -23,6 +23,7 @@ export default function AdminMerchAnalyticsPage() {
   const [usersMap, setUsersMap] = useState({});
   const [error, setError] = useState("");
   const [adminReady, setAdminReady] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
@@ -50,9 +51,10 @@ export default function AdminMerchAnalyticsPage() {
     return () => unsub();
   }, [router]);
 
-  const loadData = async (rangeValue) => {
+  const loadData = async (rangeValue, silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
+      setRefreshing(true);
       setError("");
 
       const user = auth.currentUser;
@@ -75,10 +77,12 @@ export default function AdminMerchAnalyticsPage() {
       setUsersMap(data.users || {});
       setOrders(data.orders || []);
       setLoading(false);
+      setRefreshing(false);
     } catch (err) {
       console.error(err);
       setError("Failed to load analytics");
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -289,7 +293,12 @@ export default function AdminMerchAnalyticsPage() {
               </option>
             ))}
           </select>
-          <button onClick={() => loadData(range)}>Refresh</button>
+          <button
+            onClick={() => loadData(range, true)}
+            disabled={refreshing}
+          >
+            {refreshing ? "Loading..." : "Refresh"}
+          </button>
         </div>
       </header>
 

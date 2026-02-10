@@ -1,24 +1,23 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { auth, db } from "../../../../app/lib/firebase";
-import {
-  collection,
-  getDocs,
-  doc,
-  getDoc,
-} from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
 export default function AdminUsersPage() {
   const router = useRouter();
 
   const [users, setUsers] = useState([]);
-  const [ordersMap, setOrdersMap] = useState({});
   const [loading, setLoading] = useState(true);
+  const [paginating, setPaginating] = useState(false);
+  const [page, setPage] = useState(1);
+  const [nextCursor, setNextCursor] = useState(null);
+  const [cursorStack, setCursorStack] = useState([null]);
 
   /* Filters */
+  const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [year, setYear] = useState("");
   const [stream, setStream] = useState("");
@@ -26,9 +25,46 @@ export default function AdminUsersPage() {
   const [hasOrders, setHasOrders] = useState("");
   const [createdAfter, setCreatedAfter] = useState("");
   const [ordersAfter, setOrdersAfter] = useState("");
+  const [orderedProductInput, setOrderedProductInput] = useState("");
   const [orderedProduct, setOrderedProduct] = useState("");
 
-  /* ───── ADMIN GUARD + LOAD DATA ───── */
+  const fetchUsers = async (cursor = null) => {
+    const user = auth.currentUser;
+    if (!user) return;
+    const token = await user.getIdToken();
+
+    const params = new URLSearchParams();
+    params.set("limit", "20");
+    if (cursor) params.set("cursor", cursor);
+    if (search) params.set("search", search);
+    if (year) params.set("year", year);
+    if (stream) params.set("stream", stream);
+    if (role) params.set("role", role);
+    if (hasOrders) params.set("hasOrders", hasOrders);
+    if (createdAfter) params.set("createdAfter", createdAfter);
+    if (ordersAfter) params.set("ordersAfter", ordersAfter);
+    if (orderedProduct) params.set("orderedProduct", orderedProduct);
+
+    const res = await fetch(`/api/admin/users/list?${params.toString()}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error("Failed to load users");
+    return res.json();
+  };
+
+  useEffect(() => {
+    const t = setTimeout(() => setSearch(searchInput.trim()), 400);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
+  useEffect(() => {
+    const t = setTimeout(
+      () => setOrderedProduct(orderedProductInput.trim()),
+      400
+    );
+    return () => clearTimeout(t);
+  }, [orderedProductInput]);
+
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) {
@@ -45,42 +81,12 @@ export default function AdminUsersPage() {
           return;
         }
 
-        /* Load users */
-        const usersSnap = await getDocs(collection(db, "users"));
-        const usersData = usersSnap.docs.map((d) => {
-          const data = d.data();
-          return {
-            id: d.id,
-            uid: data.uid || d.id,
-            name: data.name?.trim() || "",
-            email: data.email?.trim() || "",
-            phone: data.phone?.trim() || "",
-            stream: data.stream?.trim() || "",
-            year: data.year ? String(data.year).trim() : "",
-            role: data.role?.trim() || "",
-            createdAt: data.createdAt || null,
-          };
-        });
-
-        /* Load orders */
-        const ordersSnap = await getDocs(collection(db, "orders"));
-        const map = {};
-
-        ordersSnap.forEach((d) => {
-          const o = d.data();
-          if (!o.userId) return;
-
-          if (!map[o.userId]) map[o.userId] = [];
-
-          map[o.userId].push({
-            id: d.id,
-            ...o,
-            totalAmountPaid: Number(o.totalAmountPaid) || 0,
-          });
-        });
-
-        setUsers(usersData);
-        setOrdersMap(map);
+        setLoading(true);
+        const data = await fetchUsers(null);
+        setUsers(data?.users || []);
+        setNextCursor(data?.nextCursor || null);
+        setCursorStack([null]);
+        setPage(1);
         setLoading(false);
       } catch (err) {
         console.error(err);
@@ -91,85 +97,23 @@ export default function AdminUsersPage() {
     return () => unsub();
   }, [router]);
 
-  /* Date conversion */
-  const createdAfterDate = createdAfter
-    ? new Date(createdAfter + ":00")
-    : null;
-
-  const ordersAfterDate = ordersAfter
-    ? new Date(ordersAfter + ":00")
-    : null;
-
-  /* Orders filter */
-  const getFilteredOrders = (uid) => {
-    let orders = ordersMap[uid] || [];
-
-    if (ordersAfterDate) {
-      orders = orders.filter((o) => {
-        const d = getDateFromTimestamp(o.createdAt || o.timestamp);
-        return d && d.getTime() >= ordersAfterDate.getTime();
-      });
-    }
-
-    return orders;
-  };
-
-  /* ───── FILTER USERS ───── */
-  const filteredUsers = useMemo(() => {
-    const qSearch = search.trim().toLowerCase();
-    const qProduct = orderedProduct.trim().toLowerCase();
-
-    return users.filter((u) => {
-      const orders = getFilteredOrders(u.uid);
-      const createdAt = getDateFromTimestamp(u.createdAt);
-
-      /* Search */
-      if (qSearch) {
-        const fields = [u.name, u.email, u.phone, u.uid]
-          .filter(Boolean)
-          .map((v) => String(v).toLowerCase());
-
-        if (!fields.some((v) => v.includes(qSearch))) return false;
+  useEffect(() => {
+    const run = async () => {
+      try {
+        setPaginating(true);
+        const data = await fetchUsers(null);
+        setUsers(data?.users || []);
+        setNextCursor(data?.nextCursor || null);
+        setCursorStack([null]);
+        setPage(1);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setPaginating(false);
       }
-
-      if (year && String(u.year) !== String(year)) return false;
-      if (stream && u.stream !== stream) return false;
-      if (role && u.role !== role) return false;
-
-      /* Created After */
-      if (createdAfterDate) {
-        if (!createdAt) return false;
-        if (createdAt.getTime() < createdAfterDate.getTime()) return false;
-      }
-
-      /* Orders existence */
-      if (hasOrders === "yes" && orders.length === 0) return false;
-      if (hasOrders === "no" && orders.length > 0) return false;
-
-      /* Ordered product */
-      if (qProduct) {
-        const match = orders.some((o) =>
-          getOrderProductNames(o).some((p) =>
-            p.toLowerCase().includes(qProduct)
-          )
-        );
-        if (!match) return false;
-      }
-
-      return true;
-    });
-  }, [
-    users,
-    ordersMap,
-    search,
-    year,
-    stream,
-    role,
-    hasOrders,
-    createdAfterDate,
-    ordersAfterDate,
-    orderedProduct,
-  ]);
+    };
+    run();
+  }, [search, year, stream, role, hasOrders, createdAfter, ordersAfter, orderedProduct]);
 
   /* Unique stream list (trimmed, no duplicates) */
   const streamOptions = useMemo(() => {
@@ -178,31 +122,17 @@ export default function AdminUsersPage() {
 
   /* CSV Export */
   const exportCsv = () => {
-    const rows = filteredUsers.map((u) => {
-      const orders = getFilteredOrders(u.uid);
-
-      const totalSpent = orders.reduce(
-        (s, o) => s + (o.totalAmountPaid || 0),
-        0
-      );
-
-      const products = uniqueList(
-        orders.flatMap((o) => getOrderProductNames(o))
-      );
-
-      return {
-        name: u.name,
-        email: u.email,
-        phone: u.phone,
-        stream: u.stream,
-        year: u.year,
-        role: u.role,
-        createdAt: formatDateForCsv(u.createdAt),
-        ordersCount: orders.length,
-        totalSpent,
-        orderedProducts: products.join(" | "),
-      };
-    });
+    const rows = users.map((u) => ({
+      name: u.name,
+      email: u.email,
+      phone: u.phone,
+      stream: u.stream,
+      year: u.year,
+      role: u.role,
+      createdAt: formatDateForCsv(u.createdAt),
+      ordersCount: u.ordersCount || 0,
+      totalSpent: u.totalSpent || 0,
+    }));
 
     downloadCsv(toCsv(rows), `users-${Date.now()}.csv`);
   };
@@ -210,7 +140,7 @@ export default function AdminUsersPage() {
   if (loading) {
     return (
       <main className="min-h-screen grid place-items-center bg-black text-slate-400">
-        Loading users…
+        Loading users...
       </main>
     );
   }
@@ -221,8 +151,8 @@ export default function AdminUsersPage() {
 
       <input
         placeholder="Search name / email / phone / uid"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        value={searchInput}
+        onChange={(e) => setSearchInput(e.target.value)}
         className="w-full mb-4 px-4 py-2 bg-black border border-white/10 rounded-lg text-sm"
       />
 
@@ -230,7 +160,11 @@ export default function AdminUsersPage() {
         <DateFilter label="User Created After" value={createdAfter} setValue={setCreatedAfter} />
         <DateFilter label="Orders After" value={ordersAfter} setValue={setOrdersAfter} />
 
-        <TextFilter label="Ordered Product" value={orderedProduct} setValue={setOrderedProduct} />
+        <TextFilter
+          label="Ordered Product"
+          value={orderedProductInput}
+          setValue={setOrderedProductInput}
+        />
 
         <Select label="Year" value={year} onChange={setYear}>
           <option value="">All</option>
@@ -263,36 +197,93 @@ export default function AdminUsersPage() {
           onClick={exportCsv}
           className="px-4 py-2 bg-white text-black rounded-lg text-sm"
         >
-          Export ({filteredUsers.length})
+          Export ({users.length})
         </button>
       </div>
 
       <div className="space-y-3">
-        {filteredUsers.map((u) => {
-          const orders = getFilteredOrders(u.uid);
-          const spent = orders.reduce((s, o) => s + o.totalAmountPaid, 0);
-
-          return (
+        {paginating ? (
+          Array.from({ length: 6 }).map((_, i) => (
             <div
-              key={u.uid}
-              onClick={() => router.push(`/admin/users/${u.uid}`)}
-              className="p-4 bg-[#0b0f15] rounded-xl border border-white/10 cursor-pointer"
+              key={i}
+              className="p-4 bg-[#0b0f15] rounded-xl border border-white/10 animate-pulse"
             >
               <div className="flex justify-between">
-                <div>
-                  <p className="font-semibold">{u.name}</p>
-                  <p className="text-xs text-slate-400">
-                    {u.email} · {u.phone}
-                  </p>
+                <div className="space-y-2">
+                  <div className="h-4 w-40 bg-white/10 rounded" />
+                  <div className="h-3 w-56 bg-white/5 rounded" />
                 </div>
-                <div className="text-right text-sm">
-                  <p>{orders.length} orders</p>
-                  <p className="text-cyan-300">₹{spent}</p>
+                <div className="space-y-2 text-right">
+                  <div className="h-3 w-20 bg-white/10 rounded ml-auto" />
+                  <div className="h-4 w-16 bg-white/10 rounded ml-auto" />
                 </div>
               </div>
             </div>
-          );
-        })}
+          ))
+        ) : (
+          users.map((u) => {
+            const spent = u.totalSpent || 0;
+
+            return (
+              <div
+                key={u.uid}
+                onClick={() => router.push(`/admin/users/${u.uid}`)}
+                className="p-4 bg-[#0b0f15] rounded-xl border border-white/10 cursor-pointer"
+              >
+                <div className="flex justify-between">
+                  <div>
+                    <p className="font-semibold">{u.name}</p>
+                    <p className="text-xs text-slate-400">
+                      {u.email} · {u.phone}
+                    </p>
+                  </div>
+                  <div className="text-right text-sm">
+                    <p>{u.ordersCount || 0} orders</p>
+                    <p className="text-cyan-300">₹{spent}</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-400">
+        <span>Page {page}</span>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={async () => {
+              if (page === 1) return;
+              setPaginating(true);
+              const prevCursor = cursorStack[page - 2] || null;
+              const data = await fetchUsers(prevCursor);
+              setUsers(data?.users || []);
+              setNextCursor(data?.nextCursor || null);
+              setPage((p) => Math.max(1, p - 1));
+              setPaginating(false);
+            }}
+            disabled={page === 1}
+            className="px-3 py-1 rounded border border-white/10 text-white disabled:opacity-50"
+          >
+            Prev
+          </button>
+          <button
+            onClick={async () => {
+              if (!nextCursor) return;
+              setPaginating(true);
+              const data = await fetchUsers(nextCursor);
+              setUsers(data?.users || []);
+              setNextCursor(data?.nextCursor || null);
+              setCursorStack((s) => [...s, nextCursor]);
+              setPage((p) => p + 1);
+              setPaginating(false);
+            }}
+            disabled={!nextCursor}
+            className="px-3 py-1 rounded border border-white/10 text-white disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </main>
   );
@@ -344,29 +335,12 @@ function TextFilter({ label, value, setValue }) {
 
 /* Helpers */
 
-function getDateFromTimestamp(value) {
-  if (!value) return null;
-  if (value.toDate) return value.toDate();
-  if (value.seconds) return new Date(value.seconds * 1000);
-  const d = new Date(value);
-  return Number.isNaN(d.getTime()) ? null : d;
-}
-
 function formatDateForCsv(value) {
-  const d = getDateFromTimestamp(value);
-  return d ? d.toISOString() : "";
-}
-
-function getOrderProductNames(order) {
-  if (!order) return [];
-  if (Array.isArray(order.items)) {
-    return order.items.map((i) => i.productName || i.productId).filter(Boolean);
-  }
-  return [order.productName || order.productId].filter(Boolean);
-}
-
-function uniqueList(arr) {
-  return [...new Set(arr)];
+  if (!value) return "";
+  if (value.toDate) return value.toDate().toISOString();
+  if (value.seconds) return new Date(value.seconds * 1000).toISOString();
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? "" : d.toISOString();
 }
 
 function toCsv(rows) {
@@ -388,5 +362,3 @@ function downloadCsv(csv, filename) {
   a.click();
   URL.revokeObjectURL(url);
 }
-
-
