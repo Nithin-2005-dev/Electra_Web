@@ -135,6 +135,18 @@ export default function OrderCard({ order, onApprove, onReject }) {
       {/* ───── DETAILS ───── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-slate-400">
         <Detail label="User ID" value={order.userId} />
+        <Detail label="User Name" value={order.userProfile?.name || "—"} />
+        <Detail label="User Email" value={order.userProfile?.email || "—"} />
+        <Detail label="User Phone" value={order.userProfile?.phone || "—"} />
+        <Detail label="Year" value={order.userProfile?.year || "—"} />
+        <Detail
+          label="Branch"
+          value={
+            order.userProfile?.stream ||
+            order.userProfile?.branch ||
+            "—"
+          }
+        />
         <Detail label="Txn ID" value={order.txnId || "—"} />
         <Detail label="Print Charge" value={`₹${printTotal}`} />
         <Detail

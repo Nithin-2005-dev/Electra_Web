@@ -58,11 +58,32 @@ export default function AdminOrdersDashboard() {
         orderBy("createdAt", "desc")
       );
       const res = await getDocs(q);
+      const rawOrders = res.docs.map((d) => ({
+        ...d.data(),
+        items: Array.isArray(d.data().items) ? d.data().items : [],
+      }));
+
+      const uniqueUserIds = Array.from(
+        new Set(rawOrders.map((o) => o.userId).filter(Boolean))
+      );
+
+      const userEntries = await Promise.all(
+        uniqueUserIds.map(async (uid) => {
+          try {
+            const userSnap = await getDoc(doc(db, "users", uid));
+            return [uid, userSnap.exists() ? userSnap.data() : null];
+          } catch {
+            return [uid, null];
+          }
+        })
+      );
+
+      const userMap = Object.fromEntries(userEntries);
 
       setOrders(
-        res.docs.map((d) => ({
-          ...d.data(),
-          items: Array.isArray(d.data().items) ? d.data().items : [],
+        rawOrders.map((o) => ({
+          ...o,
+          userProfile: userMap[o.userId] || null,
         }))
       );
 
