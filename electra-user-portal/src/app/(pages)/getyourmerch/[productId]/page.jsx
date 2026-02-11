@@ -15,7 +15,6 @@ import {
 import { db, auth } from "../../../lib/firebase";
 import { useParams, useRouter } from "next/navigation";
 import { nanoid } from "nanoid";
-import { logMerchEvent } from "../../../lib/merchAnalytics";
 import { useSignInRequiredPopup } from "../../../lib/useSignInRequiredPopup";
 import SignInRequiredPopup from "../../../../components/auth/SignInRequiredPopup";
 
@@ -76,11 +75,6 @@ export default function ProductPage() {
 
       setActive(data.imageMain);
       setLoading(false);
-
-      logMerchEvent("product_view", {
-        productId,
-        meta: { name: data.name || null },
-      });
     };
 
     loadProduct();

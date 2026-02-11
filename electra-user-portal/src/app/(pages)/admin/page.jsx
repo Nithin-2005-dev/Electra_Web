@@ -157,16 +157,9 @@ export default function AdminHomePage() {
 
         <AdminCard
           title="Users"
-          desc="View members, roles, activity and analytics"
+          desc="View members, roles, and activity"
           action="Manage Users"
           onClick={() => router.push("/admin/users")}
-        />
-
-        <AdminCard
-          title="Analytics"
-          desc="Track merch views, intent, and cart conversions"
-          action="Open Analytics"
-          onClick={() => router.push("/admin/analytics")}
         />
       </section>
 

@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../app/lib/firebase";
 import MerchCard from "./MerchCard";
-import { logMerchEvent } from "../../app/lib/merchAnalytics";
 
 export default function MerchPage() {
   const [products, setProducts] = useState([]);
@@ -19,11 +18,6 @@ export default function MerchPage() {
     });
   }, []);
 
-  useEffect(() => {
-    logMerchEvent("merch_page_view", {
-      meta: { page: "products" },
-    });
-  }, []);
 
   /* ───────── FILTER + SORT (SAFE) ───────── */
   const filtered = useMemo(() => {
