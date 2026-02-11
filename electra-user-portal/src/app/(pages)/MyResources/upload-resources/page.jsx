@@ -7,6 +7,8 @@ import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { SubjectData } from "../../../utils/Subjects";
+import { useSignInRequiredPopup } from "../../../lib/useSignInRequiredPopup";
+import SignInRequiredPopup from "../../../../components/auth/SignInRequiredPopup";
 
 /* ───────────────── HELPERS ───────────────── */
 
@@ -29,6 +31,7 @@ function isCollegeEmail(email) {
 
 export default function UploadResourcePage() {
   const router = useRouter();
+  const { open, secondsLeft, requireSignIn, goToSignIn, popupTitle, popupMessage } = useSignInRequiredPopup(router);
 
   const [user, setUser] = useState(null);
   const [eligible, setEligible] = useState(false);
@@ -57,7 +60,11 @@ export default function UploadResourcePage() {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
       if (!u) {
-        router.replace("/auth/sign-in");
+        requireSignIn({
+          title: "Sign in to upload resources",
+          message: "We verify contributors before allowing uploads to keep content trusted and relevant.",
+        });
+        setChecking(false);
         return;
       }
 
@@ -80,7 +87,7 @@ export default function UploadResourcePage() {
     });
 
     return () => unsub();
-  }, [router]);
+  }, [router, requireSignIn]);
 
   /* ───────── SUBMIT ───────── */
   async function handleSubmit(e) {
@@ -129,6 +136,7 @@ window.__toastTimer = setTimeout(() => {
   if (checking) {
     return (
       <main className="center">
+        <SignInRequiredPopup open={open} secondsLeft={secondsLeft} onContinue={goToSignIn} title={popupTitle} message={popupMessage} />
         <div className="spinner" />
         <p>Verifying access…</p>
 
@@ -158,6 +166,7 @@ window.__toastTimer = setTimeout(() => {
 
   return (
     <main className="root">
+     <SignInRequiredPopup open={open} secondsLeft={secondsLeft} onContinue={goToSignIn} title={popupTitle} message={popupMessage} />
      {toast && (
   <div className="toast">
     {toast.message}
@@ -638,5 +647,6 @@ function Field({ label, children }) {
     </div>
   );
 }
+
 
 

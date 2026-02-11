@@ -5,9 +5,12 @@ import { useRouter } from "next/navigation";
 import { auth, db } from "../../lib/firebase";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
+import { useSignInRequiredPopup } from "../../lib/useSignInRequiredPopup";
+import SignInRequiredPopup from "../../../components/auth/SignInRequiredPopup";
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { open, secondsLeft, requireSignIn, goToSignIn, popupTitle, popupMessage } = useSignInRequiredPopup(router);
 
   const [user, setUser] = useState(null);
   const [checking, setChecking] = useState(true);
@@ -16,16 +19,19 @@ export default function ProfilePage() {
   const [college, setCollege] = useState("");
   const [stream, setStream] = useState("");
   const [year, setYear] = useState("");
-  const [phone, setPhone] = useState(""); // ✅ NEW
+  const [phone, setPhone] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  /* ---------- AUTH HYDRATION ---------- */
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
       if (!firebaseUser) {
-        router.replace("/auth/sign-in");
+        requireSignIn({
+          title: "Sign in to complete profile",
+          message: "Profile setup is account-specific, so you need to sign in first.",
+        });
+        setChecking(false);
         return;
       }
 
@@ -43,17 +49,15 @@ export default function ProfilePage() {
     });
 
     return () => unsub();
-  }, [router]);
+  }, [router, requireSignIn]);
 
-  /* ---------- VALIDATION ---------- */
   const isValid =
     name.trim().length >= 2 &&
     college.trim().length >= 3 &&
     stream.trim().length >= 2 &&
-    ["1", "2", "3", "4","m.tech","phd","mba","faculty","alumni"].includes(year) &&
-    phone.trim().length >= 10; // ✅ phone mandatory
+    ["1", "2", "3", "4", "m.tech", "phd", "mba", "faculty", "alumni"].includes(year) &&
+    phone.trim().length >= 10;
 
-  /* ---------- SUBMIT ---------- */
   const handleSubmit = async () => {
     if (!user || !isValid) return;
 
@@ -65,10 +69,10 @@ export default function ProfilePage() {
         uid: user.uid,
         name,
         email: user.email,
-        phone, // ✅ from input
+        phone,
         college,
         stream,
-        year: year,
+        year,
         role: "member",
         createdAt: serverTimestamp(),
       });
@@ -81,11 +85,11 @@ export default function ProfilePage() {
     }
   };
 
-  /* ---------- LOADING ---------- */
   if (checking) {
     return (
       <main className="wrap_profile">
-        <p className="loading">Checking account…</p>
+        <SignInRequiredPopup open={open} secondsLeft={secondsLeft} onContinue={goToSignIn} title={popupTitle} message={popupMessage} />
+        <p className="loading">Checking account...</p>
         <style jsx>{`
           .wrap_profile {
             min-height: 100vh;
@@ -101,6 +105,7 @@ export default function ProfilePage() {
 
   return (
     <main className="wrap_profile">
+      <SignInRequiredPopup open={open} secondsLeft={secondsLeft} onContinue={goToSignIn} title={popupTitle} message={popupMessage} />
       <div className="card">
         <h1>Complete your profile</h1>
         <p className="sub">
@@ -155,7 +160,7 @@ export default function ProfilePage() {
           disabled={!isValid || loading}
           onClick={handleSubmit}
         >
-          {loading ? "Saving…" : "Finish Setup"}
+          {loading ? "Saving..." : "Finish Setup"}
         </button>
       </div>
 
@@ -227,3 +232,4 @@ export default function ProfilePage() {
     </main>
   );
 }
+

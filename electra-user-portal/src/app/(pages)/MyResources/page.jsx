@@ -5,16 +5,29 @@ import axios from "axios";
 import { auth } from "../../lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import { useSignInRequiredPopup } from "../../lib/useSignInRequiredPopup";
+import SignInRequiredPopup from "../../../components/auth/SignInRequiredPopup";
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { open, secondsLeft, requireSignIn, goToSignIn, popupTitle, popupMessage } = useSignInRequiredPopup(router);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const safeStats = stats || {
+    total: 0,
+    publicCount: 0,
+    privateCount: 0,
+    lastUploaded: null,
+  };
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        router.push("/auth/sign-in");
+        requireSignIn({
+          title: "Sign in to access My Resources",
+          message: "This space shows your personal uploads, drafts, and contribution activity.",
+        });
+        setLoading(false);
         return;
       }
 
@@ -41,11 +54,12 @@ export default function DashboardPage() {
     });
 
     return () => unsub();
-  }, [router]);
+  }, [router, requireSignIn]);
 
   if (loading) {
     return (
       <main className="loader">
+        <SignInRequiredPopup open={open} secondsLeft={secondsLeft} onContinue={goToSignIn} title={popupTitle} message={popupMessage} />
         <div className="dot" />
         <p>Loading your workspace…</p>
 
@@ -76,6 +90,7 @@ export default function DashboardPage() {
 
   return (
     <main className="page">
+      <SignInRequiredPopup open={open} secondsLeft={secondsLeft} onContinue={goToSignIn} title={popupTitle} message={popupMessage} />
       {/* INTRO */}
       <section className="intro">
         <span className="label">ELECTRA SOCIETY</span>
@@ -102,9 +117,9 @@ export default function DashboardPage() {
 
       {/* STATS */}
       <section className="stats">
-        <Stat title="Total uploads" value={stats.total} />
-        <Stat title="Public resources" value={stats.publicCount} />
-        <Stat title="Private drafts" value={stats.privateCount} />
+        <Stat title="Total uploads" value={safeStats.total} />
+        <Stat title="Public resources" value={safeStats.publicCount} />
+        <Stat title="Private drafts" value={safeStats.privateCount} />
       </section>
 
       {/* CONTROL */}
@@ -123,14 +138,14 @@ export default function DashboardPage() {
       <section className="latest">
         <h2>Latest activity</h2>
 
-        {stats.lastUploaded ? (
+        {safeStats.lastUploaded ? (
           <div className="latest-card">
             <div className="bar" />
             <div>
-              <strong>{stats.lastUploaded.name}</strong>
+              <strong>{safeStats.lastUploaded.name}</strong>
               <span>
-                {stats.lastUploaded.subject} · Semester{" "}
-                {stats.lastUploaded.semester}
+                {safeStats.lastUploaded.subject} · Semester{" "}
+                {safeStats.lastUploaded.semester}
               </span>
             </div>
             <button onClick={() => router.push("/MyResources/manage-resources")}>
@@ -301,3 +316,7 @@ function Stat({ title, value }) {
     </div>
   );
 }
+
+
+
+

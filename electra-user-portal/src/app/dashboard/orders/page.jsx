@@ -5,6 +5,8 @@ import { auth, db } from "../../lib/firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import { useSignInRequiredPopup } from "../../lib/useSignInRequiredPopup";
+import SignInRequiredPopup from "../../../components/auth/SignInRequiredPopup";
 
 /* ───────────────── HELPERS ───────────────── */
 
@@ -40,6 +42,7 @@ function getOrderState(order) {
 
 export default function OrdersPage() {
   const router = useRouter();
+  const { open, secondsLeft, requireSignIn, goToSignIn, popupTitle, popupMessage } = useSignInRequiredPopup(router);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState("active");
@@ -48,7 +51,11 @@ export default function OrdersPage() {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        router.replace("/auth/sign-in");
+        requireSignIn({
+          title: "Sign in to view your orders",
+          message: "Order history contains personal transactions and is only available in your account.",
+        });
+        setLoading(false);
         return;
       }
 
@@ -71,7 +78,7 @@ export default function OrdersPage() {
     });
 
     return () => unsub();
-  }, [router]);
+  }, [router, requireSignIn]);
 
   /* ───────── GROUPS ───────── */
   const activeOrders = useMemo(
@@ -105,6 +112,7 @@ export default function OrdersPage() {
   if (loading) {
     return (
       <main className="wrap_dashboard_orders">
+        <SignInRequiredPopup open={open} secondsLeft={secondsLeft} onContinue={goToSignIn} title={popupTitle} message={popupMessage} />
         <h1>Your Orders</h1>
 
         <div className="tabs">
@@ -164,6 +172,7 @@ export default function OrdersPage() {
 
   return (
     <main className="wrap_dashboard_orders">
+      <SignInRequiredPopup open={open} secondsLeft={secondsLeft} onContinue={goToSignIn} title={popupTitle} message={popupMessage} />
       <h1>Your Orders</h1>
 
       <div className="tabs">
@@ -531,3 +540,4 @@ function OrderSkeleton() {
     </div>
   );
 }
+

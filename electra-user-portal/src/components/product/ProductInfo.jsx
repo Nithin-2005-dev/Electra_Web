@@ -13,6 +13,8 @@ import {
 } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { logMerchEvent } from "../../app/lib/merchAnalytics";
+import { useSignInRequiredPopup } from "../../app/lib/useSignInRequiredPopup";
+import SignInRequiredPopup from "../auth/SignInRequiredPopup";
 
 export default function ProductInfo({
   product,
@@ -27,6 +29,7 @@ export default function ProductInfo({
   setPrintedName,
 }) {
   const router = useRouter();
+  const { open, secondsLeft, requireSignIn, goToSignIn, popupTitle, popupMessage } = useSignInRequiredPopup(router);
   const [adding, setAdding] = useState(false);
   const [toast, setToast] = useState("");
   const [sizeError, setSizeError] = useState("");
@@ -88,7 +91,10 @@ export default function ProductInfo({
 
     const user = auth.currentUser;
     if (!user) {
-      router.push("/auth/sign-in");
+      requireSignIn({
+        title: "Sign in to add this item",
+        message: "Your selection is linked to your account so we can save your cart and checkout details.",
+      });
       return;
     }
     if (printName && !printedName.trim()) {
@@ -163,6 +169,7 @@ export default function ProductInfo({
 
   return (
     <>
+      <SignInRequiredPopup open={open} secondsLeft={secondsLeft} onContinue={goToSignIn} title={popupTitle} message={popupMessage} />
       <section className="info">
         <h1 className="title">{product?.name}</h1>
 
@@ -799,3 +806,4 @@ export default function ProductInfo({
     </>
   );
 }
+

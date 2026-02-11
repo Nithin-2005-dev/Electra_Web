@@ -10,10 +10,13 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
+import { useSignInRequiredPopup } from "../../../lib/useSignInRequiredPopup";
+import SignInRequiredPopup from "../../../../components/auth/SignInRequiredPopup";
 
 export default function CheckoutPage() {
   const { orderId } = useParams();
   const router = useRouter();
+  const { open, secondsLeft, requireSignIn, goToSignIn, popupTitle, popupMessage } = useSignInRequiredPopup(router);
 
   const [order, setOrder] = useState(null);
   const [txnId, setTxnId] = useState("");
@@ -44,7 +47,14 @@ const [qrLoading, setQrLoading] = useState(false);
   /* LOAD ORDER */
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
-      if (!user) return router.replace("/auth/sign-in");
+      if (!user) {
+        requireSignIn({
+          title: "Sign in to continue checkout",
+          message: "We need your account to validate this order and accept payment proof securely.",
+        });
+        setLoading(false);
+        return;
+      }
 
       const snap = await getDoc(doc(db, "orders", orderId));
       if (!snap.exists()) {
@@ -84,7 +94,7 @@ const [qrLoading, setQrLoading] = useState(false);
     });
 
     return () => unsub();
-  }, [orderId, router]);
+  }, [orderId, router, requireSignIn]);
 
   /* DELIVERY MAP */
   useEffect(() => {
@@ -120,7 +130,7 @@ const [qrLoading, setQrLoading] = useState(false);
   if (!finalAmount || !order) return "#";
 
   const params = new URLSearchParams({
-    pa: "manishromi03@oksbi",
+    pa: "maxroy2003-1@oksbi",
     pn: "Electra Society",
     am: finalAmount.toString(),
     cu: "INR",
@@ -246,9 +256,10 @@ useEffect(() => {
     window.location.href = scheme;
   };
 
-  if (loading) {
+if (loading) {
   return (
     <main className="loading">
+      <SignInRequiredPopup open={open} secondsLeft={secondsLeft} onContinue={goToSignIn} title={popupTitle} message={popupMessage} />
       <div className="skeleton" />
       <div className="skeleton" />
       <div className="skeleton" />
@@ -286,10 +297,18 @@ useEffect(() => {
   );
 }
 
-  if (!order) return <main>{error}</main>;
+  if (!order) {
+    return (
+      <main>
+        <SignInRequiredPopup open={open} secondsLeft={secondsLeft} onContinue={goToSignIn} title={popupTitle} message={popupMessage} />
+        {error}
+      </main>
+    );
+  }
 
   return (
     <main className="checkout">
+      <SignInRequiredPopup open={open} secondsLeft={secondsLeft} onContinue={goToSignIn} title={popupTitle} message={popupMessage} />
       <section className="payment">
         <h1>Complete Payment</h1>
         <p className="step">Scan → Pay → Upload proof</p>
@@ -985,3 +1004,4 @@ useEffect(() => {
     </main>
   );
 }
+

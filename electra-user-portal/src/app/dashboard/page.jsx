@@ -6,10 +6,18 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useAuthGuard } from "../lib/useAuthGaurd";
+import SignInRequiredPopup from "../../components/auth/SignInRequiredPopup";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { loading: authLoading } = useAuthGuard({ requireProfile: true });
+  const {
+    loading: authLoading,
+    open: showSignInPopup,
+    secondsLeft,
+    goToSignIn,
+    popupTitle,
+    popupMessage,
+  } = useAuthGuard({ requireProfile: true });
 
   const [userData, setUserData] = useState(null);
   const [formData, setFormData] = useState(null);
@@ -69,6 +77,13 @@ export default function DashboardPage() {
  if (authLoading || loading) {
   return (
     <main className="wrap">
+      <SignInRequiredPopup
+        open={showSignInPopup}
+        secondsLeft={secondsLeft}
+        onContinue={goToSignIn}
+        title={popupTitle}
+        message={popupMessage}
+      />
       <div className="loader">
         <div className="header">
           <div className="sk sk-eyebrow" />
@@ -197,6 +212,13 @@ export default function DashboardPage() {
 
   return (
     <main className="wrap">
+      <SignInRequiredPopup
+        open={showSignInPopup}
+        secondsLeft={secondsLeft}
+        onContinue={goToSignIn}
+        title={popupTitle}
+        message={popupMessage}
+      />
       {/* HEADER */}
       <header className="top">
         <div>

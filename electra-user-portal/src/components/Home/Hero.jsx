@@ -6,9 +6,12 @@ import { auth, db } from "../../app/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import Link from "next/link";
+import { useSignInRequiredPopup } from "../../app/lib/useSignInRequiredPopup";
+import SignInRequiredPopup from "../auth/SignInRequiredPopup";
 
 export default function Hero() {
   const router = useRouter();
+  const { open, secondsLeft, requireSignIn, goToSignIn, popupTitle, popupMessage } = useSignInRequiredPopup(router);
 
   const [checking, setChecking] = useState(true);
   const [user, setUser] = useState(null);
@@ -41,7 +44,10 @@ export default function Hero() {
     if (checking) return;
 
     if (!user) {
-      router.push("/auth/sign-in");
+      requireSignIn({
+        title: "Sign in to join Electra",
+        message: "Create your member space, complete your profile, and unlock your dashboard tools.",
+      });
       return;
     }
 
@@ -55,6 +61,7 @@ export default function Hero() {
 
   return (
     <section className="hero">
+      <SignInRequiredPopup open={open} secondsLeft={secondsLeft} onContinue={goToSignIn} title={popupTitle} message={popupMessage} />
       {/* BACKGROUND VIDEO */}
       <video
         className="video"
@@ -222,3 +229,4 @@ export default function Hero() {
     </section>
   );
 }
+

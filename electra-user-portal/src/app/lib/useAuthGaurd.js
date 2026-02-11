@@ -5,15 +5,22 @@ import { auth, db } from "../lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSignInRequiredPopup } from "./useSignInRequiredPopup";
 
 export function useAuthGuard({ requireProfile = false } = {}) {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const popup = useSignInRequiredPopup(router);
+  const { requireSignIn } = popup;
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        router.replace("/auth/sign-in");
+        requireSignIn({
+          title: "Sign in to open dashboard",
+          message: "Your dashboard contains personal data and account activity.",
+        });
+        setLoading(false);
         return;
       }
 
@@ -29,7 +36,7 @@ export function useAuthGuard({ requireProfile = false } = {}) {
     });
 
     return () => unsub();
-  }, [router, requireProfile]);
+  }, [router, requireProfile, requireSignIn]);
 
-  return { loading };
+  return { loading, ...popup };
 }

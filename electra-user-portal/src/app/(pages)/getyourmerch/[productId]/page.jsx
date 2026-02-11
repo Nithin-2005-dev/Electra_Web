@@ -16,6 +16,8 @@ import { db, auth } from "../../../lib/firebase";
 import { useParams, useRouter } from "next/navigation";
 import { nanoid } from "nanoid";
 import { logMerchEvent } from "../../../lib/merchAnalytics";
+import { useSignInRequiredPopup } from "../../../lib/useSignInRequiredPopup";
+import SignInRequiredPopup from "../../../../components/auth/SignInRequiredPopup";
 
 import ProductGallery from "../../../../components/product/ProductGallery";
 import ProductInfo from "../../../../components/product/ProductInfo";
@@ -26,6 +28,7 @@ import LoadingScreen from "../../../../components/product/LoadingScreen";
 export default function ProductPage() {
   const { productId } = useParams();
   const router = useRouter();
+  const { open, secondsLeft, requireSignIn, goToSignIn, popupTitle, popupMessage } = useSignInRequiredPopup(router);
 
   const [user, setUser] = useState(null);
 
@@ -104,7 +107,10 @@ export default function ProductPage() {
     }
 
     if (!user) {
-      router.push("/auth/sign-in");
+      requireSignIn({
+        title: "Sign in to place your order",
+        message: "We need your account to create the order and track payment and delivery updates.",
+      });
       return;
     }
 
@@ -175,6 +181,7 @@ export default function ProductPage() {
 
   return (
     <main className="wrap_product">
+      <SignInRequiredPopup open={open} secondsLeft={secondsLeft} onContinue={goToSignIn} title={popupTitle} message={popupMessage} />
       <ProductGallery
         active={active}
         setActive={setActive}
@@ -212,3 +219,4 @@ export default function ProductPage() {
     </main>
   );
 }
+

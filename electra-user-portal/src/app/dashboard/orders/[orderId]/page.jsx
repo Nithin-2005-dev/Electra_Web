@@ -6,6 +6,8 @@ import { auth, db } from "../../../lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import ProgressBar from "../../../../components/user-orders/ProgressBar";
+import { useSignInRequiredPopup } from "../../../lib/useSignInRequiredPopup";
+import SignInRequiredPopup from "../../../../components/auth/SignInRequiredPopup";
 
 /* ───────── HELPERS ───────── */
 const formatDate = (ts) =>
@@ -22,13 +24,21 @@ const formatDate = (ts) =>
 export default function OrderDetailsPage() {
   const { orderId } = useParams();
   const router = useRouter();
+  const { open, secondsLeft, requireSignIn, goToSignIn, popupTitle, popupMessage } = useSignInRequiredPopup(router);
 
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
-      if (!user) return router.replace("/auth/sign-in");
+      if (!user) {
+        requireSignIn({
+          title: "Sign in to view order details",
+          message: "This page includes private order status and payment information linked to your account.",
+        });
+        setLoading(false);
+        return;
+      }
 
       const snap = await getDoc(doc(db, "orders", orderId));
       if (!snap.exists() || snap.data().userId !== user.uid) {
@@ -41,11 +51,12 @@ export default function OrderDetailsPage() {
     });
 
     return () => unsub();
-  }, [orderId, router]);
+  }, [orderId, router, requireSignIn]);
 
   if (loading) {
     return (
       <main className="page">
+        <SignInRequiredPopup open={open} secondsLeft={secondsLeft} onContinue={goToSignIn} title={popupTitle} message={popupMessage} />
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="panel skeleton" />
         ))}
@@ -80,7 +91,13 @@ export default function OrderDetailsPage() {
     );
   }
 
-  if (!order) return null;
+  if (!order) {
+    return (
+      <main className="page">
+        <SignInRequiredPopup open={open} secondsLeft={secondsLeft} onContinue={goToSignIn} title={popupTitle} message={popupMessage} />
+      </main>
+    );
+  }
 
   const items =
     order.items || [
@@ -109,6 +126,7 @@ export default function OrderDetailsPage() {
 
   return (
     <main className="page">
+      <SignInRequiredPopup open={open} secondsLeft={secondsLeft} onContinue={goToSignIn} title={popupTitle} message={popupMessage} />
       {/* HEADER */}
       <header className="header">
         <div>
@@ -397,3 +415,4 @@ function Timeline({ label, date }) {
     </div>
   );
 }
+

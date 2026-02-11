@@ -14,9 +14,12 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { nanoid } from "nanoid";
 import { cloudinaryImage } from "../../lib/cloudinary";
+import { useSignInRequiredPopup } from "../../lib/useSignInRequiredPopup";
+import SignInRequiredPopup from "../../../components/auth/SignInRequiredPopup";
 
 export default function CartPage() {
   const router = useRouter();
+  const { open, secondsLeft, requireSignIn, goToSignIn, popupTitle, popupMessage } = useSignInRequiredPopup(router);
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,7 +31,11 @@ export default function CartPage() {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        router.replace("/auth/sign-in");
+        requireSignIn({
+          title: "Sign in to view your cart",
+          message: "Your cart is saved to your account so you can continue shopping across sessions.",
+        });
+        setLoading(false);
         return;
       }
 
@@ -71,7 +78,7 @@ export default function CartPage() {
     });
 
     return () => unsub();
-  }, [router]);
+  }, [router, requireSignIn]);
 
   /* ───────── UPDATE QTY ───────── */
   const updateQty = async (key, qty) => {
@@ -319,6 +326,7 @@ export default function CartPage() {
   if (loading) {
     return (
       <main className="state">
+        <SignInRequiredPopup open={open} secondsLeft={secondsLeft} onContinue={goToSignIn} title={popupTitle} message={popupMessage} />
         <div className="skeleton-card" />
         <div className="skeleton-card" />
         <div className="skeleton-card" />
@@ -357,6 +365,7 @@ export default function CartPage() {
   if (!items.length) {
     return (
       <main className="empty">
+        <SignInRequiredPopup open={open} secondsLeft={secondsLeft} onContinue={goToSignIn} title={popupTitle} message={popupMessage} />
         <div className="empty-card">
           <div className="icon">🛒</div>
           <h2>Your cart is empty</h2>
@@ -411,6 +420,7 @@ export default function CartPage() {
   /* ───────── MAIN CART UI ───────── */
   return (
     <main className="cart">
+      <SignInRequiredPopup open={open} secondsLeft={secondsLeft} onContinue={goToSignIn} title={popupTitle} message={popupMessage} />
     {/* ───────── CART HEADER / FLOW ───────── */}
 <header className="cartHeader">
   <div>
@@ -966,3 +976,7 @@ export default function CartPage() {
     </main>
   );
 }
+
+
+
+
