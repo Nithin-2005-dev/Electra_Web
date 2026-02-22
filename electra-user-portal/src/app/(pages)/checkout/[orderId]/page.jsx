@@ -130,7 +130,7 @@ const [qrLoading, setQrLoading] = useState(false);
   if (!finalAmount || !order) return "#";
 
   const params = new URLSearchParams({
-    pa: "maxroy2003@okicic",
+    pa: "manishromi03@oksbi",
     pn: "Electra Society",
     am: finalAmount.toString(),
     cu: "INR",
