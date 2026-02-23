@@ -7,6 +7,9 @@ import { User } from "../../../../models/user.model";
 const DRIVE_REGEX =
   /^https:\/\/drive\.google\.com\/file\/d\/[a-zA-Z0-9_-]+\/?/;
 
+/**
+ * Uploads a learning resource after auth, eligibility, and payload validation.
+ */
 export async function POST(req) {
   await ConnectDb();
 

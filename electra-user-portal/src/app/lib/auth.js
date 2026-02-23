@@ -6,7 +6,17 @@ import {
 } from "firebase/auth";
 import { auth } from "./firebase";
 
+/**
+ * Client auth helpers used by sign-in and verification pages.
+ */
+
 /* ---------- EMAIL MAGIC LINK ---------- */
+/**
+ * Sends Firebase email-link sign-in and stores email locally for verification.
+ *
+ * @param {string} email
+ * @returns {Promise<void>}
+ */
 export const sendEmailLink = async (email) => {
   if (!email || typeof email !== "string") {
     throw new Error("Invalid email");
@@ -33,6 +43,12 @@ export const sendEmailLink = async (email) => {
 /* ---------- PHONE OTP ---------- */
 let recaptchaVerifier;
 
+/**
+ * Lazily creates a singleton invisible reCAPTCHA verifier for phone auth.
+ *
+ * @param {string} [containerId="recaptcha"]
+ * @returns {RecaptchaVerifier | null}
+ */
 export const initRecaptcha = (containerId = "recaptcha") => {
   if (typeof window === "undefined") return null;
 
@@ -52,6 +68,12 @@ export const initRecaptcha = (containerId = "recaptcha") => {
   return recaptchaVerifier;
 };
 
+/**
+ * Requests OTP using Firebase phone authentication.
+ *
+ * @param {string} phone
+ * @returns {Promise<import("firebase/auth").ConfirmationResult>}
+ */
 export const sendPhoneOTP = async (phone) => {
   if (!phone || typeof phone !== "string") {
     throw new Error("Invalid phone number");
@@ -66,6 +88,12 @@ export const sendPhoneOTP = async (phone) => {
 };
 
 /* ---------- VERIFY EMAIL LINK ---------- */
+/**
+ * Completes email-link sign-in from verification page context.
+ *
+ * @param {string} link
+ * @returns {Promise<import("firebase/auth").UserCredential>}
+ */
 export const verifyEmailLink = async (link) => {
   let email = window.localStorage.getItem("emailForSignIn");
 

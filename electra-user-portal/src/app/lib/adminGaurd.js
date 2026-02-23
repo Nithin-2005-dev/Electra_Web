@@ -1,5 +1,11 @@
 import admin from "./firebaseAdmin";
 
+/**
+ * Validates bearer token and ensures caller has admin role in Firestore.
+ *
+ * @param {Request} req
+ * @returns {Promise<string>} Admin UID.
+ */
 export async function requireAdmin(req) {
   const authHeader = req.headers.get("authorization");
 

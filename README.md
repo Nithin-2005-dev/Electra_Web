@@ -1,70 +1,89 @@
-# Electra Society Website - NIT Silchar
-This repository contains the source code for the official website of the Electra Society of NIT Silchar, built using Next.js.
+﻿# Electra Website Platform
+
+Production web platform for the Electra Society, NIT Silchar.
+
+This repository is organized as a multi-app codebase with separate user and admin portals, shared domain concepts, and API-driven workflows for commerce, resources, and media operations.
+
 ## Overview
 
-This website showcases the activities, events, and achievements of the society, providing information to students, faculty, and visitors.
+- Public/member experience: `electra-user-portal`
+- Internal operations: `electra-admin-portal`
+- Legacy archived app: `electra-user-portal_old`
 
-## Tech Stack
+## Monorepo Layout
 
-- Next.js: React framework for server-rendered applications.
-- React.js: Frontend UI library for building interactive user interfaces.
-- Tailwind CSS (or your choice of styling): For styling and responsive design.
-- Node.js: Backend for handling requests and API endpoints (if applicable).
--mongoDb:Database to handle the overall data in the website
-## Prerequisites
+```text
+Electra_Web/
+|-- electra-user-portal/        # primary website + member + order flows
+|-- electra-admin-portal/       # internal operations portal
+|-- electra-user-portal_old/    # archived legacy portal
+|-- docs/                       # architecture and operational docs
+\-- README.md
+```
 
-- Node.js
-- npm or yarn package manager
+## Core Architecture
 
-## Getting Started
+- Framework: Next.js App Router (independent apps)
+- Authentication: Firebase Auth
+- Admin verification: Firebase Admin SDK
+- Operational datastore (orders/users): Firestore
+- Content datastore (resources/team/images metadata): MongoDB + Mongoose
+- Media: Cloudinary
+- Notifications: Resend (email)
+- Export pipelines: Excel (`xlsx`)
 
-To get a local copy of the project and run it locally:
+Detailed architecture: `docs/ARCHITECTURE.md`
+
+## Documentation Index
+
+- Architecture: `docs/ARCHITECTURE.md`
+- API Reference: `docs/API_REFERENCE.md`
+- Environment Variables: `docs/ENVIRONMENT.md`
+- Development Workflow: `docs/DEVELOPMENT.md`
+
+App-specific documentation:
+
+- User portal: `electra-user-portal/README.md`
+- Admin portal: `electra-admin-portal/README.md`
+- Legacy portal: `electra-user-portal_old/README.md`
+
+## Quick Start
+
+1. Install dependencies in each app.
+
 ```bash
-### 1. Clone the repository
-git clone https://github.com/Nithin-2005-dev/Electra_Website.git
-cd Electra_Website
-### 2. Install Dependencies
+cd electra-user-portal
 npm install
-# or
-yarn install
 
-### 3. Run the development server
+cd ../electra-admin-portal
+npm install
+```
+
+2. Configure environment variables.
+
+See `docs/ENVIRONMENT.md`.
+
+3. Run both apps in separate terminals.
+
+```bash
+# terminal 1
+cd electra-user-portal
 npm run dev
-# or
-yarn dev
-Open http://localhost:3000 in your browser to view the website in development mode.
+```
 
-### 5. Build for production
-npm run build
+```bash
+# terminal 2
+cd electra-admin-portal
+npm run dev -p 3001
+```
 
-### 6.  Start the production server
-npm start
+Local URLs:
 
-project structure
-.app
-├──src
-      
-      ├── database       # database folder
-      ├── api            # API routes
-      ├── external_apis  # third party apis
-      ├── auth           #pages belongs to authantication 
-      ├── pages          # pages
-      ├── store          # context apis
-      ├── styles         # custom styles with css modules
-      └── utils          # utility files
-├── components   # Reusable ui components
-├── models       # data models
+- User portal: `http://localhost:3000`
+- Admin portal: `http://localhost:3001`
 
-packages
-->three.js three/fibre three/drei #3d model rendering
-->shadcn #ui components
-->react icons #custom icons
-->hover.css #for hovering effect of buttons [https://github.com/IanLunn/Hover]
-->react-verticle-components #event-timeline
-->clerk #for authentication
-->file-saver #to save images
-->framer-motion #animation library
-->mongoose #for data validating and modelling
-->cloudinary #images store
-->type writer #typing effect library
-->react-toastify #to show toasts
+## Maintenance Notes
+
+- Keep server-only secrets out of client bundles.
+- Treat `electra-user-portal_old` as read-only archival code unless migration work is planned.
+- Update docs in `docs/` whenever route contracts, architecture boundaries, or environment keys change.

@@ -1,3 +1,9 @@
+/**
+ * Derives UI step state for an order timeline from payment/fulfillment fields.
+ *
+ * @param {object} order
+ * @returns {{step: "placed" | "confirmed" | "shipped" | "delivered" | "cancelled", terminal: boolean}}
+ */
 export function deriveOrderStep(order) {
   if (!order) {
     return { step: "placed", terminal: false };

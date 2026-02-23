@@ -3,6 +3,9 @@
 import React, { useMemo, useState } from "react";
 import * as XLSX from "xlsx";
 
+/**
+ * Product-batch card used by shipping and delivery admin tabs.
+ */
 export default function BatchCard({
   productId,
   productName,
@@ -36,6 +39,7 @@ export default function BatchCard({
   );
 
   /* ───────── EXPORT ───────── */
+  // Uses onExport from parent when available, otherwise falls back to local export.
   const exportToExcel = async () => {
     if (!items.length || loading) return;
     setLoading("export");
@@ -77,6 +81,7 @@ export default function BatchCard({
     }
   };
 
+  // Runs batch action callback and manages button loading state.
   const handleAction = async () => {
     if (loading) return;
     setLoading("action");

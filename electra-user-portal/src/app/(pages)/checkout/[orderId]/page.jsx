@@ -103,6 +103,7 @@ const [qrLoading, setQrLoading] = useState(false);
   }, [deliveryType]);
 
   /* PRICE */
+  // Name-print charge is computed per item quantity.
   const printTotal =
     order?.items.reduce(
       (s, i) =>
@@ -126,6 +127,7 @@ const [qrLoading, setQrLoading] = useState(false);
 }, [order, orderId]);
 
   /* UPI LINK */
+  // Stable UPI payload used by app deeplinks and QR generation.
  const upiLink = useMemo(() => {
   if (!finalAmount || !order) return "#";
 
@@ -142,6 +144,7 @@ const [qrLoading, setQrLoading] = useState(false);
 
 
   /* UPLOAD */
+  // Uploads payment proof to Cloudinary and returns hosted image URL.
   const uploadScreenshot = async (file) => {
     const fd = new FormData();
     fd.append("file", file);
@@ -159,6 +162,7 @@ const [qrLoading, setQrLoading] = useState(false);
     const data = await res.json();
     return data.secure_url;
   };
+  // Shows QR only after delivery choice is selected (amount depends on it).
   const handleQRClick = () => {
   if (!deliveryType) {
     setPayError("Please select delivery option first.");
@@ -175,6 +179,7 @@ useEffect(() => {
 }, [deliveryType, finalAmount]);
 
   /* SUBMIT */
+  // Finalizes payment proof + delivery metadata and moves order for admin verification.
   const submitProof = async () => {
     if (!txnId || !file) {
       setError("Transaction ID and screenshot are required");
@@ -237,15 +242,7 @@ useEffect(() => {
     }
   };
 
-  const handlePayClick = (e) => {
-    if (!deliveryType) {
-      e.preventDefault();
-      setPayError("Please select delivery option first.");
-      return;
-    }
-    setPayError("");
-  };
-
+  // Opens specific UPI app schemes after delivery option validation.
   const openPaymentApp = (scheme) => {
     if (!deliveryType) {
       setPayError("Please select delivery option first.");

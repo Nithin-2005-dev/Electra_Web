@@ -1,6 +1,9 @@
 import admin, { adminDb } from "../../../../lib/firebaseAdmin";
 import { requireAdmin } from "../../../../lib/adminGaurd";
 
+/**
+ * Normalizes Firestore timestamp/date-like values into epoch millis.
+ */
 function toMillis(value) {
   if (!value) return null;
   if (value.toDate) return value.toDate().getTime();
@@ -9,6 +12,9 @@ function toMillis(value) {
   return Number.isNaN(d.getTime()) ? null : d.getTime();
 }
 
+/**
+ * Encodes pagination cursor from a Firestore doc snapshot.
+ */
 function encodeCursor(doc) {
   if (!doc) return null;
   const data = doc.data();
@@ -20,6 +26,9 @@ function encodeCursor(doc) {
   ).toString("base64");
 }
 
+/**
+ * Decodes base64 pagination cursor into query boundary values.
+ */
 function decodeCursor(cursor) {
   if (!cursor) return null;
   try {
@@ -32,6 +41,9 @@ function decodeCursor(cursor) {
   }
 }
 
+/**
+ * Shapes a Firestore order document into frontend-safe response schema.
+ */
 function normalizeOrder(docSnap) {
   const data = docSnap.data();
   return {
@@ -51,6 +63,9 @@ function normalizeOrder(docSnap) {
   };
 }
 
+/**
+ * Groups flattened item rows into product batches for shipping/delivery tabs.
+ */
 function groupBulkByProduct(items) {
   const map = new Map();
   for (const item of items) {
@@ -68,6 +83,11 @@ function groupBulkByProduct(items) {
   return Array.from(map.values());
 }
 
+/**
+ * Admin orders listing endpoint.
+ * - payments/rejected: cursor-based order list
+ * - shipping/delivery/completed: product-batch list derived from confirmed orders
+ */
 export async function GET(req) {
   try {
     await requireAdmin(req);

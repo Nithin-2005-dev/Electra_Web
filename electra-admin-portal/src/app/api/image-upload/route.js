@@ -1,6 +1,10 @@
 import { ConnectDb } from "../../database/dbConfig";
 import { ImageUpload} from "@/models/Image.model";
 import {  NextResponse } from "next/server";
+
+/**
+ * Stores uploaded image metadata for gallery/event usage.
+ */
 export async function POST(req) {
 console.log('db connecting')
 await ConnectDb();

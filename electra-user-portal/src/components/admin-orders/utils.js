@@ -1,8 +1,19 @@
 import { auth } from "../../app/lib/firebase";
 import * as XLSX from "xlsx";
 
+/**
+ * Shared helpers for admin order management screens.
+ */
+
 /* ───────────────── ADMIN API CALL ───────────────── */
 
+/**
+ * Sends an authenticated POST request to an admin API route.
+ *
+ * @param {string} url
+ * @param {object} payload
+ * @returns {Promise<any>}
+ */
 export async function adminApi(url, payload) {
   const user = auth.currentUser;
   if (!user) throw new Error("Not authenticated");
@@ -32,10 +43,11 @@ export async function adminApi(url, payload) {
 
 /* ───────────────── BULK GROUPING (FIXED) ───────────────── */
 /**
- * Groups orders by productId (ITEM-AWARE)
- * - Supports cart + buy-now orders
- * - Preserves full order reference
- * - Quantity-safe
+ * Groups order records by `productId`.
+ * Supports both cart-based and legacy single-product orders.
+ *
+ * @param {Array<object>} orders
+ * @returns {Array<{productId: string, productName: string, orders: object[]}>}
  */
 export function groupBulkByProduct(orders) {
   const map = new Map();
@@ -79,8 +91,10 @@ export function groupBulkByProduct(orders) {
 
 /* ───────────────── EXCEL EXPORT (ITEM-LEVEL) ───────────────── */
 /**
- * Exports ONE product batch
- * Each row = ONE T-SHIRT (quantity exploded)
+ * Builds and downloads an Excel file for one product batch.
+ *
+ * @param {{productName: string, orders: object[]}} batch
+ * @returns {void}
  */
 
 
